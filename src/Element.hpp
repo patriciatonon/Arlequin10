@@ -389,6 +389,7 @@ public:
     // void getTransientNavierStokes_FEM(double **jacobianNRMatrix, double *rhsVector);
     void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
 
+    void setBoundaryConditions_ISO(double **jacobianNRMatrix, double *rhsVector);
 
     //.......................Bezier Element transformation.......................
     // Computes Bézier extract operator 
@@ -397,6 +398,8 @@ public:
     void getInvMatrixC(double **MatrixCuInv, double **MatrixCvInv);
 
     double getIntegPointWeightFunction_ISO(int ind) {return intPointWeightFunctionSpecial[ind];};
+
+
 
 };
 
@@ -2092,10 +2095,7 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
         	                                     double *rhsVector1, double *rhsVector2){
 
 	//Fluid Data
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
     double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
     double &k1 = parameters.getArlequinK1();
     double &k2 = parameters.getArlequinK2();
 
@@ -2107,6 +2107,7 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 	double dvna_dx = alpha_f * dv_dx + (1. - alpha_f) * dvprev_dx;
 	double dvna_dy = alpha_f * dv_dy + (1. - alpha_f) * dvprev_dy;
 
+    double WJ = weight_ * djac_;
 
 	for (int i = 0; i < 9; i++){
 		for (int j = 0; j < 9; j++){
@@ -2114,21 +2115,21 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 			//L2 operator
 			double L2 = phi_[i] * phi_[j] * k1;
 
-			lagrMultMatrix[2*i][2*j] -= L2 * djac_ * weight_;
-			lagrMultMatrix[2*i+1][2*j+1] -= L2 * djac_ * weight_;
+			lagrMultMatrix[2*i][2*j] -= L2 * WJ;
+			lagrMultMatrix[2*i+1][2*j+1] -= L2 * WJ;
 
-			// //H1 operator
-			// double H1xx = (2. * dphi_dx[0][i] * dphi_dx[0][j] + 
-   //                         dphi_dx[1][i] * dphi_dx[1][j]) * k2;
-			// double H1xy = dphi_dx[1][i] * dphi_dx[0][j]* k2;
-			// double H1yx = dphi_dx[0][i] * dphi_dx[1][j]* k2;
-			// double H1yy = (2. * dphi_dx[1][i] * dphi_dx[1][j] + 
-   //                         dphi_dx[0][i] * dphi_dx[0][j])* k2;
+			//H1 operator
+			double H1xx = 0.;//(2. * dphi_dx[0][i] * dphi_dx[0][j] + 
+                           //dphi_dx[1][i] * dphi_dx[1][j]) * k2;
+			double H1xy = 0.;//dphi_dx[1][i] * dphi_dx[0][j]* k2;
+			double H1yx = 0.;//dphi_dx[0][i] * dphi_dx[1][j]* k2;
+			double H1yy = 0.;//(2. * dphi_dx[1][i] * dphi_dx[1][j] + 
+                           // dphi_dx[0][i] * dphi_dx[0][j])* k2;
 
-			// lagrMultMatrix[2*i][2*j] -= H1xx * djac_ * weight_;
-			// lagrMultMatrix[2*i+1][2*j] -= H1yx * djac_ * weight_;
-			// lagrMultMatrix[2*i][2*j+1] -= H1xy * djac_ * weight_;
-			// lagrMultMatrix[2*i+1][2*j+1] -= H1yy * djac_ * weight_;
+			lagrMultMatrix[2*i][2*j] -= H1xx * WJ;
+			lagrMultMatrix[2*i+1][2*j] -= H1yx  * WJ;
+			lagrMultMatrix[2*i][2*j+1] -= H1xy  * WJ;
+			lagrMultMatrix[2*i+1][2*j+1] -= H1yy  * WJ;
 
 
 		};
@@ -2146,8 +2147,8 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
                       // 2. * dphi_dx[1][i] * lamy_dy + 
                       // dphi_dx[0][i] * lamy_dx) * k2;  
 
-		rhsVector1[2*i] += (l2x_+ h1x_)  * djac_ * weight_;
-		rhsVector1[2*i+1] += (l2y_+ h1y_)  * djac_ * weight_;
+		rhsVector1[2*i] += (l2x_+ h1x_) * WJ;
+		rhsVector1[2*i+1] += (l2y_+ h1y_) * WJ;
 
 		//L2 operator - Velocity
 		double l2ux_ = phi_[i] * una_ * k1;
@@ -2162,10 +2163,13 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
                       // 2. * dphi_dx[1][i] * dvna_dy + 
                       // dphi_dx[0][i] * dvna_dx) * k2; 
 
-		rhsVector2[2*i] += (l2ux_ + h1ux_) * djac_ * weight_;
-		rhsVector2[2*i+1] += (l2uy_ + h1uy_) * djac_ * weight_;
+		rhsVector2[2*i] += (l2ux_ + h1ux_) * WJ;
+		rhsVector2[2*i+1] += (l2uy_ + h1uy_)  * WJ;
 
 	};
+
+
+
 
 };
 
@@ -2188,15 +2192,16 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
 	double dvna_dx = alpha_f * dv_dx + (1. - alpha_f) * dvprev_dx;
 	double dvna_dy = alpha_f * dv_dy + (1. - alpha_f) * dvprev_dy;
 	
-
+    double WJ = weight_ * djac_;
+    
 	for (int i = 0; i < 9; i++){
 		for (int j = 0; j < 9; j++){
 
 			//L2 operator
 			double L2 = phi_[i] * phiC_[j] * k1;
 
-			lagrMultMatrix[2*i][2*j] += L2 * djac_ * weight_;
-			lagrMultMatrix[2*i+1][2*j+1] += L2 * djac_ * weight_;
+			lagrMultMatrix[2*i][2*j] += L2 * WJ;
+			lagrMultMatrix[2*i+1][2*j+1] += L2 * WJ;
 
 			// //H1 operator
 			// double H1xx = (2. * dphi_dx[0][i] * dphiC_dx[0][j] + 
@@ -2226,8 +2231,8 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
                       // 2. * dphiC_dx[1][i] * lamy_dy + 
                       // dphiC_dx[0][i] * lamy_dx) * k2;  
 
-		rhsVector1[2*i] -= (l2x_+ h1x_)  * djac_ * weight_;
-		rhsVector1[2*i+1] -= (l2y_+ h1y_)  * djac_ * weight_;
+		rhsVector1[2*i] -= (l2x_+ h1x_)  * WJ;
+		rhsVector1[2*i+1] -= (l2y_+ h1y_)  * WJ;
 
 		//L2 operator - Velocity
 		double l2ux_ = phi_[i] * una_ * k1;
@@ -2242,8 +2247,8 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
                       // 2. * dphi_dx[1][i] * dvna_dy + 
                       // dphi_dx[0][i] * dvna_dx) * k2; 
 
-		rhsVector2[2*i] -= (l2ux_ + h1ux_) * djac_ * weight_;
-		rhsVector2[2*i+1] -= (l2uy_ + h1uy_) * djac_ * weight_;
+		rhsVector2[2*i] -= (l2ux_ + h1ux_) * WJ;
+		rhsVector2[2*i+1] -= (l2uy_ + h1uy_) * WJ;
 
 	};
 };
@@ -2392,6 +2397,7 @@ void Element<2>::getResidualVector_ISO(int &index,double *phi_, double **dphi_dx
     return;
 };
 
+
 //------------------------------------------------------------------------------
 //----------------------ARLEQUIN ELEMENT LOCAL MATRIX/VECTOR--------------------
 //------------------------------------------------------------------------------
@@ -2444,9 +2450,11 @@ void Element<2>::getLagrangeMultipliersSameMesh(double **lagrMultMatrix, double 
         //Computes matrixes and vectors
         getMatrixAndVectorsSameMesh_ISO(phi_,dphi_dx,lagrMultMatrix, 
         	                            rhsVector1,rhsVector2);
+
        
         index++; 
     };
+
 
     for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
     delete [] dphi_dx;
@@ -2456,7 +2464,7 @@ void Element<2>::getLagrangeMultipliersSameMesh(double **lagrMultMatrix, double 
     delete [] quadJacMat;
 
     return;
-
+      
 };
 
 
@@ -2585,10 +2593,40 @@ void Element<2>::getLagrangeMultipliersDifferentMesh_ISO(int &ipatchC, std::vect
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+template<>
+void Element<2>::setBoundaryConditions_ISO(double **jacobianNRMatrix,double *rhsVector){
 
+
+    for (int i = 0; i < 9; i++){
+        //direction x
+        int constrain = (*nodes_)[connect_[i]] -> getConstrains(0);
+        if ((constrain == 1) || (constrain == 3)){
+            for (int j = 0; j < 27; j++){
+                jacobianNRMatrix[2*i][j] = 0.0;
+                jacobianNRMatrix[j][2*i] = 0.0;
+            }
+            jacobianNRMatrix[2*i][2*i] = 1.0;
+            rhsVector[2*i] = 0.0;
+        }   
+
+        //direction y
+        constrain = (*nodes_)[connect_[i]] -> getConstrains(1);
+        if ((constrain == 1) || (constrain == 3)){
+            for (int j = 0; j < 27; j++){
+                jacobianNRMatrix[2*i+1][j] = 0.0;
+                jacobianNRMatrix[j][2*i+1] = 0.0;
+            }
+            jacobianNRMatrix[2*i+1][2*i+1] = 1.0;
+            rhsVector[2*i+1] = 0.0;
+        }
+
+        //if PRESSURE CONDITION ADD NODE!
+    }
+}
 //------------------------------------------------------------------------------
 //-----------------------TRANSIENT NAVIER-STOKES PROBEM-------------------------
 //------------------------------------------------------------------------------
+
 // template<>
 // void Element<2>::getTransientNavierStokes_FEM(double **jacobianNRMatrix,double *rhsVector){
 
@@ -2717,6 +2755,8 @@ void Element<2>::getTransientNavierStokes_ISO(double **jacobianNRMatrix,double *
         index++; 
     };
 
+    setBoundaryConditions_ISO(jacobianNRMatrix,rhsVector);
+
     for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
     delete [] dphi_dx;
     for (int i = 0; i < 2; ++i) delete [] ainv_[i];
@@ -2725,6 +2765,9 @@ void Element<2>::getTransientNavierStokes_ISO(double **jacobianNRMatrix,double *
     delete [] quadJacMat;
    
 };
+
+
+
 
 
 

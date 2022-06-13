@@ -2764,13 +2764,13 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
     printResultsIP(-1);
 
 
-    //Set the degre of freedom index with boundary condition
-    std::vector<int> dofTemp;
-    setDirichletConstrain(dofTemp);
-    PetscMalloc1(dofTemp.size(),&dof);
-	for (size_t i = 0; i < dofTemp.size(); i++){
-		dof[i] = dofTemp[i];
-	};
+ //    //Set the degre of freedom index with boundary condition
+ //    std::vector<int> dofTemp;
+ //    setDirichletConstrain(dofTemp);
+ //    PetscMalloc1(dofTemp.size(),&dof);
+	// for (size_t i = 0; i < dofTemp.size(); i++){
+	// 	dof[i] = dofTemp[i];
+	// };
 
     //Non coincidente number nodes or control points in fine and coarse mesh
     int NCNumberNodesF = fineModel.NCNumberNodes; //IGA mesh
@@ -3080,10 +3080,11 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	        		double elemVectorLag1[18] = {};
 	        		double elemVectorLag2[18] = {};
 
+	        		
 	        		elementsFine_[jel] -> getLagrangeMultipliersSameMesh(elemMatrixLag1,elemVectorLag1,elemVectorLag2);
 
-	        		double integ = alpha_f * gamma * dTime;
-
+	        		
+        			double integ = alpha_f * gamma * dTime;
 	        		for (int i = 0; i < 9; i++){
 	        			for (int j = 0; j < 9; j++){
 
@@ -3141,13 +3142,6 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
 	        		};//i
 
-	        		for (int i = 0; i < 18; i++){
-	        				elemVectorLag1[i] = 0.0;
-	        				elemVectorLag2[i] = 0.0;
-	        			for (int j = 0; j < 18; j++){
-	        				elemMatrixLag1[i][j] = 0.0;
-	        			}
-	        		}
 
 	        		int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial();
 
@@ -3183,15 +3177,23 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
 
 		            for (int ielem = 0; ielem < numElemIntersect; ielem++){
+
+		            	for (int i = 0; i < 18; i++){
+	        				elemVectorLag1[i] = 0.0;
+	        				elemVectorLag2[i] = 0.0;
+		        			for (int j = 0; j < 18; j++){
+		        				elemMatrixLag1[i][j] = 0.0;
+		        			}
+	        			}
 	                
 	                	int iElemCoarse = diffElem[ielem];
-
 
 	                	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
 	                	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
 	                	
 	                	elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
 													 								  elemMatrixLag1,elemVectorLag1,elemVectorLag2);    
+
 
 	                	for (int i = 0; i < 9; i++){
 	        				
@@ -3274,7 +3276,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
             //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
-            MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
+            //MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
             
             //Create KSP context to solve the linear system
             ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
