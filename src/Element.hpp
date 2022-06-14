@@ -2119,12 +2119,12 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 			lagrMultMatrix[2*i+1][2*j+1] -= L2 * WJ;
 
 			//H1 operator
-			double H1xx = 0.;//(2. * dphi_dx[0][i] * dphi_dx[0][j] + 
-                           //dphi_dx[1][i] * dphi_dx[1][j]) * k2;
-			double H1xy = 0.;//dphi_dx[1][i] * dphi_dx[0][j]* k2;
-			double H1yx = 0.;//dphi_dx[0][i] * dphi_dx[1][j]* k2;
-			double H1yy = 0.;//(2. * dphi_dx[1][i] * dphi_dx[1][j] + 
-                           // dphi_dx[0][i] * dphi_dx[0][j])* k2;
+			double H1xx = (2. * dphi_dx[0][i] * dphi_dx[0][j] + 
+                          dphi_dx[1][i] * dphi_dx[1][j]) * k2;
+			double H1xy = dphi_dx[1][i] * dphi_dx[0][j]* k2;
+			double H1yx = dphi_dx[0][i] * dphi_dx[1][j]* k2;
+			double H1yy = (2. * dphi_dx[1][i] * dphi_dx[1][j] + 
+                           dphi_dx[0][i] * dphi_dx[0][j])* k2;
 
 			lagrMultMatrix[2*i][2*j] -= H1xx * WJ;
 			lagrMultMatrix[2*i+1][2*j] -= H1yx  * WJ;
@@ -2139,13 +2139,13 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 		double l2y_ = phi_[i] * lamy_ * k1;
 
 		//H1 operator - Lagrange
-		double h1x_ = 0.;//(2. * dphi_dx[0][i] * lamx_dx + 
-                      // dphi_dx[1][i] * lamx_dy + 
-                      // dphi_dx[1][i] * lamy_dx) * k2 ;
+		double h1x_ = (2. * dphi_dx[0][i] * lamx_dx + 
+                      dphi_dx[1][i] * lamx_dy + 
+                      dphi_dx[1][i] * lamy_dx) * k2 ;
         
-        double h1y_ = 0.;//(dphi_dx[0][i] * lamx_dy + 
-                      // 2. * dphi_dx[1][i] * lamy_dy + 
-                      // dphi_dx[0][i] * lamy_dx) * k2;  
+        double h1y_ = (dphi_dx[0][i] * lamx_dy + 
+                      2. * dphi_dx[1][i] * lamy_dy + 
+                      dphi_dx[0][i] * lamy_dx) * k2;  
 
 		rhsVector1[2*i] += (l2x_+ h1x_) * WJ;
 		rhsVector1[2*i+1] += (l2y_+ h1y_) * WJ;
@@ -2155,13 +2155,13 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 		double l2uy_ = phi_[i] * vna_ * k1;
 
 		//H1 operator - Velocity
-		double h1ux_ = 0.;//(2. * dphi_dx[0][i] * duna_dx+ 
-                       // dphi_dx[1][i] * duna_dy + 
-                       // dphi_dx[1][i] * dvna_dx) * k2;
+		double h1ux_ = (2. * dphi_dx[0][i] * duna_dx+ 
+                       dphi_dx[1][i] * duna_dy + 
+                       dphi_dx[1][i] * dvna_dx) * k2;
         
-        double h1uy_= 0.;//(dphi_dx[0][i] * duna_dy + 
-                      // 2. * dphi_dx[1][i] * dvna_dy + 
-                      // dphi_dx[0][i] * dvna_dx) * k2; 
+        double h1uy_= (dphi_dx[0][i] * duna_dy + 
+                      2. * dphi_dx[1][i] * dvna_dy + 
+                      dphi_dx[0][i] * dvna_dx) * k2; 
 
 		rhsVector2[2*i] += (l2ux_ + h1ux_) * WJ;
 		rhsVector2[2*i+1] += (l2uy_ + h1uy_)  * WJ;
@@ -2203,18 +2203,18 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
 			lagrMultMatrix[2*i][2*j] += L2 * WJ;
 			lagrMultMatrix[2*i+1][2*j+1] += L2 * WJ;
 
-			// //H1 operator
-			// double H1xx = (2. * dphi_dx[0][i] * dphiC_dx[0][j] + 
-   //                         dphi_dx[1][i] * dphiC_dx[1][j]) * k2;
-			// double H1xy = dphi_dx[1][i] * dphiC_dx[0][j]* k2;
-			// double H1yx = dphi_dx[0][i] * dphiC_dx[1][j]* k2;
-			// double H1yy = (2. * dphi_dx[1][i] * dphiC_dx[1][j] + 
-   //                         dphi_dx[0][i] * dphiC_dx[0][j])* k2;
+			//H1 operator
+			double H1xx = (2. * dphi_dx[0][i] * dphiC_dx[0][j] + 
+                           dphi_dx[1][i] * dphiC_dx[1][j]) * k2;
+			double H1xy = dphi_dx[1][i] * dphiC_dx[0][j]* k2;
+			double H1yx = dphi_dx[0][i] * dphiC_dx[1][j]* k2;
+			double H1yy = (2. * dphi_dx[1][i] * dphiC_dx[1][j] + 
+                           dphi_dx[0][i] * dphiC_dx[0][j])* k2;
 
-			// lagrMultMatrix[2*i][2*j] += H1xx * djac_ * weight_;
-			// lagrMultMatrix[2*i+1][2*j] += H1yx * djac_ * weight_;
-			// lagrMultMatrix[2*i][2*j+1] += H1xy * djac_ * weight_;
-			// lagrMultMatrix[2*i+1][2*j+1] += H1yy * djac_ * weight_;
+			lagrMultMatrix[2*i][2*j] += H1xx * djac_ * weight_;
+			lagrMultMatrix[2*i+1][2*j] += H1yx * djac_ * weight_;
+			lagrMultMatrix[2*i][2*j+1] += H1xy * djac_ * weight_;
+			lagrMultMatrix[2*i+1][2*j+1] += H1yy * djac_ * weight_;
 
 		};
 
@@ -2223,13 +2223,13 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
 		double l2y_ = phiC_[i] * lamy_ * k1;
 
 		//H1 operator - Lagrange
-		double h1x_ = 0.;//(2. * dphiC_dx[0][i] * lamx_dx + 
-                      // dphiC_dx[1][i] * lamx_dy + 
-                      // dphiC_dx[1][i] * lamy_dx) * k2 ;
+		double h1x_ = (2. * dphiC_dx[0][i] * lamx_dx + 
+                      dphiC_dx[1][i] * lamx_dy + 
+                      dphiC_dx[1][i] * lamy_dx) * k2 ;
         
-        double h1y_ = 0.;//(dphiC_dx[0][i] * lamx_dy + 
-                      // 2. * dphiC_dx[1][i] * lamy_dy + 
-                      // dphiC_dx[0][i] * lamy_dx) * k2;  
+        double h1y_ = (dphiC_dx[0][i] * lamx_dy + 
+                      2. * dphiC_dx[1][i] * lamy_dy + 
+                      dphiC_dx[0][i] * lamy_dx) * k2;  
 
 		rhsVector1[2*i] -= (l2x_+ h1x_)  * WJ;
 		rhsVector1[2*i+1] -= (l2y_+ h1y_)  * WJ;
@@ -2239,13 +2239,13 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO(double *phi_, double **dph
 		double l2uy_ = phi_[i] * vna_ * k1;
 
 		//H1 operator - Velocity
-		double h1ux_ = 0.;//(2. * dphi_dx[0][i] * duna_dx+ 
-                       // dphi_dx[1][i] * duna_dy + 
-                       // dphi_dx[1][i] * dvna_dx) * k2;
+		double h1ux_ = (2. * dphi_dx[0][i] * duna_dx+ 
+                       dphi_dx[1][i] * duna_dy + 
+                       dphi_dx[1][i] * dvna_dx) * k2;
         
-        double h1uy_= 0.;//(dphi_dx[0][i] * duna_dy + 
-                      // 2. * dphi_dx[1][i] * dvna_dy + 
-                      // dphi_dx[0][i] * dvna_dx) * k2; 
+        double h1uy_= (dphi_dx[0][i] * duna_dy + 
+                      2. * dphi_dx[1][i] * dvna_dy + 
+                      dphi_dx[0][i] * dvna_dx) * k2; 
 
 		rhsVector2[2*i] -= (l2ux_ + h1ux_) * WJ;
 		rhsVector2[2*i+1] -= (l2uy_ + h1uy_) * WJ;

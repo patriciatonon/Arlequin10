@@ -1891,8 +1891,8 @@ void Arlequin<2>::printResults(int step) {
 
 
         // Bezier Extraction
-        double VelF[numBezierNodes][dim], realVelF[numBezierNodes][dim], CoordF[numBezierNodes][dim];
-        double PressF[numBezierNodes], realPressF[numBezierNodes], DistanceF[numBezierNodes],EnergyWF[numBezierNodes];
+        double VelF[numBezierNodes][dim], realVelF[numBezierNodes][dim], CoordF[numBezierNodes][dim], LagMult[numBezierNodes][dim],
+        PressF[numBezierNodes], realPressF[numBezierNodes], DistanceF[numBezierNodes],EnergyWF[numBezierNodes];
 
         for (int iElem = 0; iElem < numElemFine; ++iElem){
                          
@@ -1900,7 +1900,7 @@ void Arlequin<2>::printResults(int step) {
             int *connec = elementsFine_[iElem] -> getConnectivity();
 
         	// Data in the NURBS control points
-            double coord_[9][dim],vel_[9][dim],realvel_[9][dim],
+            double coord_[9][dim],vel_[9][dim],realvel_[9][dim],lagmult_[9][dim],
             	   press_[9],realpress_[9],distance_[9],energyW_[9];
             
             for (int i = 0; i < 9; i++){
@@ -1909,6 +1909,7 @@ void Arlequin<2>::printResults(int step) {
                 	coord_[i][j] = x[j];
                 	vel_[i][j] = nodesFine_[connec[i]] -> getVelocity(j);
                 	realvel_[i][j] = nodesFine_[connec[i]] -> getVelocityArlequin(j);
+                	lagmult_[i][j] = nodesFine_[connec[i]] -> getLagrangeMultiplier(j);
                 };
                 press_[i] = nodesFine_[connec[i]] -> getPressure();
                 realpress_[i] = nodesFine_[connec[i]] -> getPressureArlequin();
@@ -1924,6 +1925,7 @@ void Arlequin<2>::printResults(int step) {
             double Brealpress_[9]= {};
             double Bdistance_[9]= {};
             double BenergyW_[9] = {};
+            double Blagmult_[9][2] = {};
 
             for (int i = 0; i < 9; i++){
 
@@ -1940,6 +1942,7 @@ void Arlequin<2>::printResults(int step) {
                 		Bcoord_[i][k] += phi_[j] * coord_[j][k];
                     	Bvel_[i][k] += phi_[j] * vel_[j][k];
                     	Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+                    	Blagmult_[i][k] += phi_[j] * lagmult_[j][k];
                 	};
                     Bpress_[i] += phi_[j] * press_[j];
                     Brealpress_[i] += phi_[j] * realpress_[j];
@@ -1953,6 +1956,7 @@ void Arlequin<2>::printResults(int step) {
                 	CoordF[Beconnec[i]][j] = Bcoord_[i][j];
                 	VelF[Beconnec[i]][j] = Bvel_[i][j];
                 	realVelF[Beconnec[i]][j] = Brealvel_[i][j];
+                	LagMult[Beconnec[i]][j] = Blagmult_[i][j];
                 };
                 PressF[Beconnec[i]] = Bpress_[i];
                 realPressF[Beconnec[i]] = Brealpress_[i];
@@ -2055,6 +2059,17 @@ void Arlequin<2>::printResults(int step) {
             output_vf << "      </DataArray> " << std::endl;
         };
 
+        if (fineModel.printLagrangeMultipliers){
+            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                     << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+            for (int i=0; i<numBezierNodes; i++){
+                output_vf << LagMult[i][0] <<  " "
+                          << LagMult[i][1] << " " 
+                          << 0.0 << " " << std::endl;
+            };
+            output_vf << "      </DataArray> " << std::endl;
+        };
+
 
         if (fineModel.printDistFunction){
             output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
@@ -2074,6 +2089,7 @@ void Arlequin<2>::printResults(int step) {
             };
             output_vf << "      </DataArray> " << std::endl;
         };
+
 
         if (fineModel.printNodalCorrespondence){
             output_vf<<"      <DataArray type=\"Int32\" NumberOfComponents=\"1\" "
@@ -2848,7 +2864,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time();
             
             ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
-                                sysSize,sysSize,500,NULL,500,NULL,&A);CHKERRQ(ierr);
+                                sysSize,sysSize,1000000,NULL,1000000,NULL,&A);CHKERRQ(ierr);
 
             for (int i=0; i<sysSize; i++){
                 double valu = 1.e-20;
