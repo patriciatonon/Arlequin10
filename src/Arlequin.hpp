@@ -288,8 +288,8 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
         error = sqrt(deltaXsi[0]*deltaXsi[0] + deltaXsi[1]*deltaXsi[1]);
     };
     
-    double t1 = -1 + 1.e-2;
-    double t2 =  1. - 1.e-2;   
+    double t1 = -1 - 1.e-2;
+    double t2 =  1. + 1.e-2;   
 
     if ((xsi[0] >= t1) && (xsi[1] >= t1) &&
         (xsi[0] <= t2) && (xsi[1] <= t2)){
@@ -466,8 +466,8 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
                     error = sqrt(deltaXsi[0]*deltaXsi[0] + deltaXsi[1]*deltaXsi[1]);
                 };
                 
-                double t1 = -1 + 1.e-2;
-                double t2 =  1. - 1.e-2;
+                double t1 = -1 - 1.e-2;
+                double t2 =  1. + 1.e-2;
                     
                 if ((xsi[0] >= t1) && (xsi[1] >= t1) &&
                     (xsi[0] <= t2) && (xsi[1] <= t2)){
@@ -497,16 +497,18 @@ void Arlequin<2>::setCorrespondenceFine() {
 
     //Node correspondence
     for (int inode = 0; inode < numNodesGlueZoneFine; inode++) {
+
+
+    	//std::cout << nodesGlueZoneFine_[inode] << std::endl;
         
         double* x = nodesFine_[nodesGlueZoneFine_[inode]] -> getCoordinates();
 
-        //Pergunta, quero saber sobre os pontos de Bezier ou sobre os pontos de controle mesmo?
         int elemC = 0;
         double xsiC[dim] = {};
 
         searchPointCorrespondence(x, nodesCoarse_, elementsCoarse_,elementsCoarse_.size(),xsiC,elemC,
                                   nodesFine_[nodesGlueZoneFine_[inode]] -> getNodalElemCorrespondence());
-       
+      
         nodesFine_[nodesGlueZoneFine_[inode]] -> setNodalCorrespondence(elemC,xsiC);             
 
     };
@@ -704,31 +706,31 @@ void Arlequin<2>::setSignaledDistance(){
     // vai me dar a normal final do ponto de controle
 
     //Gambiarra para os cantos para o problema da cavidade com todas as bordas com malhas refinidas
-    // n[0] = 1.;
-    // n[1] = 1.;
+    n[0] = 1.;
+    n[1] = 1.;
 
-    // nodesFine_[334] -> setInnerNormal(n);
-    // nodesFine_[469] -> setInnerNormal(n);
+    nodesFine_[334] -> setInnerNormal(n);
+    nodesFine_[469] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = 1.;
+    n[0] = -1.;
+    n[1] = 1.;
 
-    // nodesFine_[359] -> setInnerNormal(n);
-    // nodesFine_[720] -> setInnerNormal(n);
+    nodesFine_[359] -> setInnerNormal(n);
+    nodesFine_[720] -> setInnerNormal(n);
 
 
-    // n[0] = -1.;
-    // n[1] = -1.;
+    n[0] = -1.;
+    n[1] = -1.;
 
-    // nodesFine_[1105] -> setInnerNormal(n);
-    // nodesFine_[970] -> setInnerNormal(n);
+    nodesFine_[1105] -> setInnerNormal(n);
+    nodesFine_[970] -> setInnerNormal(n);
 
     
-    // n[0] = 1.;
-    // n[1] = -1.;
+    n[0] = 1.;
+    n[1] = -1.;
 
-    // nodesFine_[1080] -> setInnerNormal(n);
-    // nodesFine_[719] -> setInnerNormal(n);
+    nodesFine_[1080] -> setInnerNormal(n);
+    nodesFine_[719] -> setInnerNormal(n);
 
 
     //Coarse mesh - closer distance for nodes or control points from defined fine boundary 
@@ -1274,7 +1276,9 @@ void Arlequin<2>::setGluingZone(){
     numElemGlueZoneFine = elementsGlueZoneFine_.size();
 
     for (int i = 0; i < numElemGlueZoneFine; i++){
+
         int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
+
         for (int ino = 0; ino < 9; ino++){
             nodesCZ[connec[ino]] += 1;
             nodesFine_[connec[ino]] -> setGlueZone();
@@ -1968,7 +1972,7 @@ void Arlequin<2>::printResults(int step) {
 
               
         for (int i = 0; i< numBezierNodes;i++){
-        	output_vf << CoordF[i][0] << " " << CoordF[i][1] << " " << 0. << std::endl;
+        	output_vf << CoordF[i][0] << " " << CoordF[i][1] << " " << 0.1 << std::endl;
         };
 
         output_vf << "      </DataArray>" << std::endl
@@ -3301,11 +3305,11 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             //Solve using GMRES
             // ierr = KSPSetTolerances(ksp,1.e-10,PETSC_DEFAULT,PETSC_DEFAULT,500); CHKERRQ(ierr);
             // ierr = KSPGetPC(ksp,&pc);
-            // ierr = PCSetType(pc,PCLU);
+            // ierr = PCSetType(pc,PCNONE);
             // ierr = KSPSetType(ksp,KSPDGMRES); CHKERRQ(ierr);
             // ierr = KSPGMRESSetRestart(ksp, 500); CHKERRQ(ierr);
 
-            //Solve using Mumps
+            // //Solve using Mumps
             #if defined(PETSC_HAVE_MUMPS)
             ierr = KSPSetType(ksp,KSPPREONLY);
             ierr = KSPGetPC(ksp,&pc);
@@ -3464,73 +3468,61 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         };
 
 
-  //       //Computes the real velocity
-  //       QuadShapeFunction<2> shapeQuad;
-  //       double phi_[9];
+        //Computes the real velocity
+        QuadShapeFunction<2> shapeQuad;
+                
+        for (int i = 0; i<numNodesFine; i++){
+            for (int k = 0; k < dim; k++) nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
+            nodesFine_[i] -> setPressureArlequin(nodesFine_[i] ->getPressure());
+        };
+
+        for (int i=0; i<numNodesCoarse; i++){
+        	for (int k = 0; k < dim; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
+            nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
+        };
         
-  //       for (int i = 0; i<numNodesFine; i++){
-  //           for (int k = 0; k < dim; k++) 
-  //               nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
-  //           	nodesFine_[i] -> setPressureArlequin(nodesFine_[i] ->getPressure());
-  //       };
-
-  //       for (int i=0; i<numNodesCoarse; i++){
-  //       	for (int k = 0; k < dim; k++) 
-  //           nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
-  //           nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
-  //       };
-        
-        
-  //       for (int i = 0; i < numElemGlueZoneFine; i++){
-
-  //       	int jel = elementsGlueZoneFine_[i];
-
-  //       	int *connect = elementsFine_[jel] -> getConnectivity();
-        	
-  //       	for (int inode = 0; inode < 9; inode++){
-
-  //       		int elCoarse = nodesFine_[connect[i]] -> getNodalElemCorrespondence();
-  //       		double* xsiC = nodesFine_[connect[i]] -> getNodalXsiCorrespondence();
-
-  //       		int *connecC = elementsCoarse_[elCoarse] -> getConnectivity();
-
-  //       		double u_coarse[9], v_coarse[9], p_coarse[9];
-  //           	for (int j = 0; j < 9; j++){
-  //           		u_coarse[j] = nodesCoarse_[connecC[j]] -> getVelocity(0);
-  //               	v_coarse[j] = nodesCoarse_[connecC[j]] -> getVelocity(1);
-  //               	p_coarse[j] = nodesCoarse_[connecC[j]] -> getPressure();
-  //           	}
-
-  //       		 //Computes nurbs basis functions in coarse mesh
-        		
-  //               int patchC = elementsCoarse_[elCoarse] -> getPatch();
-  //       		int *incC = nodesCoarse_[connecC[8]] -> getINC();
-  //       		double wpcC[9],phiC_[9];
-  //       		for (int k = 0; k<9; k++) wpcC[k] = nodesCoarse_[connecC[k]] -> getWeightPC();
-  //               shapeQuad.evaluateIso(xsiC,phiC_,wpcC,incC,IsoParCoarse,patchC);
-
-  //           	double u_ = {};
-  //           	double v_ = {};
-  //           	double p_ = {};
-  //           	for (int j = 0; j < 9; j++){
-  //           		u_ += u_coarse[j] * phi_[j];
-  //           		v_ += v_coarse[j] * phi_[j];
-  //           		p_ += p_coarse[j] * phi_[j]; 
-  //           	}
-        	
-  //           	double wFunc = nodesFine_[connect[i]] -> getWeightFunction();
-
-  //           	double u_int = nodesFine_[connect[i]] -> getVelocity(0) * wFunc + u_ * (1. - wFunc);
-  //           	double v_int = nodesFine_[connect[i]] -> getVelocity(1) * wFunc + v_ * (1. - wFunc);
-  //           	double p_int = nodesFine_[connect[i]] -> getPressure() * wFunc + p_ * (1. - wFunc);
-
-  //           	nodesFine_[connect[i]] -> setVelocityArlequin(0,u_int);
-  //           	nodesFine_[connect[i]] -> setVelocityArlequin(1,v_int);
-  //           	nodesFine_[connect[i]] -> setPressureArlequin(p_int);
-  //       	};
+        for (int i = 0; i<numNodesGlueZoneFine; i++){
+            
+            int elCoarse = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalElemCorrespondence();
+            double* xsiC = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalXsiCorrespondence();
 
 
-		// }; 
+            int *connecCoarse = elementsCoarse_[elCoarse] -> getConnectivity();
+           
+            double u_coarse[9], v_coarse[9], p_coarse[9];
+            for (int j=0; j<9; j++){
+                u_coarse[j] = nodesCoarse_[connecCoarse[j]] -> getVelocity(0);
+                v_coarse[j] = nodesCoarse_[connecCoarse[j]] -> getVelocity(1);
+                p_coarse[j] = nodesCoarse_[connecCoarse[j]] -> getPressure();
+            };
+
+            int patchC = elementsCoarse_[elCoarse] -> getPatch();
+    		int *incC = nodesCoarse_[connecCoarse[8]] -> getINC();
+    		double wpcC[9],phiC_[9];
+    		for (int k = 0; k<9; k++) wpcC[k] = nodesCoarse_[connecCoarse[k]] -> getWeightPC();
+            shapeQuad.evaluateIso(xsiC,phiC_,wpcC,incC,IsoParCoarse,patchC);
+            
+            double u = 0.;
+            double v = 0.;
+            double p = 0.;
+            for (int j=0; j<9; j++){
+                u += u_coarse[j] * phiC_[j];
+                v += v_coarse[j] * phiC_[j];
+                p += p_coarse[j] * phiC_[j];
+            };
+            
+            double wFunc = nodesFine_[nodesGlueZoneFine_[i]] -> getWeightFunction();
+            
+            double u_int = nodesFine_[nodesGlueZoneFine_[i]] -> getVelocity(0) * wFunc + u * (1. - wFunc);
+            double v_int = nodesFine_[nodesGlueZoneFine_[i]] -> getVelocity(1) * wFunc + v * (1. - wFunc);
+            double p_int = nodesFine_[nodesGlueZoneFine_[i]] -> getPressure() * wFunc + p * (1. - wFunc);
+            
+            nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(0,u_int);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(1,v_int);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(p_int);
+            
+        };
+       
         
         
         // Compute and print drag and lift coefficients
