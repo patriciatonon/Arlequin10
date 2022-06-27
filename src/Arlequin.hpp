@@ -706,31 +706,31 @@ void Arlequin<2>::setSignaledDistance(){
     // vai me dar a normal final do ponto de controle
 
     //Gambiarra para os cantos para o problema da cavidade com todas as bordas com malhas refinidas
-    n[0] = 1.;
-    n[1] = 1.;
+    // n[0] = 1.;
+    // n[1] = 1.;
 
-    nodesFine_[334] -> setInnerNormal(n);
-    nodesFine_[469] -> setInnerNormal(n);
+    // nodesFine_[334] -> setInnerNormal(n);
+    // nodesFine_[469] -> setInnerNormal(n);
 
-    n[0] = -1.;
-    n[1] = 1.;
+    // n[0] = -1.;
+    // n[1] = 1.;
 
-    nodesFine_[359] -> setInnerNormal(n);
-    nodesFine_[720] -> setInnerNormal(n);
+    // nodesFine_[359] -> setInnerNormal(n);
+    // nodesFine_[720] -> setInnerNormal(n);
 
 
-    n[0] = -1.;
-    n[1] = -1.;
+    // n[0] = -1.;
+    // n[1] = -1.;
 
-    nodesFine_[1105] -> setInnerNormal(n);
-    nodesFine_[970] -> setInnerNormal(n);
+    // nodesFine_[1105] -> setInnerNormal(n);
+    // nodesFine_[970] -> setInnerNormal(n);
 
     
-    n[0] = 1.;
-    n[1] = -1.;
+    // n[0] = 1.;
+    // n[1] = -1.;
 
-    nodesFine_[1080] -> setInnerNormal(n);
-    nodesFine_[719] -> setInnerNormal(n);
+    // nodesFine_[1080] -> setInnerNormal(n);
+    // nodesFine_[719] -> setInnerNormal(n);
 
 
     //Coarse mesh - closer distance for nodes or control points from defined fine boundary 
@@ -2784,13 +2784,13 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
     printResultsIP(-1);
 
 
- //    //Set the degre of freedom index with boundary condition
- //    std::vector<int> dofTemp;
- //    setDirichletConstrain(dofTemp);
- //    PetscMalloc1(dofTemp.size(),&dof);
-	// for (size_t i = 0; i < dofTemp.size(); i++){
-	// 	dof[i] = dofTemp[i];
-	// };
+    //Set the degre of freedom index with boundary condition
+    std::vector<int> dofTemp;
+    setDirichletConstrain(dofTemp);
+    PetscMalloc1(dofTemp.size(),&dof);
+	for (size_t i = 0; i < dofTemp.size(); i++){
+		dof[i] = dofTemp[i];
+	};
 
     //Non coincidente number nodes or control points in fine and coarse mesh
     int NCNumberNodesF = fineModel.NCNumberNodes; //IGA mesh
@@ -3094,16 +3094,29 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	            	int *connec = elementsFine_[jel] -> getConnectivity();
 	            	int *connecL = glueZoneFine_[l] -> getConnectivity();	
 
+	            	//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
 	        		double **elemMatrixLag1;
 	        		elemMatrixLag1 = new double*[18]();
 	        		for (int i = 0; i < 18; ++i)  elemMatrixLag1[i] = new double[18]();
 	        		double elemVectorLag1[18] = {};
 	        		double elemVectorLag2[18] = {};
-
 	        		
 	        		elementsFine_[jel] -> getLagrangeMultipliersSameMesh(elemMatrixLag1,elemVectorLag1,elemVectorLag2);
 
-	        		
+	        		//ARLEQUIN STABILIZATION MATRIX
+	        		double **elemStabMatrix;
+	        		elemStabMatrix = new double*[18]();
+	        		for (int i = 0; i < 18; ++i)  elemStabMatrix[i] = new double[18]();
+	        		double elemStabVector[18] = {};
+
+	        		elementsFine_[jel] -> getLagrangeMultipliersArlequinSameMesh(elemStabMatrix, elemStabVector);
+
+
+           //          if (inewton == 1) {
+
+           //              for (int i = 0; i < 18; i++) std::cout << elemStabVector [i] << " " << elemVectorLag2[i] << std::endl;
+           //          }
+        		
         			double integ = alpha_f * gamma * dTime;
 	        		for (int i = 0; i < 9; i++){
 	        			for (int j = 0; j < 9; j++){
@@ -3145,6 +3158,32 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
 	                                            &elemMatrixLag1[2*i+1][2*j+1],
 	                                            ADD_VALUES);
+
+	        				//Stabilization Arlequin Terms diagonal
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i][2*j],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i+1][2*j],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i][2*j+1],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i+1][2*j+1],
+	                                            ADD_VALUES);
+
 	        			};//j
 
 	        			int newconi = nodesFine_[connec[i]] -> getnewcon();
@@ -3159,6 +3198,12 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i  ],ADD_VALUES);
 	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
 	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i+1 ],ADD_VALUES);
+
+	        			//Stabilization Arlequin Term
+	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i  ],ADD_VALUES);
+	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i+1 ],ADD_VALUES);
 
 	        		};//i
 
@@ -3201,10 +3246,13 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 		            	for (int i = 0; i < 18; i++){
 	        				elemVectorLag1[i] = 0.0;
 	        				elemVectorLag2[i] = 0.0;
+	        				elemStabVector[i] = 0.0;
 		        			for (int j = 0; j < 18; j++){
 		        				elemMatrixLag1[i][j] = 0.0;
+		        				elemStabMatrix[i][j] = 0.0;
 		        			}
 	        			}
+
 	                
 	                	int iElemCoarse = diffElem[ielem];
 
@@ -3212,7 +3260,11 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	                	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
 	                	
 	                	elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
-													 								  elemMatrixLag1,elemVectorLag1,elemVectorLag2);    
+													 								  elemMatrixLag1,elemVectorLag1,elemVectorLag2);  
+
+	                	//elementsFine_[jel] -> getLagrangeMultipliersArlequinDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse,
+                  	                                										  // elemStabMatrix,elemStabVector);
+
 
 
 	                	for (int i = 0; i < 9; i++){
@@ -3258,6 +3310,31 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	                                            &elemMatrixLag1[2*i+1][2*j+1],
 	                                            ADD_VALUES);
 
+	        				//Arlequin Stabilization Terms
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i][2*j],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i+1][2*j],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i][2*j+1],
+	                                            ADD_VALUES);
+
+	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                            &elemStabMatrix[2*i+1][2*j+1],
+	                                            ADD_VALUES);
+
 	        				};//i
 
 	        				int newconi = nodesCoarse_[connecC[i]] -> getnewcon();
@@ -3272,14 +3349,24 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
 	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
 	        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i+1],ADD_VALUES);
+
+	        				//Stabilization Arlequin Term
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i  ],ADD_VALUES);
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i+1 ],ADD_VALUES);
 	        				
 	        			};//j
 
 	                };//intersect
                
 
-	                for (int i = 0; i < 18; ++i) delete [] elemMatrixLag1[i];
+	                for (int i = 0; i < 18; ++i) {
+	                	delete [] elemMatrixLag1[i];
+	                	delete [] elemStabMatrix[i];
+	                }
 	        		delete [] elemMatrixLag1; 
+	        		delete [] elemStabMatrix;
 	        	};//decomposition
 
             };//gluezonefine
@@ -3296,7 +3383,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
             //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
-            //MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
+            MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
             
             //Create KSP context to solve the linear system
             ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
