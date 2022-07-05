@@ -125,11 +125,11 @@ public:
 
 public:
     //Reads the input file 
-    // void dataReading_FEM(const std::string& inputFile, const std::string& inputMesh, const std::string& mirror, const bool& deleteFiles);
+    void dataReading_FEM(const std::string& inputFile, const std::string& inputMesh, const std::string& mirror, const bool& deleteFiles);
     void dataReading_ISO(const std::string& inputFile, const std::string& inputMeshIso, const std::string& mirror, const bool& deleteFiles);
     
     //Performs the domain decomposition for parallel processing
-    // void domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_); 
+    void domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_); 
     void domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_); 
 
     //Export the domain decomposition 
@@ -148,74 +148,74 @@ public:
 //------------------------------------------------------------------------------
 //---------------------SUBDIVIDES THE FINITE ELEMENT DOMAIN---------------------
 //------------------------------------------------------------------------------
-// template<>
-// void FluidData<2>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_) {
+template<>
+void FluidData<2>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_) {
     
-//     std::string mirror2;
-//     mirror2 = "domain_decomposition.txt";
-//     std::ofstream mirrorData(mirror2.c_str());
+    std::string mirror2;
+    mirror2 = "domain_decomposition.txt";
+    std::ofstream mirrorData(mirror2.c_str());
     
-//     int size;
+    int size;
 
-//     MPI_Comm_size(PETSC_COMM_WORLD, &size);
+    MPI_Comm_size(PETSC_COMM_WORLD, &size);
 
-//     idx_t objval;
-//     idx_t numEl = numFemElem;
-//     idx_t numNd = numFemNodes;
-//     idx_t dd = 2;
-//     idx_t ssize = size;
-//     idx_t three = 3;
-//     idx_t one = 1;
-//     idx_t elem_start[numEl+1], elem_connec[6*numEl];
+    idx_t objval;
+    idx_t numEl = numFemElem;
+    idx_t numNd = numFemNodes;
+    idx_t dd = 2;
+    idx_t ssize = size;
+    idx_t three = 3;
+    idx_t one = 1;
+    idx_t elem_start[numEl+1], elem_connec[6*numEl];
    
 
-//     MPI_Bcast(&numEl,1,MPI_INT,0,PETSC_COMM_WORLD);
-//     MPI_Bcast(&numNd,1,MPI_INT,0,PETSC_COMM_WORLD);
+    MPI_Bcast(&numEl,1,MPI_INT,0,PETSC_COMM_WORLD);
+    MPI_Bcast(&numNd,1,MPI_INT,0,PETSC_COMM_WORLD);
 
-//     part_elem = new idx_t[numEl];
-//     part_nodes = new idx_t[numNd];
+    part_elem = new idx_t[numEl];
+    part_nodes = new idx_t[numNd];
 
-//     if (rank == 0){
+    if (rank == 0){
 
-//         for (idx_t i = 0; i < numEl+1; i++){
-//             elem_start[i]=6*i;
-//         };
-//         for (idx_t jel = 0; jel < numEl; jel++){
-//             int *connec;
-//             connec = elem_[jel] -> getConnectivity();      
-//             for (idx_t i=0; i<6; i++){
-//                 elem_connec[6*jel+i] = connec[i];
-//             };
-//         };
+        for (idx_t i = 0; i < numEl+1; i++){
+            elem_start[i]=6*i;
+        };
+        for (idx_t jel = 0; jel < numEl; jel++){
+            int *connec;
+            connec = elem_[jel] -> getConnectivity();      
+            for (idx_t i=0; i<6; i++){
+                elem_connec[6*jel+i] = connec[i];
+            };
+        };
     
 
-//         //Performs the domain decomposition
-//         METIS_PartMeshDual(&numEl, &numNd, elem_start, elem_connec,
-//                                   NULL, NULL, &one, &ssize, NULL, NULL,
-//                                   &objval, part_elem, part_nodes);
+        //Performs the domain decomposition
+        METIS_PartMeshDual(&numEl, &numNd, elem_start, elem_connec,
+                                  NULL, NULL, &one, &ssize, NULL, NULL,
+                                  &objval, part_elem, part_nodes);
 
-//         mirrorData << std::endl 
-//                    << "FLUID MESH DOMAIN DECOMPOSITION - ELEMENTS" << std::endl;
-//         for(int i = 0; i < numFemElem; i++){
-//             mirrorData << "process = " << part_elem[i]
-//                        << ", element = " << i << std::endl;
-//         };
+        mirrorData << std::endl 
+                   << "FLUID MESH DOMAIN DECOMPOSITION - ELEMENTS" << std::endl;
+        for(int i = 0; i < numFemElem; i++){
+            mirrorData << "process = " << part_elem[i]
+                       << ", element = " << i << std::endl;
+        };
 
-//         mirrorData << std::endl 
-//                    << "FLUID MESH DOMAIN DECOMPOSITION - NODES" << std::endl;
-//         for(int i = 0; i < numFemNodes; i++){
-//             mirrorData << "process = " << part_nodes[i]
-//                        << ", node = " << i << std::endl;
-//         };
+        mirrorData << std::endl 
+                   << "FLUID MESH DOMAIN DECOMPOSITION - NODES" << std::endl;
+        for(int i = 0; i < numFemNodes; i++){
+            mirrorData << "process = " << part_nodes[i]
+                       << ", node = " << i << std::endl;
+        };
         
-//     }
+    }
 
-//     MPI_Bcast(part_elem,numEl,MPI_INT,0,PETSC_COMM_WORLD);
-//     MPI_Bcast(part_nodes,numNd,MPI_INT,0,PETSC_COMM_WORLD);
+    MPI_Bcast(part_elem,numEl,MPI_INT,0,PETSC_COMM_WORLD);
+    MPI_Bcast(part_nodes,numNd,MPI_INT,0,PETSC_COMM_WORLD);
 
-//     return;
+    return;
 
-// };
+};
 
 template<>
 void FluidData<2>::domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_) {
@@ -639,375 +639,381 @@ void FluidData<3>::BezierConnectivity() {
 //------------------------------------------------------------------------------
 //----------------------------READS FLUID INPUT FILE----------------------------
 //------------------------------------------------------------------------------
-// template<>
-// void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::string& inputMesh, 
-//                                const std::string& mirror,const bool& deleteFiles){
+template<>
+void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::string& inputMeshFem, 
+                               const std::string& mirror,const bool& deleteFiles){
                            
-
-//     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);      
-//     MPI_Comm_size(PETSC_COMM_WORLD, &size);
-
-//     int dim = 2;
-
-//     if (rank == 0)std::cout << "Reading fluid data from \"" 
-//                             << inputFile << "\"" << std::endl;
-
-//     //Defines input and output files
-//     std::ifstream inputData(inputFile.c_str());
-//     std::ifstream file(inputMesh);
-//     std::ofstream mirrorData(mirror.c_str());
-//     std::string line;
-//     std::string remove2 = "rm ";
-      
-//     //Start to read the data problems  
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
+        MPI_Comm_rank(PETSC_COMM_WORLD, &rank);      
+    MPI_Comm_size(PETSC_COMM_WORLD, &size);
     
-//     //Read and print out time steps and printing frequence
-//     inputData >> numTimeSteps >> printFreq;
-    
-//     mirrorData << "Number of Time Steps   = " << numTimeSteps << std::endl;
-//     mirrorData << "Printing Frequence     = " << printFreq << std::endl;
-    
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     //Read and print out data from Arlequin problem
-//     inputData >> glueZoneThickness;
-//     mirrorData << "Thickness of glue zone   = " << glueZoneThickness << std::endl;
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     inputData >> arlequinEpsilon;
-//     mirrorData << "Epsilon from Arlequin formulation   = " << arlequinEpsilon << std::endl;
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-    
-//     //Read and print out undisturbed velocity and pressure components
-//     inputData >> velocityInf[0] >> velocityInf[1] >> velocityInf[2] >> pressInf;
-    
-//     mirrorData << "Undisturbed Velocity x = " << velocityInf[0] << std::endl;
-//     mirrorData << "Undisturbed Velocity y = " << velocityInf[1] << std::endl;
-//     mirrorData << "Undisturbed Velocity z = " << velocityInf[2] << std::endl;
-//     mirrorData << "Undisturbed Pressure   = " << pressInf << std::endl;
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     //Read and print out undisturbed density and viscosity
-//     inputData >> rhoInf >> viscInf;
-    
-//     mirrorData << "Undisturbed Density    = " << rhoInf << std::endl;
-//     mirrorData << "Undisturbed Viscosity  = " << viscInf << std::endl;
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     //Read and print out time step and time integration scheme
-//     inputData >> dTime >> integScheme;
-    
-//     mirrorData << "Time Step              = " << dTime << std::endl;
-//     mirrorData << "Time Integration Scheme= " << integScheme << std::endl;
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-
-//     //Read and print out field forces
-//     inputData >> fieldForces[0] >> fieldForces[1] >> fieldForces[2];
-    
-//     mirrorData << "Field Forces x         = " << fieldForces[0] << std::endl;
-//     mirrorData << "Field Forces y         = " << fieldForces[1] << std::endl;
-//     mirrorData << "Field Forces z         = " << fieldForces[2] << std::endl 
-//                << std::endl;
-    
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     //Sets Fluid parameters
-//     fluidParameters.setViscosity(viscInf);
-//     fluidParameters.setDensity(rhoInf);
-//     fluidParameters.setTimeStep(dTime);
-//     fluidParameters.setSpectralRadius(integScheme);
-//     fluidParameters.setFieldForce(fieldForces);
-
-//     //Read and print out Drag and lift coeficients
-//     inputData >> computeDragAndLift >> numberOfLines; 
-
-//     dragAndLiftBoundary.reserve(numberOfLines);
-//     for (int i = 0; i < numberOfLines; ++i)
-//     {
-//         int aux;
-//         inputData >> aux; 
-//         dragAndLiftBoundary.push_back(aux);
-//     }
-
-
-//     mirrorData << "Compute Drag and Lift  = " << computeDragAndLift<< std::endl;
-//     mirrorData << "Number of Lines  = " << numberOfLines << std::endl;
-//     for (int i = 0; i < numberOfLines; ++i)
-//     {
-//         mirrorData << "Lines  = " << dragAndLiftBoundary[i] << std::endl;
-//     }
-
-//     getline(inputData,line);getline(inputData,line);getline(inputData,line);
-//     getline(inputData,line);getline(inputData,line);
-
-//     //Read and print out Printing results
-//     inputData >> printVelocity;              getline(inputData,line);
-//     inputData >> printRealVelocity;          getline(inputData,line);
-//     inputData >> printPressure;              getline(inputData,line);
-//     inputData >> printRealPressure;          getline(inputData,line);
-//     inputData >> printMeshVelocity;          getline(inputData,line);
-//     inputData >> printMeshDisplacement;      getline(inputData,line);
-//     inputData >> printDistFunction;          getline(inputData,line);
-//     inputData >> printGlueZone;              getline(inputData,line);
-//     inputData >> printEnergyWeightFunction;  getline(inputData,line);
-//     inputData >> printLagrangeMultipliers;   getline(inputData,line);
-//     inputData >> printProcess;          
-
-//     mirrorData << "PrintVelocity              = " << printVelocity << std::endl;
-//     mirrorData << "PrintRealVelocity          = " << printRealVelocity << std::endl;
-//     mirrorData << "PrintPressure              = " << printPressure << std::endl;
-//     mirrorData << "PrintRealPressure          = " << printRealPressure << std::endl;
-//     mirrorData << "PrintMeshVelocity          = " << printMeshVelocity << std::endl;
-//     mirrorData << "PrintMeshDisplacement      = " << printMeshDisplacement << std::endl;
-//     mirrorData << "printDistFunction          = " << printDistFunction << std::endl;
-//     mirrorData << "printGlueZone              = " << printGlueZone << std::endl;
-//     mirrorData << "printEnergyWeightFunction  = " << printEnergyWeightFunction << std::endl;
-//     mirrorData << "printLagrangeMultipliers   = " << printLagrangeMultipliers << std::endl;
-//     mirrorData << "PrintProcess               = " << printProcess << std::endl << std::endl;
-
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//     //++++++++++++++++++++++++++READING FEM MESH++++++++++++++++++++++++++++++
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//     getline(file, line); getline(file, line); getline(file, line);
-
-//     // Read and print out number of FEM elements and FEM nodes
-//     file >> numFemElem >> numFemNodes; 
-
-// 	mirrorData << "FEM nodes " << numFemNodes << std::endl;
-//     mirrorData << "FEM elements " << numFemElem << std::endl;
-
-//     nodes_.reserve(numFemNodes);
-//     elements_.reserve(numFemElem);
-
-//     getline(file, line); getline(file, line); getline(file, line);
-//     getline(file, line); getline(file, line);
-
-//     // Read and print out nodes from the mesh
-//     int index = 0;
-//     for (int i = 0; i < numFemNodes; i++) {        
-        
-//         double wei, x3;
-//         double x[dim];
-        
-//         file >> x[0] >> x[1] >> x3 >> wei;
-//         std::getline(file, line);
-        
-//         Node *node = new Node(x, index++, wei); 
-//         nodes_.push_back(node);
-//     };
-
-//     mirrorData << "Nodal Coordinates " << std::endl;
-    
-//     for (int i = 0 ; i<numFemNodes; i++){       
-        
-//         double *x = nodes_[i]->getCoordinates();       
-//         double x_[dim];
-//         for (int j = 0; j < dim; j++) x_[j] = x[j];
-//         for (int j = 0; j < dim; j++) mirrorData << x_[j] << " ";
-//         mirrorData << std::endl;
-        
-//         //Setting the initial nodal values variables
-//         double u[dim];
-//         for (int j = 0; j < dim; j++) u[j] = 0.;
-//         nodes_[i] -> setVelocity(velocityInf);
-//         nodes_[i] -> setPreviousVelocity(velocityInf);
-//         nodes_[i] -> setPreviousMeshVelocity(u);
-//         nodes_[i] -> setMeshVelocity(u);
-//         nodes_[i] -> setPreviousCoordinates(x_);
-
-//     };
-
-
-//     std::getline(file, line); std::getline(file, line); std::getline(file, line);
-//     std::getline(file, line);
-    
-
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//     //++++++++++++++++++++++++++++++++ELEMENTS++++++++++++++++++++++++++++++++
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//     //Read connectivity of the elements
-//     index = 0;
-//     for (int i = 0; i < numFemElem; i++){
-        
-//         int *connect;
-//         connect = new int[6];
-//         file >> connect[0] >> connect[1] >> connect[2] >> connect[3] >> 
-//         connect[4] >> connect[5];
-            
-//         std::getline(file, line);
-
-//         connect[0] -= 1;connect[1] -= 1;connect[2] -= 1;connect[3] -= 1;
-//         connect[4] -= 1; connect[5] -= 1;
-
-//         Elements *el = new Elements(index++,connect,nodes_,0,fluidParameters,
-//         	                        IsoPar_,1000); 
-//         elements_.push_back(el);
-//         //0 = Element finit type of element 
-//         //1000 = path number for IGA mesh
-//         for (int k = 0; k < 6; k++){
-//             nodes_[connect[k]] -> pushInverseIncidence(index);
-//         };
-//     };
-
-//     getline(file, line); getline(file, line); getline(file, line); 
-//     getline(file, line);
-   
-//     // Read and print out number of FEM boundaries and FEM elements boundaries
-//     file >> numFemBoundaries >> numFemBoundElem;
-//     getline(file, line);
-
-//     mirrorData << "Number of Boundary groups (FEM MESH) = " << numFemBoundaries << std::endl;
-//     mirrorData << "Number of Boundary Elements (FEM MESH)= " << numFemBoundElem << std::endl;
-
-//     boundary_.reserve(numBoundElemIso);
-   
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//     //+++++++++++++++++++++++++++++BONDARIES++++++++++++++++++++++++++++++++++
-//     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//     //Read boundary information: connectivity and prescribed value
-//     index = 0;
-//     for (int ibound=0; ibound< numFemBoundaries; ibound++){
-        
-//         getline(file,line);getline(file,line);getline(file,line);
-//         getline(file,line);getline(file,line);
-//         int constrain[dim+1];
-//         double value[dim+1];
-//         int numGroup;
-
-//         file >> numGroup >> constrain[0] >> constrain[1] >> constrain[2] 
-//         >> value[0] >> value[1] >> value[2];
-
-//         getline(file,line);getline(file,line);getline(file,line);
-//         getline(file,line);getline(file,line);
+    int dim = 2;
        
-//         for (int i = 0; i < numGroup; i++){        	
-//         	int *connectB;
-//         	connectB = new int[3];
-//             file >> connectB[0] >> connectB[1] >> connectB[2];
-//             getline(file,line);
-//             connectB[0] -= 1;
-//             connectB[1] -= 1;
-//             connectB[2] -= 1;
-//             Boundaries *bound = new Boundaries(connectB, index++,  
-//                                                constrain, value, ibound);
-//             boundary_.push_back(bound);
-//         };
-//     };     
+    if (rank == 0)std::cout << "Reading fluid data from \"" 
+                            << inputFile << "\"" << std::endl;
+
+    //Defines input and output files
+    std::ifstream inputData(inputFile.c_str());
+    std::ifstream file(inputMeshFem);
+    std::ofstream mirrorData(mirror.c_str());
+    std::string line;
+    std::string remove2 = "rm ";
+      
+    //Start to read the data problems  
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    
+    //Read and print out time steps and printing frequence
+    inputData >> numTimeSteps >> printFreq;
+    
+    mirrorData << "Number of Time Steps   = " << numTimeSteps << std::endl;
+    mirrorData << "Printing Frequence     = " << printFreq << std::endl;
+    
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read and print out data from Arlequin problem
+    inputData >> glueZoneThickness;
+    mirrorData << "Thickness of glue zone   = " << glueZoneThickness << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    inputData >> arlequinEpsilon;
+    mirrorData << "Epsilon from Arlequin formulation   = " << arlequinEpsilon << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    inputData >> arlequinK1 >> arlequinK2;
+    mirrorData << "Arlequin k1   = " << arlequinK1 << std::endl;
+    mirrorData << "Arlequin k2   = " << arlequinK2 << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    
+    //Read and print out undisturbed velocity and pressure components
+    inputData >> velocityInf[0] >> velocityInf[1] >> velocityInf[2] >> pressInf;
+    
+    mirrorData << "Undisturbed Velocity x = " << velocityInf[0] << std::endl;
+    mirrorData << "Undisturbed Velocity y = " << velocityInf[1] << std::endl;
+    mirrorData << "Undisturbed Velocity z = " << velocityInf[2] << std::endl;
+    mirrorData << "Undisturbed Pressure   = " << pressInf << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read and print out undisturbed density and viscosity
+    inputData >> rhoInf >> viscInf;
+    
+    mirrorData << "Undisturbed Density    = " << rhoInf << std::endl;
+    mirrorData << "Undisturbed Viscosity  = " << viscInf << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read and print out time step and time integration scheme
+    inputData >> dTime >> integScheme;
+    
+    mirrorData << "Time Step              = " << dTime << std::endl;
+    mirrorData << "Time Integration Scheme= " << integScheme << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+
+    //Read and print out field forces
+    inputData >> fieldForces[0] >> fieldForces[1] >> fieldForces[2];
+    
+    mirrorData << "Field Forces x         = " << fieldForces[0] << std::endl;
+    mirrorData << "Field Forces y         = " << fieldForces[1] << std::endl;
+    mirrorData << "Field Forces z         = " << fieldForces[2] << std::endl 
+               << std::endl;
+    
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    fluidParameters.setViscosity(viscInf);
+    fluidParameters.setDensity(rhoInf);
+    fluidParameters.setTimeStep(dTime);
+    fluidParameters.setSpectralRadius(integScheme);
+    fluidParameters.setFieldForce(fieldForces);
+    fluidParameters.setArlequink1(arlequinK1);
+    fluidParameters.setArlequink2(arlequinK2);
+
+    //Read and print out Drag and lift coeficients
+    inputData >> computeDragAndLift >> numberOfLines; 
+
+    dragAndLiftBoundary.reserve(numberOfLines);
+    for (int i = 0; i < numberOfLines; ++i)
+    {
+        int aux;
+        inputData >> aux; 
+        dragAndLiftBoundary.push_back(aux);
+    }
+
+
+    mirrorData << "Compute Drag and Lift  = " << computeDragAndLift<< std::endl;
+    mirrorData << "Number of Lines  = " << numberOfLines << std::endl;
+    for (int i = 0; i < numberOfLines; ++i)
+    {
+        mirrorData << "Lines  = " << dragAndLiftBoundary[i] << std::endl;
+    }
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read and print out Printing results
+    inputData >> printVelocity;              getline(inputData,line);
+    inputData >> printRealVelocity;          getline(inputData,line);
+    inputData >> printPressure;              getline(inputData,line);
+    inputData >> printRealPressure;          getline(inputData,line);
+    inputData >> printMeshVelocity;          getline(inputData,line);
+    inputData >> printMeshDisplacement;      getline(inputData,line);
+    inputData >> printDistFunction;          getline(inputData,line);
+    inputData >> printGlueZone;              getline(inputData,line);
+    inputData >> printEnergyWeightFunction;  getline(inputData,line);
+    inputData >> printLagrangeMultipliers;   getline(inputData,line);
+    inputData >> printNodalCorrespondence;   getline(inputData,line);
+    inputData >> printProcess;          
+
+    mirrorData << "PrintVelocity              = " << printVelocity << std::endl;
+    mirrorData << "PrintRealVelocity          = " << printRealVelocity << std::endl;
+    mirrorData << "PrintPressure              = " << printPressure << std::endl;
+    mirrorData << "PrintRealPressure          = " << printRealPressure << std::endl;
+    mirrorData << "PrintMeshVelocity          = " << printMeshVelocity << std::endl;
+    mirrorData << "PrintMeshDisplacement      = " << printMeshDisplacement << std::endl;
+    mirrorData << "printDistFunction          = " << printDistFunction << std::endl;
+    mirrorData << "printGlueZone              = " << printGlueZone << std::endl;
+    mirrorData << "printEnergyWeightFunction  = " << printEnergyWeightFunction << std::endl;
+    mirrorData << "printLagrangeMultipliers   = " << printLagrangeMultipliers << std::endl;
+    mirrorData << "printNodalCorrespondence   = " << printNodalCorrespondence << std::endl;
+    mirrorData << "PrintProcess               = " << printProcess << std::endl << std::endl;
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++READING FEM MESH++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    getline(file, line); getline(file, line); getline(file, line);
+
+    // Read and print out number of FEM elements and FEM nodes
+    file >> numFemElem >> numFemNodes; 
+
+	mirrorData << "FEM nodes " << numFemNodes << std::endl;
+    mirrorData << "FEM elements " << numFemElem << std::endl;
+
+    nodes_.reserve(numFemNodes);
+    elements_.reserve(numFemElem);
+
+    getline(file, line); getline(file, line); getline(file, line);
+    getline(file, line); getline(file, line);
+
+    // Read and print out nodes from the mesh
+    int index = 0;
+    for (int i = 0; i < numFemNodes; i++) {        
+        
+        double wei, x3;
+        double x[dim];
+        
+        file >> x[0] >> x[1] >> x3 >> wei;
+        std::getline(file, line);
+        
+        Node *node = new Node(x, index++, wei); 
+        nodes_.push_back(node);
+    };
+
+    mirrorData << "Nodal Coordinates " << std::endl;
+    
+    for (int i = 0 ; i<numFemNodes; i++){       
+        
+        double *x = nodes_[i]->getCoordinates();       
+        double x_[dim];
+        for (int j = 0; j < dim; j++) x_[j] = x[j];
+        for (int j = 0; j < dim; j++) mirrorData << x_[j] << " ";
+        mirrorData << std::endl;
+        
+        //Setting the initial nodal values variables
+        double u[dim];
+        for (int j = 0; j < dim; j++) u[j] = 0.;
+        nodes_[i] -> setVelocity(velocityInf);
+        nodes_[i] -> setPreviousVelocity(velocityInf);
+        nodes_[i] -> setPreviousMeshVelocity(u);
+        nodes_[i] -> setMeshVelocity(u);
+        nodes_[i] -> setPreviousCoordinates(x_);
+
+    };
+
+
+    std::getline(file, line); std::getline(file, line); std::getline(file, line);
+    std::getline(file, line);
+    
+
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++ELEMENTS++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    //Read connectivity of the elements
+    index = 0;
+    for (int i = 0; i < numFemElem; i++){
+        
+        int *connect;
+        connect = new int[6];
+        file >> connect[0] >> connect[1] >> connect[2] >> connect[3] >> 
+        connect[4] >> connect[5];
+            
+        std::getline(file, line);
+
+        connect[0] -= 1;connect[1] -= 1;connect[2] -= 1;connect[3] -= 1;
+        connect[4] -= 1; connect[5] -= 1;
+
+        Elements *el = new Elements(index++,connect,nodes_,0,fluidParameters,
+        	                        IsoPar_,1000); 
+        elements_.push_back(el);
+        //0 = Element finit type of element 
+        //1000 = path number for FEM mesh
+        for (int k = 0; k < 6; k++){
+            nodes_[connect[k]] -> pushInverseIncidence(index);
+        };
+    };
+
+    getline(file, line); getline(file, line); getline(file, line); 
+    getline(file, line);
+   
+    // Read and print out number of FEM boundaries and FEM elements boundaries
+    file >> numFemBoundaries >> numFemBoundElem;
+    getline(file, line);
+
+    mirrorData << "Number of Boundary groups (FEM MESH) = " << numFemBoundaries << std::endl;
+    mirrorData << "Number of Boundary Elements (FEM MESH)= " << numFemBoundElem << std::endl;
+
+    boundary_.reserve(numBoundElemIso);
+   
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++BONDARIES++++++++++++++++++++++++++++++++++
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    //Read boundary information: connectivity and prescribed value
+    index = 0;
+    for (int ibound=0; ibound< numFemBoundaries; ibound++){
+        
+        getline(file,line);getline(file,line);getline(file,line);
+        getline(file,line);getline(file,line);
+        int constrain[dim+1];
+        double value[dim+1];
+        int numGroup;
+
+        file >> numGroup >> constrain[0] >> constrain[1] >> constrain[2] 
+        >> value[0] >> value[1] >> value[2];
+
+        getline(file,line);getline(file,line);getline(file,line);
+        getline(file,line);getline(file,line);
+       
+        for (int i = 0; i < numGroup; i++){        	
+        	int *connectB;
+        	connectB = new int[3];
+            file >> connectB[0] >> connectB[1] >> connectB[2];
+            getline(file,line);
+            connectB[0] -= 1;
+            connectB[1] -= 1;
+            connectB[2] -= 1;
+            Boundaries *bound = new Boundaries(connectB, index++,  
+                                               constrain, value, ibound);
+            boundary_.push_back(bound);
+        };
+    };     
      	
 
-//     //Sets boundary constrains
-//     for (int ibound = 0; ibound < numFemBoundElem; ibound++){
-//         int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
-//         int no1 = connectB[0];
-//         int no2 = connectB[1];
-//         int no3 = connectB[2];
-//         if ((boundary_[ibound] -> getConstrain(0) == 1) || 
-//         	(boundary_[ibound] -> getConstrain(0) == 3)){
-//             nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-//                                          boundary_[ibound] -> getConstrainValue(0));
-//             nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-//                                          boundary_[ibound] -> getConstrainValue(0));
-//             nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-//                                          boundary_[ibound] -> getConstrainValue(0));
-//         };
-//         if((boundary_[ibound] -> getConstrain(1) == 1) || 
-//         	(boundary_[ibound] -> getConstrain(1) == 3)){
-//             nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-//                                          boundary_[ibound] -> getConstrainValue(1));
-//             nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-//                                          boundary_[ibound] -> getConstrainValue(1));
-//             nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-//                                          boundary_[ibound] -> getConstrainValue(1));
-//         };   
-//     };
+    //Sets boundary constrains
+    for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+        int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
+        int no1 = connectB[0];
+        int no2 = connectB[1];
+        int no3 = connectB[2];
 
-//     //Print nodal constrains
-//     for (int i=0; i< numFemNodes; i++){
-//         mirrorData<< "Constrains " << i
-//                   << " " << nodes_[i] -> getConstrains(0) 
-//                   << " " << nodes_[i] -> getConstrainValue(0) 
-//                   << " " << nodes_[i] -> getConstrains(1) 
-//                   << " " << nodes_[i] -> getConstrainValue(1) << std::endl;
-//     }; 
+        for (int i = 0; i < dim; i++){
+           
+            if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+                (boundary_[ibound] -> getConstrain(i) == 3)){
+                nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+            };
+        };
+          
+    };
+
+    //Print nodal constrains
+    for (int i=0; i< numFemNodes; i++){
+        mirrorData<< "Constrains " << i
+                  << " " << nodes_[i] -> getConstrains(0) 
+                  << " " << nodes_[i] -> getConstrainValue(0) 
+                  << " " << nodes_[i] -> getConstrains(1) 
+                  << " " << nodes_[i] -> getConstrainValue(1) << std::endl;
+    }; 
 
     
-//     //Sets fluid elements and sides on interface boundaries
-//     int boundElem[numFemBoundElem]; 
-//     for (int i = 0; i< numFemBoundElem; i++){
-//             if ((boundary_[i] -> getConstrain(0) > 0) ||
-//             (boundary_[i] -> getConstrain(1) > 0)) {
-//             int *connectB= boundary_[i] -> getBoundaryConnectivity();
-//             for (int j = 0; j < numFemElem; j++){               
-//                 int *connect = elements_[j] -> getConnectivity();              
-//                 int flag = 0;
-//                 int side[3];
-//                 for (int k = 0; k < 6; k++){
-//                     if ((connectB[0] == connect[k]) || 
-//                         (connectB[1] == connect[k]) ||
-//                         (connectB[2] == connect[k])){
-//                         side[flag] = k;
-//                         flag++;
-//                     };
-//                 };
-//                 if (flag == 3){
-//                     //Sets element index and side
-//                     if ((side[0]==4) || (side[1]==4) || (side[2]==4)){
-//                         boundary_[i] -> setElementSide(0);
-//                         boundElem[i] = j;
-//                     };
-//                     if ((side[0]==5) || (side[1]==5) || (side[2]==5)){
-//                         boundary_[i] -> setElementSide(1);
-//                         boundElem[i] = j;
-//                     };
-//                     if ((side[0]==3) || (side[1]==3) || (side[2]==3)){
-//                         boundary_[i] -> setElementSide(2);
-//                         boundElem[i] = j;
-//                     };   
-//                 } 
-//             }; 
-//         }; 
-//     }; 
+    //Sets fluid elements and sides on interface boundaries
+    int boundElem[numFemBoundElem]; 
+    for (int i = 0; i< numFemBoundElem; i++){
+            if ((boundary_[i] -> getConstrain(0) > 0) ||
+            (boundary_[i] -> getConstrain(1) > 0)) {
+            int *connectB= boundary_[i] -> getBoundaryConnectivity();
+            for (int j = 0; j < numFemElem; j++){               
+                int *connect = elements_[j] -> getConnectivity();              
+                int flag = 0;
+                int side[3];
+                for (int k = 0; k < 6; k++){
+                    if ((connectB[0] == connect[k]) || 
+                        (connectB[1] == connect[k]) ||
+                        (connectB[2] == connect[k])){
+                        side[flag] = k;
+                        flag++;
+                    };
+                };
+                if (flag == 3){
+                    boundary_[i] -> setElement(elements_[j] -> getIndex());
+                    //Sets element index and side
+                    if ((side[0]==4) || (side[1]==4) || (side[2]==4)){
+                        boundary_[i] -> setElementSide(0);
+                        boundElem[i] = j;
+                    };
+                    if ((side[0]==5) || (side[1]==5) || (side[2]==5)){
+                        boundary_[i] -> setElementSide(1);
+                        boundElem[i] = j;
+                    };
+                    if ((side[0]==3) || (side[1]==3) || (side[2]==3)){
+                        boundary_[i] -> setElementSide(2);
+                        boundElem[i] = j;
+                    };   
+                } 
+            }; 
+        }; 
+    }; 
 
-//     std::vector<int> elemSide;
-//     std::vector<int> elemBound;
+    std::vector<int> elemSide;
+    std::vector<int> elemBound;
 
-//     for (int i =0; i <numFemElem; i++){
-//         for (int j =0; j<numFemBoundElem; j++){
-//             if (boundElem[j] == i){
-//                 int side = boundary_[j] -> getElementSide();
-//                 elemSide.push_back(side);
-//                 elemBound.push_back(j);
-//             };
-//         };
-//         elements_[i] -> setElemSideInBoundary(elemSide,elemBound);
-//     };
+    for (int i =0; i <numFemElem; i++){
+        for (int j =0; j<numFemBoundElem; j++){
+            if (boundElem[j] == i){
+                int side = boundary_[j] -> getElementSide();
+                elemSide.push_back(side);
+                elemBound.push_back(j);
+            };
+        };
+        elements_[i] -> setElemSideInBoundary(elemSide,elemBound);
+    };
 
 
-//     domainDecompositionMETIS(elements_);
+    domainDecompositionMETIS_FEM(elements_);
 
-//      //Closing the file
-//      file.close();
-//      if (deleteFiles)
-//         system((remove2 + inputFile).c_str());
+     //Closing the file
+     file.close();
+     if (deleteFiles)
+        system((remove2 + inputFile).c_str());
 
-//     return;
-// };
+    return;
+};
 
 template<>
 void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::string& inputMeshIso,
@@ -1513,24 +1519,19 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         int no1 = connectB[0];
         int no2 = connectB[1];
         int no3 = connectB[2];
-        if ((boundary_[ibound] -> getConstrain(0) == 1) || 
-        	(boundary_[ibound] -> getConstrain(0) == 3)){
-            nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         boundary_[ibound] -> getConstrainValue(0));
-            nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         boundary_[ibound] -> getConstrainValue(0));
-            nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         boundary_[ibound] -> getConstrainValue(0));
-        };
-        if((boundary_[ibound] -> getConstrain(1) == 1) ||
-           (boundary_[ibound] -> getConstrain(1) == 3)){
-            nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         boundary_[ibound] -> getConstrainValue(1));
-            nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         boundary_[ibound] -> getConstrainValue(1));
-            nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         boundary_[ibound] -> getConstrainValue(1));
-        };   
+        
+        for (int i = 0; i < dim; i++){
+           
+            if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+                (boundary_[ibound] -> getConstrain(i) == 3)){
+                nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+            };
+        }; 
     };
 
     //Print nodal constrains

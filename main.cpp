@@ -77,7 +77,8 @@ int main(int argc, char **args) {
     //1- Fluid Flow Data
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
     coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
+    //fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
+    fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
     
     //ArlequinProblem needs two objects from fluid:
     //1 - coarseModel;

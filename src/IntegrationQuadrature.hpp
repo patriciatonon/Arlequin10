@@ -27,8 +27,8 @@ public:
     typedef IsogeometricParameters<DIM>                         IParameters;
 
     // Returns the index of the first integration point
-    double* begin() {
-        return std::begin(pointWeight);
+    double* beginFem() {
+        return std::begin(pointWeightFem);
     }
 
     double* beginIso() {
@@ -36,8 +36,8 @@ public:
     }
 
     // Returns the index of the last integration point
-    double* end() {
-        return std::end(pointWeight);
+    double* endFem() {
+        return std::end(pointWeightFem);
     }
 
     double* endIso() {
@@ -45,25 +45,25 @@ public:
     }
 
     // Returns the integration point coordinate
-    double PointList(int i, int j); 
+    double PointListFem(int i, int j); 
     double PointListIso(int i, int j); 
 
     //Retuns the integration point weight
-    double WeightList(int i);
+    double WeightListFem(int i);
     double WeightListIso(int i);
   
-    double interpolateQuadraticVariable(double *nValues, int &point);
+    double interpolateQuadraticVariableFem(double *nValues, int &point);
     double interpolateQuadraticVariableIso(double *nValues, int &point, double *wpc, int *INC_, std::vector<IParameters *> &iparam, int &patch);
 
 private:
     std::vector<IParameters *> *iparameters;
 
     //List of integration points coordinates
-    double pointCoord[8*DIM-9][DIM];
+    double pointCoordFem[8*DIM-9][DIM];
     double pointCoordIso[18*DIM-27][DIM];
 
     //List of integration points weights
-    double pointWeight[8*DIM-9];
+    double pointWeightFem[8*DIM-9];
     double pointWeightIso[18*DIM-27];
 
 };
@@ -76,30 +76,30 @@ private:
 //-----------------------QUADRATURE POINTS - COORDINATES------------------------
 //------------------------------------------------------------------------------
 template<>
-double IntegQuadrature<2>::PointList(int i, int j){
+double IntegQuadrature<2>::PointListFem(int i, int j){
 
-    pointCoord[0][0] = 1. / 3.;
-    pointCoord[0][1] = 1. / 3.;
+    pointCoordFem[0][0] = 1. / 3.;
+    pointCoordFem[0][1] = 1. / 3.;
         
-    pointCoord[1][0] = (9. + 2. * sqrt(15.)) / 21.;
-    pointCoord[1][1] = (6. - sqrt(15.)) / 21.;
+    pointCoordFem[1][0] = (9. + 2. * sqrt(15.)) / 21.;
+    pointCoordFem[1][1] = (6. - sqrt(15.)) / 21.;
       
-    pointCoord[2][0]= (6. - sqrt(15.)) / 21.;
-    pointCoord[2][1] = (9. + 2. * sqrt(15.)) / 21.;
+    pointCoordFem[2][0]= (6. - sqrt(15.)) / 21.;
+    pointCoordFem[2][1] = (9. + 2. * sqrt(15.)) / 21.;
       
-    pointCoord[3][0] = (6. - sqrt(15.)) / 21.;
-    pointCoord[3][1] = (6. - sqrt(15.)) / 21.;
+    pointCoordFem[3][0] = (6. - sqrt(15.)) / 21.;
+    pointCoordFem[3][1] = (6. - sqrt(15.)) / 21.;
       
-    pointCoord[4][0] = (6. + sqrt(15.)) / 21.;
-    pointCoord[4][1] = (6. + sqrt(15.)) / 21.;
+    pointCoordFem[4][0] = (6. + sqrt(15.)) / 21.;
+    pointCoordFem[4][1] = (6. + sqrt(15.)) / 21.;
       
-    pointCoord[5][0] = (9. - 2. * sqrt(15.)) / 21.;
-    pointCoord[5][1] = (6. + sqrt(15.)) / 21.;
+    pointCoordFem[5][0] = (9. - 2. * sqrt(15.)) / 21.;
+    pointCoordFem[5][1] = (6. + sqrt(15.)) / 21.;
       
-    pointCoord[6][0] = (6. + sqrt(15.)) / 21.;
-    pointCoord[6][1] = (9. - 2. * sqrt(15.)) / 21.;
+    pointCoordFem[6][0] = (6. + sqrt(15.)) / 21.;
+    pointCoordFem[6][1] = (9. - 2. * sqrt(15.)) / 21.;
 
-    return pointCoord[i][j];
+    return pointCoordFem[i][j];
 };
 
 template<>
@@ -294,17 +294,17 @@ double IntegQuadrature<2>::PointListIso(int i, int j){
 //-------------------------QUADRATURE POINTS - WEIGHTS--------------------------
 //------------------------------------------------------------------------------
 template<>
-double IntegQuadrature<2>::WeightList(int i){
+double IntegQuadrature<2>::WeightListFem(int i){
     
-    pointWeight[0] = 0.11250;
-    pointWeight[1] = (155. - sqrt(15.)) / 2400.;
-    pointWeight[2] = (155. - sqrt(15.)) / 2400.;
-    pointWeight[3] = (155. - sqrt(15.)) / 2400.;
-    pointWeight[4] = (155. + sqrt(15.)) / 2400.;
-    pointWeight[5] = (155. + sqrt(15.)) / 2400.;
-    pointWeight[6] = (155. + sqrt(15.)) / 2400.; 
+    pointWeightFem[0] = 0.11250;
+    pointWeightFem[1] = (155. - sqrt(15.)) / 2400.;
+    pointWeightFem[2] = (155. - sqrt(15.)) / 2400.;
+    pointWeightFem[3] = (155. - sqrt(15.)) / 2400.;
+    pointWeightFem[4] = (155. + sqrt(15.)) / 2400.;
+    pointWeightFem[5] = (155. + sqrt(15.)) / 2400.;
+    pointWeightFem[6] = (155. + sqrt(15.)) / 2400.; 
 
-    return pointWeight[i];
+    return pointWeightFem[i];
 };
 
 template<>
@@ -386,17 +386,17 @@ double IntegQuadrature<2>::WeightListIso(int i){
 //-----------COMPUTES THE VALUE INTERPOLATED IN THE INTEGRATION POINT-----------
 //------------------------------------------------------------------------------
 template<>
-double IntegQuadrature<2>::interpolateQuadraticVariable(double *nValues, int &point) {
+double IntegQuadrature<2>::interpolateQuadraticVariableFem(double *nValues, int &point) {
     
     int dim = 2;
     QuadShapeFunction<2>    shapeQuad;
 
     double xsi[dim];
 
-    for (int i = 0; i < dim; i++) xsi[i] = PointList(point,i);
+    for (int i = 0; i < dim; i++) xsi[i] = PointListFem(point,i);
     
     double phi_[6];
-    shapeQuad.evaluate(xsi,phi_);
+    shapeQuad.evaluateFem(xsi,phi_);
     
     double int_value = 0.;
     for (int i = 0; i < 6; i++){

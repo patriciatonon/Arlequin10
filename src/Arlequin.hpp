@@ -66,7 +66,8 @@ public:
 private:
     
     // Meshes data
-    int elemType;                           // 0 - FEM coarse mesh; 1 - IGA coarse mesh 
+    int elemTypeCoarse;                     // 0 - FEM coarse mesh; 1 - IGA coarse mesh 
+    int elemTypeFine; 						// 0 - FEM fine mesh; 1 - IGA fine mesh
     int numElemCoarse;                      // Number of elements in the coarse mesh
     int numElemFine;                        // Number of elements in the fine mesh
     int numBoundElemCoarse;                 // Number of bondary elements in the coarse mesh
@@ -124,7 +125,8 @@ public:
    
     // Searchs point correspondence in the coarse mesh
     void searchPointCorrespondence(double *x,std::vector<Nodes *> nodes,
-                                  std::vector<Element *> elements,int numElem,
+                                  std::vector<Element *> elements, 
+                                  std::vector<IsoParameters* > isopar, int numElem,
                                   double *xsiC, int &elemC, int elSearch);
     
     //Solves the Arlequin Problem
@@ -152,64 +154,48 @@ void Arlequin<2>::setElementBoxes() {
    
 	int dim = 2;
 
-    //Compute element boxes for coarse model (FEM mesh or IGA mesh)
+    //Compute element boxes for coarse model (FEM coarse mesh)
     for (int jel = 0; jel < numElemCoarse; jel++){
         
         int *connec = elementsCoarse_[jel] -> getConnectivity();
         double xk[dim], Xk[dim];
 
-        // if (elemType == 0) { //a box that envelop the triangle
-
-        //     double *x1 = nodesCoarse_[connec[0]] -> getCoordinates();
-        //     double *x2 = nodesCoarse_[connec[1]] -> getCoordinates();
-        //     double *x3 = nodesCoarse_[connec[2]] -> getCoordinates();
-                       
-        //     for (int i = 0; i < dim; i++) {
-        //     	xk[i] = std::min(x1[i],std::min(x2[i], x3[i]));
-        //     	Xk[i] = std::max(x1[i],std::max(x2[i], x3[i]));
-        //     } 
-       
-        //     elementsCoarse_[jel] -> setIntersectionParameters(xk, Xk);
+        //Bezier transformation matrix
+    	double **MatrixC_;
+    	MatrixC_ = new double*[9];
+    	for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
+    	
+    	elementsCoarse_[jel] -> getMatrixC(MatrixC_);
         
-        // } else { 
-
-            //Bezier transformation matrix
-        	double **MatrixC_;
-        	MatrixC_ = new double*[9];
-        	for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
-        	
-        	elementsCoarse_[jel] -> getMatrixC(MatrixC_);
-            
-            //Transposing MatrixC
-            double transMatrixC_[9][9];
-            for (int i = 0; i<9; i++){
-                for (int j = 0; j<9; j++){
-                    transMatrixC_[i][j] = MatrixC_[j][i];
-                };
+        //Transposing MatrixC
+        double transMatrixC_[9][9];
+        for (int i = 0; i<9; i++){
+            for (int j = 0; j<9; j++){
+                transMatrixC_[i][j] = MatrixC_[j][i];
             };
-            
-            //control points coordinates
-            double coord_[9][2];
-            for (int i = 0; i < 9; i++){
-                double *xx = nodesCoarse_[connec[i]]->getCoordinates();
-                for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
+        };
+        
+        //control points coordinates
+        double coord_[9][2];
+        for (int i = 0; i < 9; i++){
+            double *xx = nodesCoarse_[connec[i]]->getCoordinates();
+            for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
+        };
+        
+        //Bezier control points coordinates
+        double Bcoord_[9][2] = {};
+        for (int i = 0; i<9; i++){
+            for (int j = 0; j<9; j++){
+            	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
             };
-            
-            //Bezier control points coordinates
-            double Bcoord_[9][2] = {};
-            for (int i = 0; i<9; i++){
-                for (int j = 0; j<9; j++){
-                	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
-                };
-            };
-            
-            for (int i = 0; i < dim; i++){
-            	xk[i] = Bcoord_[0][i];
-            	Xk[i] = Bcoord_[8][i];
-            }
-                        
-            elementsCoarse_[jel] -> setIntersectionParameters(xk, Xk);
-        // }; //IGA elements
+        };
+        
+        for (int i = 0; i < dim; i++){
+        	xk[i] = Bcoord_[0][i];
+        	Xk[i] = Bcoord_[8][i];
+        }
+                    
+        elementsCoarse_[jel] -> setIntersectionParameters(xk, Xk);
 
     };
 
@@ -222,6 +208,7 @@ void Arlequin<2>::setElementBoxes() {
 template<>
 void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes, 
                                             std::vector<Element *> elements, 
+                                            std::vector<IsoParameters* > isopar,
                                             int numElem, double *xsiC, int &elemC, int elSearch){
 
     int dim = 2;
@@ -232,6 +219,8 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
     ainv = new double*[dim];
     for (int i = 0; i < dim; ++i) ainv[i] = new double[dim];
 
+    //CONSIDERING FOR NOW IGA ONLY
+
     for (int i = 0; i<dim; i++){
        xsi[i] = 0.0; //central element cooordinates
        x_[i] = 0.0;
@@ -241,12 +230,12 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
   
     int *connec = elements[elSearch] -> getConnectivity();
             
-    //Computing basis functions
+    //Computing basis functions 
     double   phi_[9],wpc[9];
     for (int i = 0; i < 9; i++) wpc[i] = nodes[connec[i]] -> getWeightPC();
     int *INC_ = nodes[connec[8]] -> getINC();
     int patch = elements[elSearch] -> getPatch();
-    shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,IsoParCoarse,patch);
+    shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,isopar,patch);
 
     for (int i = 0; i < 9; i++){
         double *xint = nodes[connec[i]] -> getCoordinates();
@@ -278,7 +267,7 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
            x_[i] = 0.0;
         };
                            
-        shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,IsoParCoarse,patch);
+        shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,isopar,patch);
         
         for (int i = 0; i < 9; i++){
             double *xint = nodes[connec[i]] -> getCoordinates();
@@ -323,7 +312,7 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
             //     xsi[1] = 1. / 3.;
 
             //     double phi_[6];
-            //     shapeQuad.evaluate(xsi,phi_);
+            //     shapeQuad.evaluateFem(xsi,phi_);
 
             //     for (int i = 0; i <2 ; i++) x_[i] = 0.;
             //     for (int i = 0; i < 6; i++){
@@ -370,7 +359,7 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
             //         xsi[0] += deltaXsi[0];
             //         xsi[1] += deltaXsi[1];
                               
-            //         shapeQuad.evaluate(xsi,phi_);
+            //         shapeQuad.evaluateFem(xsi,phi_);
                     
             //         for (int i = 0; i <2 ; i++) x_[i] = 0.;
                     
@@ -423,7 +412,7 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
                     x_[i] = 0.0;
                 };
 
-                shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,IsoParCoarse,patch);
+                shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,isopar,patch);
                
                 for (int i = 0; i < 9; i++){
                     double *xint = nodes[connec[i]] -> getCoordinates();
@@ -456,7 +445,7 @@ void Arlequin<2>::searchPointCorrespondence(double *x,std::vector<Nodes *> nodes
                         x_[i] = 0.0;
                     };
                                
-                    shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,IsoParCoarse,patch);
+                    shapeQuad.evaluateIso(xsi,phi_,wpc,INC_,isopar,patch);
                     
                     for (int i = 0; i < 9; i++){
                         double *xint = nodes[connec[i]] -> getCoordinates();
@@ -493,20 +482,18 @@ template<>
 void Arlequin<2>::setCorrespondenceFine() {
 
     int dim = 2;
-    double &alpha_f = parametersFine -> getAlphaF();
 
     //Node correspondence
     for (int inode = 0; inode < numNodesGlueZoneFine; inode++) {
 
-
-    	//std::cout << nodesGlueZoneFine_[inode] << std::endl;
         
         double* x = nodesFine_[nodesGlueZoneFine_[inode]] -> getCoordinates();
 
         int elemC = 0;
         double xsiC[dim] = {};
 
-        searchPointCorrespondence(x, nodesCoarse_, elementsCoarse_,elementsCoarse_.size(),xsiC,elemC,
+        searchPointCorrespondence(x, nodesCoarse_, elementsCoarse_, IsoParCoarse,
+        						  elementsCoarse_.size(),xsiC,elemC,
                                   nodesFine_[nodesGlueZoneFine_[inode]] -> getNodalElemCorrespondence());
       
         nodesFine_[nodesGlueZoneFine_[inode]] -> setNodalCorrespondence(elemC,xsiC);             
@@ -519,40 +506,75 @@ void Arlequin<2>::setCorrespondenceFine() {
         SpecialQuadrature squad;
         
         int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
-        int patch = elementsFine_[elementsGlueZoneFine_[i]] -> getPatch();
-        int *inc = nodesFine_[connec[8]] -> getINC();
 
-        double x1[9], x2[9], wpc[9];
-        for (int j = 0; j < 9; j++){
-            double *x = nodesFine_[connec[j]] -> getCoordinates();
-            double *xp = nodesFine_[connec[j]] -> getPreviousCoordinates();
-            wpc[j] = nodesFine_[connec[j]] -> getWeightPC();
-            x1[j] = alpha_f * x[0] + (1. - alpha_f) * xp[0];
-            x2[j] = alpha_f * x[1] + (1. - alpha_f) * xp[1];
-        };   
+        if (elemTypeFine == 0) { //FEM mesh
 
-            
-        int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]] -> 
-                              getNumberOfIntegrationPointsSpecial();
+	        double x1[6], x2[6];
+	        for (int j = 0; j < 6; j++){
+	            double *x = nodesFine_[connec[j]] -> getCoordinates();
+	            x1[j] = x[0];
+	            x2[j] = x[1];
+	        };   
 
-        for (int ip = 0; ip < numberIntPoints; ip++){
+	            
+	        int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]] -> 
+	                              getNumberOfIntegrationPointsSpecial_FEM();
 
-            int elemC = 0;
-            double xsiC[dim] = {};
-            double x_[dim] = {};
+	        for (int ip = 0; ip < numberIntPoints; ip++){
 
-            x_[0] = squad.interpolateQuadraticVariable(x1,ip,wpc,inc,IsoParFine,patch);
-            x_[1] = squad.interpolateQuadraticVariable(x2,ip,wpc,inc,IsoParFine,patch);
+	            int elemC = 0;
+	            double xsiC[dim] = {};
+	            double x_[dim] = {};
 
-            searchPointCorrespondence(x_,nodesCoarse_,elementsCoarse_,
-                                      elementsCoarse_.size(),xsiC,elemC, 
-                                      elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement(ip));
+	            x_[0] = squad.interpolateQuadraticVariableFem(x1,ip);
+	            x_[1] = squad.interpolateQuadraticVariableFem(x2,ip);
 
-            
-            elementsFine_[elementsGlueZoneFine_[i]] -> setIntegrationPointCorrespondence(ip,xsiC,elemC);
-        }            
-    }
-}
+	            searchPointCorrespondence(x_,nodesCoarse_,elementsCoarse_,IsoParCoarse,
+	                                      elementsCoarse_.size(),xsiC,elemC, 
+	                                      elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement_FEM(ip));
+
+	            
+	            elementsFine_[elementsGlueZoneFine_[i]] -> setIntegrationPointCorrespondence_FEM(ip,xsiC,elemC);
+	        }; 
+
+        } else { //IGA mesh
+
+	        int patch = elementsFine_[elementsGlueZoneFine_[i]] -> getPatch();
+	        int *inc = nodesFine_[connec[8]] -> getINC();
+
+	        double x1[9], x2[9], wpc[9];
+	        for (int j = 0; j < 9; j++){
+	            double *x = nodesFine_[connec[j]] -> getCoordinates();
+	            wpc[j] = nodesFine_[connec[j]] -> getWeightPC();
+	            x1[j] = x[0];
+	            x2[j] = x[1];
+	        };   
+
+	            
+	        int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]] -> 
+	                              getNumberOfIntegrationPointsSpecial_ISO();
+
+	        for (int ip = 0; ip < numberIntPoints; ip++){
+
+	            int elemC = 0;
+	            double xsiC[dim] = {};
+	            double x_[dim] = {};
+
+	            x_[0] = squad.interpolateQuadraticVariableIso(x1,ip,wpc,inc,IsoParFine,patch);
+	            x_[1] = squad.interpolateQuadraticVariableIso(x2,ip,wpc,inc,IsoParFine,patch);
+
+	            searchPointCorrespondence(x_,nodesCoarse_,elementsCoarse_,IsoParCoarse,
+	                                      elementsCoarse_.size(),xsiC,elemC, 
+	                                      elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement_ISO(ip));
+
+	            
+	            elementsFine_[elementsGlueZoneFine_[i]] -> setIntegrationPointCorrespondence_ISO(ip,xsiC,elemC);
+	        };      
+
+        };
+             
+    };
+};
 
 //------------------------------------------------------------------------------
 //-------------------------FIND SIGNALADED DISTANCE-----------------------------
@@ -594,109 +616,171 @@ void Arlequin<2>::setSignaledDistance(){
                 };
             };
 
-            //Finding the coorrespondent coordinates in bezier element
-            double **MatrixC_;
-            MatrixC_ = new double*[9];
-            for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
-            elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
+            if (elemTypeFine == 0){ //FEM element
 
-            //Transposing MatrixC
-            double transMatrixC_[9][9];
-            for (int i = 0; i<9; i++){
-                for (int j = 0; j<9; j++){
-                    transMatrixC_[i][j] = MatrixC_[j][i];
-                };
-            };
-        	
-        	double coord_[9][2];
-        	for (int i = 0; i < 9; i++){
-                double *xx = nodesFine_[connec[i]]->getCoordinates();
-                for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
-            };
-            
-            //Bezier Coordinates
-            double Bcoord_[9][2] = {};
-            for (int i = 0; i<9; i++){
-                for (int j = 0; j<9; j++){
-                    for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
-                };
-            };
-   
-            if (side == 0){                 
-                bconnec[0] = connec[0];
-                bconnec[1] = connec[2];
-                bconnec[2] = connec[1];
-                for (int i = 0; i < dim; i++){
-                	x1B[i]= Bcoord_[0][i];
-                	x2B[i]= Bcoord_[2][i];
-                	x3B[i]= Bcoord_[1][i];
-                };
-            };
-            if (side == 1){
-                bconnec[0] = connec[2];
-                bconnec[1] = connec[8];
-                bconnec[2] = connec[5];
-                for (int i = 0; i < dim; i++){
-	                x1B[i]= Bcoord_[2][i];
-	                x2B[i]= Bcoord_[8][i];
-	                x3B[i]= Bcoord_[5][i];
-                };
-			};
-            if (side == 2){
-                bconnec[0] = connec[8];
-                bconnec[1] = connec[6];
-                bconnec[2] = connec[7];
-                for (int i = 0; i < dim; i++){
-                	x1B[i]= Bcoord_[8][i];
-	                x2B[i]= Bcoord_[6][i];
-	                x3B[i]= Bcoord_[7][i];
-                };	                
-            };
-            if (side == 3){
-                bconnec[0] = connec[6];
-                bconnec[1] = connec[0];
-                bconnec[2] = connec[3];
-                for (int i = 0; i < dim; i++){
-		            x1B[i]= Bcoord_[6][i];
-	                x2B[i]= Bcoord_[0][i];
-	                x3B[i]= Bcoord_[3][i];
-	            }; 
-            };
+	            if (side == 0){                 
+	                bconnec[0] = connec[1];
+	                bconnec[1] = connec[2];
+	                bconnec[2] = connec[4];
+	            };
+	            if (side == 1){
+	                bconnec[0] = connec[2];
+	                bconnec[1] = connec[0];
+	                bconnec[2] = connec[5];
+				};
+	            if (side == 2){
+	                bconnec[0] = connec[0];
+	                bconnec[1] = connec[1];
+	                bconnec[2] = connec[3];              
+	            };
+	 
+	            //first segment
+	            int no1 = bconnec[0];
+	            int no2 = bconnec[2];
+	            	
+	            double *xx1 = nodesFine_[no1] -> getCoordinates();
+	            double *xx2 = nodesFine_[no2] -> getCoordinates();
 
-            //first segment
-            int no1 = bconnec[0];
-            int no2 = bconnec[2];
-            for (int i = 0; i < dim; i++){
-				x1[i] = x1B[i];
-	            x2[i] = x3B[i];
-            }
-            
-            double sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                                  (x1[0] - x2[0]) * (x1[0] - x2[0]));
-            
-            n[0] = (x2[1] - x1[1]) / sLength;
-            n[1] = (x1[0] - x2[0]) / sLength;
+	            for (int k = 0; k < dim; k++) {
+	            	x1[k] = xx1[k];
+	            	x2[k] = xx2[k];
+	            }
+	            
+	            double sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                  (x1[0] - x2[0]) * (x1[0] - x2[0]));
+	            
+	            n[0] = (x2[1] - x1[1]) / sLength;
+	            n[1] = (x1[0] - x2[0]) / sLength;
 
-            nodesFine_[no1] -> setInnerNormal(n);
-            nodesFine_[no2] -> setInnerNormal(n);
+	            nodesFine_[no1] -> setInnerNormal(n);
+	            nodesFine_[no2] -> setInnerNormal(n);
 
-            //second segment
-            no1 = bconnec[2];
-            no2 = bconnec[1];
-            for (int i = 0; i <dim; i++){
-            	x1[i] = x3B[i];
-	            x2[i] = x2B[i];
+	            //second segment
+	            no1 = bconnec[2];
+	            no2 = bconnec[1];
+	            
+	            xx1 = nodesFine_[no1] -> getCoordinates();
+	            xx2 = nodesFine_[no2] -> getCoordinates();
+
+	            for (int k = 0; k < dim; k++) {
+	            	x1[k] = xx1[k];
+	            	x2[k] = xx2[k];
+	            }
+	            
+	            sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                           (x1[0] - x2[0]) * (x1[0] - x2[0]));
+
+	            n[0] = (x2[1] - x1[1]) / sLength;
+	            n[1] = (x1[0] - x2[0]) / sLength;
+
+	            nodesFine_[no1] -> setInnerNormal(n);
+	            nodesFine_[no2] -> setInnerNormal(n); 
+
+            } else {//IGA element
+            	
+            	//Finding the coorrespondent coordinates in bezier element
+	            double **MatrixC_;
+	            MatrixC_ = new double*[9];
+	            for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
+	            elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
+
+	            //Transposing MatrixC
+	            double transMatrixC_[9][9];
+	            for (int i = 0; i<9; i++){
+	                for (int j = 0; j<9; j++){
+	                    transMatrixC_[i][j] = MatrixC_[j][i];
+	                };
+	            };
+	        	
+	        	double coord_[9][2];
+	        	for (int i = 0; i < 9; i++){
+	                double *xx = nodesFine_[connec[i]]->getCoordinates();
+	                for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
+	            };
+	            
+	            //Bezier Coordinates
+	            double Bcoord_[9][2] = {};
+	            for (int i = 0; i<9; i++){
+	                for (int j = 0; j<9; j++){
+	                    for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
+	                };
+	            };
+	   
+	            if (side == 0){                 
+	                bconnec[0] = connec[0];
+	                bconnec[1] = connec[2];
+	                bconnec[2] = connec[1];
+	                for (int i = 0; i < dim; i++){
+	                	x1B[i]= Bcoord_[0][i];
+	                	x2B[i]= Bcoord_[2][i];
+	                	x3B[i]= Bcoord_[1][i];
+	                };
+	            };
+	            if (side == 1){
+	                bconnec[0] = connec[2];
+	                bconnec[1] = connec[8];
+	                bconnec[2] = connec[5];
+	                for (int i = 0; i < dim; i++){
+		                x1B[i]= Bcoord_[2][i];
+		                x2B[i]= Bcoord_[8][i];
+		                x3B[i]= Bcoord_[5][i];
+	                };
+				};
+	            if (side == 2){
+	                bconnec[0] = connec[8];
+	                bconnec[1] = connec[6];
+	                bconnec[2] = connec[7];
+	                for (int i = 0; i < dim; i++){
+	                	x1B[i]= Bcoord_[8][i];
+		                x2B[i]= Bcoord_[6][i];
+		                x3B[i]= Bcoord_[7][i];
+	                };	                
+	            };
+	            if (side == 3){
+	                bconnec[0] = connec[6];
+	                bconnec[1] = connec[0];
+	                bconnec[2] = connec[3];
+	                for (int i = 0; i < dim; i++){
+			            x1B[i]= Bcoord_[6][i];
+		                x2B[i]= Bcoord_[0][i];
+		                x3B[i]= Bcoord_[3][i];
+		            }; 
+	            };
+
+	            //first segment
+	            int no1 = bconnec[0];
+	            int no2 = bconnec[2];
+	            for (int i = 0; i < dim; i++){
+					x1[i] = x1B[i];
+		            x2[i] = x3B[i];
+	            }
+	            
+	            double sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                  (x1[0] - x2[0]) * (x1[0] - x2[0]));
+	            
+	            n[0] = (x2[1] - x1[1]) / sLength;
+	            n[1] = (x1[0] - x2[0]) / sLength;
+
+	            nodesFine_[no1] -> setInnerNormal(n);
+	            nodesFine_[no2] -> setInnerNormal(n);
+
+	            //second segment
+	            no1 = bconnec[2];
+	            no2 = bconnec[1];
+	            for (int i = 0; i <dim; i++){
+	            	x1[i] = x3B[i];
+		            x2[i] = x2B[i];
+	            };
+	            
+	            sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                           (x1[0] - x2[0]) * (x1[0] - x2[0]));
+
+	            n[0] = (x2[1] - x1[1]) / sLength;
+	            n[1] = (x1[0] - x2[0]) / sLength;
+
+	            nodesFine_[no1] -> setInnerNormal(n);
+	            nodesFine_[no2] -> setInnerNormal(n);   
             };
-            
-            sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                           (x1[0] - x2[0]) * (x1[0] - x2[0]));
-
-            n[0] = (x2[1] - x1[1]) / sLength;
-            n[1] = (x1[0] - x2[0]) / sLength;
-
-            nodesFine_[no1] -> setInnerNormal(n);
-            nodesFine_[no2] -> setInnerNormal(n);   
-
         };//constrain == 2
     }; //numBoundFine
 
@@ -705,7 +789,8 @@ void Arlequin<2>::setSignaledDistance(){
     // lembrar que a normal do ultimo elemento com aquele ponto de controle (bezier control point) 
     // vai me dar a normal final do ponto de controle
 
-    //Gambiarra para os cantos para o problema da cavidade com todas as bordas com malhas refinidas
+    //Gambiarra para os cantos para o problema da cavidade com todas as bordas com malhas refinidas e malha isogeométrica
+
     // n[0] = 1.;
     // n[1] = 1.;
 
@@ -758,199 +843,351 @@ void Arlequin<2>::setSignaledDistance(){
                         side = elemBound.first[j];
                     };
                 };
-                
-                //gets the Bezier element coordinates        
-                double **MatrixC_;
-                MatrixC_ = new double*[9];
-                for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
-                elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
 
-                //Transposing MatrixC
-                double transMatrixC_[9][9];
-                for (int i = 0; i<9; i++){
-                    for (int j = 0; j<9; j++){
-                        transMatrixC_[i][j] = MatrixC_[j][i];
-                    };
-                };
-            	
-            	double coord_[9][2];
-            	for (int i = 0; i < 9; i++){
-                    double *xx = nodesFine_[connec[i]]->getCoordinates();
-                    for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
-                };
+                if (elemTypeFine == 0) { //FEM MESH
 
-	            //Bezier Coordinates
-	            double Bcoord_[9][2] = {};
-	            for (int i = 0; i<9; i++){
-	                for (int j = 0; j<9; j++){
-	                	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
+	                if (side == 0){                 
+		                bconnec[0] = connec[1];
+		                bconnec[1] = connec[2];
+		                bconnec[2] = connec[4];
+		            };
+		            if (side == 1){
+		                bconnec[0] = connec[2];
+		                bconnec[1] = connec[0];
+		                bconnec[2] = connec[5];
+					};
+		            if (side == 2){
+		                bconnec[0] = connec[0];
+		                bconnec[1] = connec[1];
+		                bconnec[2] = connec[3];              
+		            };
+
+		            //first segment
+	                int no1,no2;
+	                no1 = bconnec[0];
+	                no2 = bconnec[2];
+	                
+	                double *xx1 = nodesFine_[no1] -> getCoordinates();
+	            	double *xx2 = nodesFine_[no2] -> getCoordinates();
+		            for (int k = 0; k < dim; k++) {
+		            	x1[k] = xx1[k];
+		            	x2[k] = xx2[k];
+		            }
+
+	                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+	                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+	                                (x2[0] - x1[0]) * x[1] +
+	                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+	                
+	                if (aux1 > aux0){
+	                    
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                   
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
 	                };
-	            };
-	       
-	            if (side == 0){                 
-	                bconnec[0] = connec[0];
-	                bconnec[1] = connec[2];
-	                bconnec[2] = connec[1];
-	                for (int i = 0; i < dim; i++){
-	                	x1B[i]= Bcoord_[0][i];
-	                	x2B[i]= Bcoord_[2][i];
-	                	x3B[i]= Bcoord_[1][i];
+
+	                if (aux1 < 0.){
+	                    
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001) signal = 1.;
+	                    
+	                    dist2 *= signal;
 	                };
-	            };
-	            if (side == 1){
-	                bconnec[0] = connec[2];
-	                bconnec[1] = connec[8];
-	                bconnec[2] = connec[5];
-	                for (int i = 0; i < dim; i++){
-		                x1B[i]= Bcoord_[2][i];
-		                x2B[i]= Bcoord_[8][i];
-		                x3B[i]= Bcoord_[5][i];
+	                
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
+	                
+	                //second segment
+	                no1 = bconnec[2];
+	                no2 = bconnec[1];
+	                
+	                xx1 = nodesFine_[no1] -> getCoordinates();
+	            	xx2 = nodesFine_[no2] -> getCoordinates();
+		            for (int k = 0; k < dim; k++) {
+		            	x1[k] = xx1[k];
+		            	x2[k] = xx2[k];
+		            }
+
+	                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+	                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+	                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+
+	                if (aux1 > aux0){
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                                       
 	                };
-				};
-	            if (side == 2){
-	                bconnec[0] = connec[8];
-	                bconnec[1] = connec[6];
-	                bconnec[2] = connec[7];
+
+	                if (aux1 < 0.){
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    
+	                    //find signal
+	                    //side normal vector
+	                    double *normal;
+	                    normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                    
+	                };
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
+
+                } else { //IGA MESH
+
+	                //gets the Bezier element coordinates        
+	                double **MatrixC_;
+	                MatrixC_ = new double*[9];
+	                for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
+	                elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
+
+	                //Transposing MatrixC
+	                double transMatrixC_[9][9];
+	                for (int i = 0; i<9; i++){
+	                    for (int j = 0; j<9; j++){
+	                        transMatrixC_[i][j] = MatrixC_[j][i];
+	                    };
+	                };
+	            	
+	            	double coord_[9][2];
+	            	for (int i = 0; i < 9; i++){
+	                    double *xx = nodesFine_[connec[i]]->getCoordinates();
+	                    for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
+	                };
+
+		            //Bezier Coordinates
+		            double Bcoord_[9][2] = {};
+		            for (int i = 0; i<9; i++){
+		                for (int j = 0; j<9; j++){
+		                	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
+		                };
+		            };
+		       
+		            if (side == 0){                 
+		                bconnec[0] = connec[0];
+		                bconnec[1] = connec[2];
+		                bconnec[2] = connec[1];
+		                for (int i = 0; i < dim; i++){
+		                	x1B[i]= Bcoord_[0][i];
+		                	x2B[i]= Bcoord_[2][i];
+		                	x3B[i]= Bcoord_[1][i];
+		                };
+		            };
+		            if (side == 1){
+		                bconnec[0] = connec[2];
+		                bconnec[1] = connec[8];
+		                bconnec[2] = connec[5];
+		                for (int i = 0; i < dim; i++){
+			                x1B[i]= Bcoord_[2][i];
+			                x2B[i]= Bcoord_[8][i];
+			                x3B[i]= Bcoord_[5][i];
+		                };
+					};
+		            if (side == 2){
+		                bconnec[0] = connec[8];
+		                bconnec[1] = connec[6];
+		                bconnec[2] = connec[7];
+		                for (int i = 0; i < dim; i++){
+		                	x1B[i]= Bcoord_[8][i];
+			                x2B[i]= Bcoord_[6][i];
+			                x3B[i]= Bcoord_[7][i];
+		                };	                
+		            };
+		            if (side == 3){
+		                bconnec[0] = connec[6];
+		                bconnec[1] = connec[0];
+		                bconnec[2] = connec[3];
+		                for (int i = 0; i < dim; i++){
+				            x1B[i]= Bcoord_[6][i];
+			                x2B[i]= Bcoord_[0][i];
+			                x3B[i]= Bcoord_[3][i];
+			            }; 
+		            };
+
+	                //first segment
+	                int no1,no2;
+	                no1 = bconnec[0];
+	                no2 = bconnec[2];
+	                for (int i = 0; i <dim; i++){
+	                	x1[i]= x1B[i];
+	                	x2[i]= x3B[i];
+	                }
+	                
+	                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+	                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+	                                (x2[0] - x1[0]) * x[1] +
+	                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+	                
+	                if (aux1 > aux0){
+	                    
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                   
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                };
+
+	                if (aux1 < 0.){
+	                    
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001) signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                };
+	                
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
+	                
+	                //second segment
+	                no1 = bconnec[2];
+	                no2 = bconnec[1];
 	                for (int i = 0; i < dim; i++){
-	                	x1B[i]= Bcoord_[8][i];
-		                x2B[i]= Bcoord_[6][i];
-		                x3B[i]= Bcoord_[7][i];
-	                };	                
-	            };
-	            if (side == 3){
-	                bconnec[0] = connec[6];
-	                bconnec[1] = connec[0];
-	                bconnec[2] = connec[3];
-	                for (int i = 0; i < dim; i++){
-			            x1B[i]= Bcoord_[6][i];
-		                x2B[i]= Bcoord_[0][i];
-		                x3B[i]= Bcoord_[3][i];
-		            }; 
-	            };
+	                	x1[i]= x3B[i];
+	                	x2[i]= x2B[i];
+	                }
 
-                //first segment
-                int no1,no2;
-                no1 = bconnec[0];
-                no2 = bconnec[2];
-                for (int i = 0; i <dim; i++){
-                	x1[i]= x1B[i];
-                	x2[i]= x3B[i];
-                }
-                
-                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
-                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
-                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
-                double dist2 =-((x2[1] - x1[1]) * x[0] - 
-                                (x2[0] - x1[0]) * x[1] +
-                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
-                
-                if (aux1 > aux0){
-                    
-                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
-                                 (x2[0] - x[0]) * (x2[0] - x[0]));
-                    //find signal
-                    //side normal vector
-                    double *normal = nodesFine_[no2] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x2[0];
-                    test[1] = x[1] - x2[1];
+	                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+	                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+	                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
 
-                    double signaltest = 0.0;
-                    for (int i=0; i<2; i++){
-                    	signaltest += normal[i] * test[i];
-                    }
-                   
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
-                };
+	                if (aux1 > aux0){
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
 
-                if (aux1 < 0.){
-                    
-                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
-                                 (x[0] - x1[0]) * (x[0] - x1[0]));
-                    //find signal
-                    //side normal vector
-                    double *normal = nodesFine_[no1] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x1[0];
-                    test[1] = x[1] - x1[1];
-                    
-                    double signaltest = 0.0;
-                    for (int i=0; i<2; i++){
-                    	signaltest += normal[i] * test[i];
-                    }
-                    
-                    double signal = -1.;
-                    if (signaltest <= -0.001) signal = 1.;
-                    
-                    dist2 *= signal;
-                };
-                
-                if (fabs(dist2) < fabs(dist)) dist = dist2;
-                
-                //second segment
-                no1 = bconnec[2];
-                no2 = bconnec[1];
-                for (int i = 0; i < dim; i++){
-                	x1[i]= x3B[i];
-                	x2[i]= x2B[i];
-                }
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                                       
+	                };
 
-                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
-                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
-                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
-                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
-                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+	                if (aux1 < 0.){
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    
+	                    //find signal
+	                    //side normal vector
+	                    double *normal;
+	                    normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                    
+	                };
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
 
-                if (aux1 > aux0){
-                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
-                                 (x2[0] - x[0]) * (x2[0] - x[0]));
-                    
-                    double *normal = nodesFine_[no2] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x2[0];
-                    test[1] = x[1] - x2[1];
-                    
-                    double signaltest = 0.0;
-                    for (int i=0; i<2; i++){
-                    	signaltest += normal[i] * test[i];
-                    }
-
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
-                                       
-                };
-
-                if (aux1 < 0.){
-                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
-                                 (x[0] - x1[0]) * (x[0] - x1[0]));
-                    
-                    //find signal
-                    //side normal vector
-                    double *normal;
-                    normal = nodesFine_[no1] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x1[0];
-                    test[1] = x[1] - x1[1];
-                    
-                    double signaltest = 0.0;
-                    for (int i=0; i<2; i++){
-                    	signaltest += normal[i] * test[i];
-                    }
-                    
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
-                    
-                };
-                if (fabs(dist2) < fabs(dist)) dist = dist2;
+                }; //If IGA mesh
             }; //if bf is the blend boundary
         }; // numboundaryfine
     
@@ -970,7 +1207,6 @@ void Arlequin<2>::setSignaledDistance(){
 
         for (int i = 0; i < dim; i++) x[i] = xx[i];
 
-        
         dist=10000000000000000000000000000.;
                
         for (int ibound = 0; ibound < numBoundElemFine; ibound++){
@@ -987,205 +1223,354 @@ void Arlequin<2>::setSignaledDistance(){
                     if (elemBound.second[j] == ibound ) {
                         side = elemBound.first[j];
                     };
-                }  ;
-                    
-                //Finding the coorrespondent coordinates in bezier element
-                double **MatrixC_;
-                MatrixC_ = new double*[9];
-                for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
-                elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
-
-            	//Transposing MatrixC
-                double transMatrixC_[9][9];
-                for (int i = 0; i<9; i++){
-                    for (int j = 0; j<9; j++){
-                        transMatrixC_[i][j] = MatrixC_[j][i];
-                    };
-                };
-                
-                double coord_[9][2];
-                for (int i = 0; i < 9; i++){
-                    double *xx = nodesFine_[connec[i]]->getCoordinates();
-                    for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
                 };
 
-                //Bezier Coordinates
-                double Bcoord_[9][2] = {};
-                for (int i = 0; i<9; i++){
-                    for (int j = 0; j<9; j++){
-                    	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
-                    };
-                };
-                
-                if (side == 0){                 
-	                bconnec[0] = connec[0];
-	                bconnec[1] = connec[2];
-	                bconnec[2] = connec[1];
-	                for (int i = 0; i < dim; i++){
-	                	x1B[i]= Bcoord_[0][i];
-	                	x2B[i]= Bcoord_[2][i];
-	                	x3B[i]= Bcoord_[1][i];
+                if (elemTypeFine == 0){ //FEM mesh
+
+                	if (side == 0){                 
+		                bconnec[0] = connec[1];
+		                bconnec[1] = connec[2];
+		                bconnec[2] = connec[4];
+		            };
+		            if (side == 1){
+		                bconnec[0] = connec[2];
+		                bconnec[1] = connec[0];
+		                bconnec[2] = connec[5];
+					};
+		            if (side == 2){
+		                bconnec[0] = connec[0];
+		                bconnec[1] = connec[1];
+		                bconnec[2] = connec[3];              
+		            };
+
+		            //first segment
+	                int no1,no2;
+	                no1 = bconnec[0];
+	                no2 = bconnec[2];
+	                
+	                double *xx1 = nodesFine_[no1] -> getCoordinates();
+	            	double *xx2 = nodesFine_[no2] -> getCoordinates();
+		            for (int k = 0; k < dim; k++) {
+		            	x1[k] = xx1[k];
+		            	x2[k] = xx2[k];
+		            }
+
+	                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+	                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+	                                (x2[0] - x1[0]) * x[1] +
+	                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+	                
+	                if (aux1 > aux0){
+	                    
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                   
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
 	                };
-	            };
-	            if (side == 1){
-	                bconnec[0] = connec[2];
-	                bconnec[1] = connec[8];
-	                bconnec[2] = connec[5];
-	                for (int i = 0; i < dim; i++){
-		                x1B[i]= Bcoord_[2][i];
-		                x2B[i]= Bcoord_[8][i];
-		                x3B[i]= Bcoord_[5][i];
+
+	                if (aux1 < 0.){
+	                    
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001) signal = 1.;
+	                    
+	                    dist2 *= signal;
 	                };
-				};
-	            if (side == 2){
-	                bconnec[0] = connec[8];
-	                bconnec[1] = connec[6];
-	                bconnec[2] = connec[7];
+	                
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
+	                
+	                //second segment
+	                no1 = bconnec[2];
+	                no2 = bconnec[1];
+	                
+	                xx1 = nodesFine_[no1] -> getCoordinates();
+	            	xx2 = nodesFine_[no2] -> getCoordinates();
+		            for (int k = 0; k < dim; k++) {
+		            	x1[k] = xx1[k];
+		            	x2[k] = xx2[k];
+		            }
+
+	                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+	                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+	                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+
+	                if (aux1 > aux0){
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                                       
+	                };
+
+	                if (aux1 < 0.){
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    
+	                    //find signal
+	                    //side normal vector
+	                    double *normal;
+	                    normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i=0; i<2; i++){
+	                    	signaltest += normal[i] * test[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                    
+	                };
+	                if (fabs(dist2) < fabs(dist)) dist = dist2;
+
+                } else { //IGA mesh
+                	
+                	//Finding the coorrespondent coordinates in bezier element
+	                double **MatrixC_;
+	                MatrixC_ = new double*[9];
+	                for (int i = 0; i < 9; i++) MatrixC_[i] = new double[9];
+	                elementsFine_[boundaryFine_[ibound] -> getElement()] -> getMatrixC(MatrixC_);
+
+	            	//Transposing MatrixC
+	                double transMatrixC_[9][9];
+	                for (int i = 0; i<9; i++){
+	                    for (int j = 0; j<9; j++){
+	                        transMatrixC_[i][j] = MatrixC_[j][i];
+	                    };
+	                };
+	                
+	                double coord_[9][2];
+	                for (int i = 0; i < 9; i++){
+	                    double *xx = nodesFine_[connec[i]]->getCoordinates();
+	                    for (int j = 0; j < dim; j++) coord_[i][j] = xx[j];
+	                };
+
+	                //Bezier Coordinates
+	                double Bcoord_[9][2] = {};
+	                for (int i = 0; i<9; i++){
+	                    for (int j = 0; j<9; j++){
+	                    	for (int k = 0; k < dim; k++) Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
+	                    };
+	                };
+	                
+	                if (side == 0){                 
+		                bconnec[0] = connec[0];
+		                bconnec[1] = connec[2];
+		                bconnec[2] = connec[1];
+		                for (int i = 0; i < dim; i++){
+		                	x1B[i]= Bcoord_[0][i];
+		                	x2B[i]= Bcoord_[2][i];
+		                	x3B[i]= Bcoord_[1][i];
+		                };
+		            };
+		            if (side == 1){
+		                bconnec[0] = connec[2];
+		                bconnec[1] = connec[8];
+		                bconnec[2] = connec[5];
+		                for (int i = 0; i < dim; i++){
+			                x1B[i]= Bcoord_[2][i];
+			                x2B[i]= Bcoord_[8][i];
+			                x3B[i]= Bcoord_[5][i];
+		                };
+					};
+		            if (side == 2){
+		                bconnec[0] = connec[8];
+		                bconnec[1] = connec[6];
+		                bconnec[2] = connec[7];
+		                for (int i = 0; i < dim; i++){
+		                	x1B[i]= Bcoord_[8][i];
+			                x2B[i]= Bcoord_[6][i];
+			                x3B[i]= Bcoord_[7][i];
+		                };	                
+		            };
+		            if (side == 3){
+		                bconnec[0] = connec[6];
+		                bconnec[1] = connec[0];
+		                bconnec[2] = connec[3];
+		                for (int i = 0; i < dim; i++){
+				            x1B[i]= Bcoord_[6][i];
+			                x2B[i]= Bcoord_[0][i];
+			                x3B[i]= Bcoord_[3][i];
+			            }; 
+		            };
+
+	                //first segment
+	                int no1 = bconnec[0];
+	                int no2 = bconnec[2];
 	                for (int i = 0; i < dim; i++){
-	                	x1B[i]= Bcoord_[8][i];
-		                x2B[i]= Bcoord_[6][i];
-		                x3B[i]= Bcoord_[7][i];
-	                };	                
-	            };
-	            if (side == 3){
-	                bconnec[0] = connec[6];
-	                bconnec[1] = connec[0];
-	                bconnec[2] = connec[3];
+	                	x1[i]= x1B[i];
+	                	x2[i]= x3B[i];
+	                }
+
+	                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+	                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+	                                (x2[0] - x1[0]) * x[1] +
+	                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+	                
+	                
+	                if (aux1 > aux0){
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    //find signal
+	                    //side normal vector
+	                    
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
+
+	                    double signaltest = 0.0;
+	                    for (int i = 0; i< 2; i++){
+	                        signaltest += test[i] * normal[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                };
+
+	                if (aux1 < 0.){
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal =  nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+
+	                    double signaltest = 0.0;
+	                    for (int i = 0; i< 2; i++){
+	                        signaltest += test[i] * normal[i];
+	                    }
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001) signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                };
+	                
+	                if (fabs(dist2) < fabs(dist)) {
+	                    dist = dist2;
+	                };
+	                
+	                //second segment
+	                no1 = bconnec[2];
+	                no2 = bconnec[1];
 	                for (int i = 0; i < dim; i++){
-			            x1B[i]= Bcoord_[6][i];
-		                x2B[i]= Bcoord_[0][i];
-		                x3B[i]= Bcoord_[3][i];
-		            }; 
-	            };
+						x1[i]= x3B[i];
+		                x2[i]= x2B[i];
+	                }
 
-                //first segment
-                int no1 = bconnec[0];
-                int no2 = bconnec[2];
-                for (int i = 0; i < dim; i++){
-                	x1[i]= x1B[i];
-                	x2[i]= x3B[i];
-                }
+	                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+	                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+	                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+	                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+	                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+	                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
 
-                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
-                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
-                               (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
-                double dist2 =-((x2[1] - x1[1]) * x[0] - 
-                                (x2[0] - x1[0]) * x[1] +
-                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
-                
-                
-                if (aux1 > aux0){
-                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
-                                 (x2[0] - x[0]) * (x2[0] - x[0]));
-                    //find signal
-                    //side normal vector
-                    
-                    double *normal = nodesFine_[no2] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x2[0];
-                    test[1] = x[1] - x2[1];
+	                if (aux1 > aux0){
+	                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+	                                 (x2[0] - x[0]) * (x2[0] - x[0]));
+	                    
+	                    double *normal = nodesFine_[no2] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x2[0];
+	                    test[1] = x[1] - x2[1];
 
-                    double signaltest = 0.0;
-                    for (int i = 0; i< 2; i++){
-                        signaltest += test[i] * normal[i];
-                    }
-                    
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
+	                    double signaltest = 0.0;
+	                    for (int i = 0; i< 2; i++){
+	                        signaltest += test[i] * normal[i];
+	                    };
+
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                                       
+	                };
+
+	                if (aux1 < 0.){
+	                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+	                                 (x[0] - x1[0]) * (x[0] - x1[0]));
+	                    //find signal
+	                    //side normal vector
+	                    double *normal = nodesFine_[no1] -> getInnerNormal();
+	                    
+	                    test[0] = x[0] - x1[0];
+	                    test[1] = x[1] - x1[1];
+	                    
+	                    double signaltest = 0.0;
+	                    for (int i = 0; i< 2; i++){
+	                        signaltest += test[i] * normal[i];
+	                    };
+	                    
+	                    double signal = -1.;
+	                    if (signaltest <= -0.001)signal = 1.;
+	                    
+	                    dist2 *= signal;
+	                    
+	                };
+
+	                if (fabs(dist2) < fabs(dist)) {
+	                    dist = dist2;
+	                };
                 };
-
-                if (aux1 < 0.){
-                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
-                                 (x[0] - x1[0]) * (x[0] - x1[0]));
-                    //find signal
-                    //side normal vector
-                    double *normal =  nodesFine_[no1] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x1[0];
-                    test[1] = x[1] - x1[1];
-
-                    double signaltest = 0.0;
-                    for (int i = 0; i< 2; i++){
-                        signaltest += test[i] * normal[i];
-                    }
-                    
-                    double signal = -1.;
-                    if (signaltest <= -0.001) signal = 1.;
-                    
-                    dist2 *= signal;
-                };
-                
-                if (fabs(dist2) < fabs(dist)) {
-                    dist = dist2;
-                };
-                
-                //second segment
-                no1 = bconnec[2];
-                no2 = bconnec[1];
-                for (int i = 0; i < dim; i++){
-					x1[i]= x3B[i];
-	                x2[i]= x2B[i];
-                }
-
-                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
-                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
-                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
-                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
-                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
-                          x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
-
-                if (aux1 > aux0){
-                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
-                                 (x2[0] - x[0]) * (x2[0] - x[0]));
-                    
-                    double *normal = nodesFine_[no2] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x2[0];
-                    test[1] = x[1] - x2[1];
-
-                    double signaltest = 0.0;
-                    for (int i = 0; i< 2; i++){
-                        signaltest += test[i] * normal[i];
-                    };
-
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
-                                       
-                };
-
-                if (aux1 < 0.){
-                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
-                                 (x[0] - x1[0]) * (x[0] - x1[0]));
-                    //find signal
-                    //side normal vector
-                    double *normal = nodesFine_[no1] -> getInnerNormal();
-                    
-                    test[0] = x[0] - x1[0];
-                    test[1] = x[1] - x1[1];
-                    
-                    double signaltest = 0.0;
-                    for (int i = 0; i< 2; i++){
-                        signaltest += test[i] * normal[i];
-                    };
-                    
-                    double signal = -1.;
-                    if (signaltest <= -0.001)signal = 1.;
-                    
-                    dist2 *= signal;
-                    
-                };
-
-                if (fabs(dist2) < fabs(dist)) {
-                    dist = dist2;
-                };
-
             }; //if bf is the blend boundary  
-            
         }; // numboundfine
 
         if(dist < 0) dist = 0;
@@ -1234,42 +1619,62 @@ void Arlequin<2>::setGluingZone(){
     for (int jel = 0; jel < numElemFine; jel++){
         
         int *connec = elementsFine_[jel] -> getConnectivity();
-       	               
-        double distance_[9];
-        for (int i = 0; i < 9; i++){
-            distance_[i] = nodesFine_[connec[i]] -> getDistFunction(); 
-        };
+       	 
+       	if (elemTypeFine == 0) { //FEM elem
 
-        double Bdistance_[9] = {};
-        for (int icp = 0; icp< 9; icp++){
-            
-            double wpc[9],phi_[9],xsi[dim];
-            for (int i = 0; i <9; i++) wpc[i] = nodesFine_[connec[i]] -> getWeightPC();
-            int *inc_ = nodesFine_[connec[8]] -> getINC();
-            int patch_ = elementsFine_[jel] -> getPatch();
-            for (int i = 0; i < dim; i++) xsi[i] = xsiCP[icp][i];
-            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParFine,patch_);
-            
-            for (int i = 0; i < 9; i++){
-                Bdistance_[icp] += phi_[i] * distance_[i];
-            };
-        };
+	        flag = 0;
+	        for (int ino = 0; ino < 6; ino++){
+	            if (nodesFine_[connec[ino]] -> getDistFunction() <= glueZoneThickness + 0.00001){
+	                flag += 1;
+	            };
+	        };
 
-        flag = 0;
-        for (int ino = 0; ino < 9; ino++){
-            if (Bdistance_[ino] <= glueZoneThickness + 0.00001){
-                flag += 1;
-            };
-        };
+	        if (flag == 6) {
+	            elementsGlueZoneFine_.push_back(jel);
+	            elementsFine_[jel] -> setGlueZone();
 
-        if (flag == 9) {
-            elementsGlueZoneFine_.push_back(jel);
-            elementsFine_[jel] -> setGlueZone();
+	            GlueZone *el = new GlueZone(index++,jel);
+	            glueZoneFine_.push_back(el);
 
-            GlueZone *el = new GlueZone(index++,jel);
-            glueZoneFine_.push_back(el);
+	    	};
+       	
+       	}   else { //IGA elem
 
-    	};
+	       	double distance_[9];
+	        for (int i = 0; i < 9; i++){
+	            distance_[i] = nodesFine_[connec[i]] -> getDistFunction(); 
+	        };
+
+	        double Bdistance_[9] = {};
+	        for (int icp = 0; icp< 9; icp++){
+	            
+	            double wpc[9],phi_[9],xsi[dim];
+	            for (int i = 0; i <9; i++) wpc[i] = nodesFine_[connec[i]] -> getWeightPC();
+	            int *inc_ = nodesFine_[connec[8]] -> getINC();
+	            int patch_ = elementsFine_[jel] -> getPatch();
+	            for (int i = 0; i < dim; i++) xsi[i] = xsiCP[icp][i];
+	            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParFine,patch_);
+	            
+	            for (int i = 0; i < 9; i++){
+	                Bdistance_[icp] += phi_[i] * distance_[i];
+	            };
+	        };
+
+	        flag = 0;
+	        for (int ino = 0; ino < 9; ino++){
+	            if (Bdistance_[ino] <= glueZoneThickness + 0.00001){
+	                flag += 1;
+	            };
+	        };
+
+	        if (flag == 9) {
+	            elementsGlueZoneFine_.push_back(jel);
+	            elementsFine_[jel] -> setGlueZone();
+
+	            GlueZone *el = new GlueZone(index++,jel);
+	            glueZoneFine_.push_back(el);
+	    	};
+       	}; //else IGA mesh         
     };
 
     //Defines which nodes are in the gluing zone
@@ -1279,10 +1684,19 @@ void Arlequin<2>::setGluingZone(){
 
         int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
 
-        for (int ino = 0; ino < 9; ino++){
-            nodesCZ[connec[ino]] += 1;
-            nodesFine_[connec[ino]] -> setGlueZone();
+        if (elemTypeFine == 0){ //FEM mesh
+        	for (int ino = 0; ino < 6; ino++){
+	            nodesCZ[connec[ino]] += 1;
+	            nodesFine_[connec[ino]] -> setGlueZone();
+	        };
+        } else { //IGA mesh
+        	for (int ino = 0; ino < 9; ino++){
+	            nodesCZ[connec[ino]] += 1;
+	            nodesFine_[connec[ino]] -> setGlueZone();
+	        };
         };
+
+	        
     };
 
     //Compute and save number of nodes in the gluing zone
@@ -1304,18 +1718,37 @@ void Arlequin<2>::setGluingZone(){
     };
 
     // Define the Lagrange Multipliers connectivity in the fine mesh
+
     for (int i = 0; i < numElemGlueZoneFine; i++){
         
-        int *connecAux;
-        connecAux = new int[9];
-        
-        int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
-       
-        for (int ino = 0; ino < numNodesGlueZoneFine; ino++)
-            for (int k = 0; k < 9; k++)
-                if (nodesGlueZoneFine_[ino] == connec[k]) connecAux[k] = ino;
-        
-        glueZoneFine_[i] -> setConnectivity(connecAux);
+        if (elemTypeFine == 0) { //FEM mesh
+
+        	int *connecAux;
+	        connecAux = new int[6];
+	        
+	        int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
+	       
+	        for (int ino = 0; ino < numNodesGlueZoneFine; ino++)
+	            for (int k = 0; k < 6; k++)
+	                if (nodesGlueZoneFine_[ino] == connec[k]) connecAux[k] = ino;
+	        
+	        glueZoneFine_[i] -> setConnectivity(connecAux);
+
+        } else { //IGA mesh
+
+        	int *connecAux;
+	        connecAux = new int[9];
+	        
+	        int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
+	       
+	        for (int ino = 0; ino < numNodesGlueZoneFine; ino++)
+	            for (int k = 0; k < 9; k++)
+	                if (nodesGlueZoneFine_[ino] == connec[k]) connecAux[k] = ino;
+	        
+	        glueZoneFine_[i] -> setConnectivity(connecAux);
+
+        };
+	        
 
     };
 
@@ -1326,53 +1759,37 @@ void Arlequin<2>::setGluingZone(){
         int *connec = elementsCoarse_[jel] -> getConnectivity();
         
         flag = 0;
-        // if (elemType == 0){          
             
-        //     for (int ino = 0; ino < 6; ino++){
-        //         double dist = nodesCoarse_[connec[ino]] -> getDistFunction();
-        //         if ((dist <= glueZoneThickness + 0.00001) && (dist >= 0.00001)){
-        //             flag += 1;
-        //         };
-        //     };
+        double distance_[9];
+        for (int i = 0; i < 9; i++){
+            distance_[i] = nodesCoarse_[connec[i]]->getDistFunction(); 
+        };
 
-        //     if (flag != 0) {
-        //         elementsGlueZoneCoarse_.push_back(jel);
-        //         elementsCoarse_[jel] -> setGlueZone();
-        //     };  
-        
-        // } else {
+        double Bdistance_[9] = {};
+        for (int icp = 0; icp< 9; icp++){
             
-            double distance_[9];
+            double wpc[9],phi_[9],xsi[dim];
+            for (int i = 0; i <9; i++) wpc[i] = nodesCoarse_[connec[i]] -> getWeightPC();
+            int *inc_ = nodesCoarse_[connec[8]] -> getINC();
+            int patch_ = elementsCoarse_[jel] -> getPatch();
+            for (int i = 0; i < dim; i++) xsi[i] = xsiCP[icp][i];
+            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParCoarse,patch_);
+
             for (int i = 0; i < 9; i++){
-                distance_[i] = nodesCoarse_[connec[i]]->getDistFunction(); 
+                Bdistance_[icp] += phi_[i] * distance_[i];
             };
+        };
 
-            double Bdistance_[9] = {};
-            for (int icp = 0; icp< 9; icp++){
-                
-                double wpc[9],phi_[9],xsi[dim];
-                for (int i = 0; i <9; i++) wpc[i] = nodesCoarse_[connec[i]] -> getWeightPC();
-                int *inc_ = nodesCoarse_[connec[8]] -> getINC();
-                int patch_ = elementsCoarse_[jel] -> getPatch();
-                for (int i = 0; i < dim; i++) xsi[i] = xsiCP[icp][i];
-                shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParCoarse,patch_);
-
-                for (int i = 0; i < 9; i++){
-                    Bdistance_[icp] += phi_[i] * distance_[i];
-                };
+        for (int ino = 0; ino < 9; ino++){
+            if ((Bdistance_[ino] <= glueZoneThickness + 0.00001) && (Bdistance_[ino]  >= 0.00001)){
+                 flag += 1;
             };
+        };
 
-            for (int ino = 0; ino < 9; ino++){
-                if ((Bdistance_[ino] <= glueZoneThickness + 0.00001) && (Bdistance_[ino]  >= 0.00001)){
-                     flag += 1;
-                };
-            };
-
-            if (flag != 0) {
-                elementsGlueZoneCoarse_.push_back(jel);
-                elementsCoarse_[jel] -> setGlueZone();
-        	};
-        // }; //else IGA element
+        if (flag != 0) {
+            elementsGlueZoneCoarse_.push_back(jel);
+            elementsCoarse_[jel] -> setGlueZone();
+    	};
       
     };
 
@@ -1381,17 +1798,10 @@ void Arlequin<2>::setGluingZone(){
     numElemGlueZoneCoarse = elementsGlueZoneCoarse_.size();
     for (int i = 0; i < numElemGlueZoneCoarse; i++){
         int *connec = elementsCoarse_[elementsGlueZoneCoarse_[i]] -> getConnectivity();
-        // if (elemType == 0){
-        //     for (int ino = 0; ino < 6; ino++){
-        //         nodesCZ2[connec[ino]] += 1;
-        //         nodesCoarse_[connec[ino]] -> setGlueZone();
-        //     };
-        // } else{
-            for (int ino = 0; ino < 9; ino++){
-                nodesCZ2[connec[ino]] += 1;
-                nodesCoarse_[connec[ino]] -> setGlueZone();
-            };
-        // };
+        for (int ino = 0; ino < 9; ino++){
+            nodesCZ2[connec[ino]] += 1;
+            nodesCoarse_[connec[ino]] -> setGlueZone();
+        };
     };
 
     //Compute number of coarse nodes in the gluing zone
@@ -1411,8 +1821,7 @@ void Arlequin<2>::setWeightFunction(){
 	double wFuncValue;
 
 	glueZoneThickness *= 1.01;	// Thickness from gluing zone
-
-    //IGA COARSE MESH or FEM mesh
+	//IGA coarse mesh
     for (int iNode = 0; iNode< numNodesCoarse; iNode++){
 
     	double r = nodesCoarse_[iNode] ->getDistFunction();
@@ -1432,13 +1841,12 @@ void Arlequin<2>::setWeightFunction(){
 
     };  //ielem    
 
-
     for (int jel = 0; jel < numElemCoarse; jel++){
         elementsCoarse_[jel] -> setIntegPointWeightFunction_ISO();        
     };
 
 
-    //IGA FINE MESH
+    //IGA or FEM FINE MESH
     for (int iNode = 0; iNode< numNodesFine; iNode++){
 
     	double r = nodesFine_[iNode] -> getDistFunction();
@@ -1455,10 +1863,17 @@ void Arlequin<2>::setWeightFunction(){
 
     };  //ielem
 
+    if (elemTypeFine == 0) { //FEM mesh
+    	for (int jel = 0; jel < numElemFine; jel++){
+        	elementsFine_[jel] -> setIntegPointWeightFunction_FEM();        
+    	};
 
-    for (int jel = 0; jel < numElemFine; jel++){
-        elementsFine_[jel] -> setIntegPointWeightFunction_ISO();        
-    };  
+    } else { //IGA mesh
+    	for (int jel = 0; jel < numElemFine; jel++){
+        	elementsFine_[jel] -> setIntegPointWeightFunction_ISO();        
+    	};
+    };
+      
      
     return;
 
@@ -1475,7 +1890,7 @@ void Arlequin<2>::printResults(int step) {
 
     if (rank == 0){
 
-        //PRINT COARSE MODEL RESULTS 
+        //PRINT COARSE MODEL RESULTS - IGA mesh
         std::string result;
         std::ostringstream convert;
         convert << step+100000;
@@ -1486,442 +1901,62 @@ void Arlequin<2>::printResults(int step) {
         std::string s = "COARSEoutput"+result+".vtu";
         std::fstream output_v(s.c_str(), std::ios_base::out);
 
-        // if (elemType == 0){ //FEM mesh
-
-        // 	output_v << "<?xml version=\"1.0\"?>" << std::endl
-        //          	<< "<VTKFile type=\"UnstructuredGrid\">" << std::endl
-        //          	<< "  <UnstructuredGrid>" << std::endl
-        //          	<< "  <Piece NumberOfPoints=\"" << numNodesCoarse
-        //          	<< "\"  NumberOfCells=\"" << numElemCoarse
-        //          	<< "\">" << std::endl;
-
-	       //  //WRITE NODAL COORDINATES
-	       //  output_v << "    <Points>" << std::endl
-	       //           << "      <DataArray type=\"Float64\" "
-	       //           << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-
-	       //  for (int i = 0; i < numNodesCoarse; i++){
-	       //      double *x = nodesCoarse_[i] -> getCoordinates();
-	       //      double x_[dim];
-	       //      for (int i = 0; i < dim; i++) x_[i] = x[i];
-	       //      output_v << x_[0] << " " << x_[1] << " " << -0.01 << std::endl;
-	       //  };
-
-	       //  output_v << "      </DataArray>" << std::endl
-	       //           << "    </Points>" << std::endl;
-        
-	       //  //WRITE ELEMENT CONNECTIVITY
-	       //  output_v << "    <Cells>" << std::endl
-	       //           << "      <DataArray type=\"Int32\" "
-	       //           << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
-	        
-	       //  for (int i = 0; i < numElemCoarse; i++){
-	       //      int *connec = elementsCoarse_[i] -> getConnectivity();
-	       //      int con[6];
-	       //      for (int i = 0; i < 6; i++) con[i] = connec[i];
-	       //      output_v << con[0] << " " << con[1] << " " << con[2] << " " 
-	       //               << con[3] << " " << con[4] << " " << con[5] << std::endl;
-	       //  };
-	       //  output_v << "      </DataArray>" << std::endl;
-	      
-	       //  //WRITE OFFSETS IN DATA ARRAY
-	       //  output_v << "      <DataArray type=\"Int32\""
-	       //           << " Name=\"offsets\" format=\"ascii\">" << std::endl;
-	        
-	       //  int aux = 0;
-	       //  for (int i = 0; i < numElemCoarse; i++){
-	       //      output_v << aux + 6 << std::endl;
-	       //      aux += 6;
-	       //  };
-	       //  output_v << "      </DataArray>" << std::endl;
-	      
-	       //  //WRITE ELEMENT TYPES
-	       //  output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
-	       //           << "format=\"ascii\">" << std::endl;
-        
-	       //  for (int i = 0; i < numElemCoarse; i++){
-	       //      output_v << 22 << std::endl;
-	       //  };
-
-	       //  output_v << "      </DataArray>" << std::endl
-	       //           << "    </Cells>" << std::endl;
-
-	       //  //WRITE NODAL RESULTS
-	       //  output_v << "    <PointData>" << std::endl;
-
-	       //  if (coarseModel.printVelocity){
-	       //      output_v <<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	       //               << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
-	       //      for (int i=0; i<numNodesCoarse; i++){ 
-	       //      	     output_v << nodesCoarse_[i] -> getVelocity(0) << " "              
-	       //               << nodesCoarse_[i] -> getVelocity(1)  << " " 
-	       //               << 0. << std::endl;
-	       //      };
-	       //      output_v << "      </DataArray> " << std::endl;
-	       //  };
-       
-	       //  if (coarseModel.printDistFunction){
-	       //      output_v <<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	       //               << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
-	       //      for (int i=0; i<numNodesCoarse; i++){        
-	       //          output_v << nodesCoarse_[i] -> getDistFunction() << std::endl;
-	       //      };
-	       //      output_v << "      </DataArray> " << std::endl;
-	       //  };
-        
-	       //  if (coarseModel.printPressure){
-	       //      output_v <<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	       //               << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
-	       //      for (int i=0; i<numNodesCoarse; i++){
-	       //      	output_v << 0. << " " << 0. << " " 
-	       //          << nodesCoarse_[i] -> getPressure()<< std::endl;
-	       //      };
-	       //      output_v << "      </DataArray> " << std::endl;
-	       //  };
-
-	       //  output_v << "    </PointData>" << std::endl; 
-
-	       //  //WRITE ELEMENT RESULTS
-	       //  output_v << "    <CellData>" << std::endl;
-	        
-	       //  if (coarseModel.printProcess){
-	       //      output_v <<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	       //               << "Name=\"Process\" format=\"ascii\">" << std::endl;
-	       //      for (int i=0; i<numElemCoarse; i++){
-	       //          output_v << domDecompCoarse.first[i] << std::endl;
-	       //      };
-	       //      output_v << "      </DataArray> " << std::endl;
-	       //  };
-
-	       //  int cont=0;
-	       //  if (coarseModel.printGlueZone){
-	       //      output_v <<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	       //               << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
-	       //      cont = 0;
-	       //      for (int i=0; i<numElemCoarse; i++){
-	       //          if (elementsGlueZoneCoarse_[cont] == i){
-	       //              output_v << 1.0 << std::endl;
-	       //              cont++;
-	       //          }else{
-	       //              output_v << 0.0 << std::endl;
-	       //          };
-	       //      };
-	       //      output_v << "      </DataArray> " << std::endl;
-	       //  };
-
-	       //  output_v << "    </CellData>" << std::endl; 
-
-	       //  //FINALIZE OUTPUT FILE
-	        
-	       //  output_v << "  </Piece>" << std::endl
-	       //     << "  </UnstructuredGrid>" << std::endl
-	       //     << "</VTKFile>" << std::endl;
         
 
-        // } else { //IGA mesh
+        int numBezierNodes = coarseModel.NumBezierNodes;
 
-	        int numBezierNodes = coarseModel.NumBezierNodes;
-
-	        output_v << "<?xml version=\"1.0\"?>" << std::endl
-	                 << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
-	                 << "  <UnstructuredGrid>" << std::endl
-	                 << "  <Piece NumberOfPoints=\"" << numBezierNodes
-	                 << "\"  NumberOfCells=\"" << numElemCoarse
-	                 << "\">" << std::endl;
-
-	        //WRITE NODAL COORDINATES
-	        output_v << "    <Points>" << std::endl
-	                 << "      <DataArray type=\"Float64\" "
-	                 << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
-
-	        // Bezier Extraction
-	        double Vel[numBezierNodes][dim], realVel[numBezierNodes][dim], Coord[numBezierNodes][dim];
-	        double Press[numBezierNodes], realPress[numBezierNodes], Distance[numBezierNodes], EnergyW[numBezierNodes];
-
-            //Interpolated variables 
-            double xsiCP[9][dim];
-            xsiCP[0][0] = -1.; xsiCP[0][1] = -1.;
-            xsiCP[1][0] = 0.; xsiCP[1][1] = -1.;
-            xsiCP[2][0] = 1.; xsiCP[2][1] = -1.;
-            xsiCP[3][0] = -1.; xsiCP[3][1] = 0.;
-            xsiCP[4][0] = 0.; xsiCP[4][1] = 0.;
-            xsiCP[5][0] = 1.; xsiCP[5][1] = 0.;
-            xsiCP[6][0] = -1.; xsiCP[6][1] = 1.;
-            xsiCP[7][0] = 0.; xsiCP[7][1] = 1.;
-            xsiCP[8][0] = 1.; xsiCP[8][1] = 1.;
-
-	        for (int iElem = 0; iElem < numElemCoarse; iElem++){
-	                            
-	            int *Beconnec = elementsCoarse_[iElem] -> getBezierConnectivity();
-	            int *connec = elementsCoarse_[iElem] -> getConnectivity();
-		
-				double coord_[9][dim],vel_[9][dim], realvel_[9][dim];
-	            double press_[9], realpress_[9], distance_[9], energyW_[9];
-	        	
-                //Data in the NURBS control points
-	            for (int i = 0; i < 9; i++){
-					double *x = nodesCoarse_[connec[i]] -> getCoordinates();
-	                for (int j = 0; j < dim; j++){
-	                	coord_[i][j] = x[j];
-	                	vel_[i][j] = nodesCoarse_[connec[i]] -> getVelocity(j);
-	                	realvel_[i][j] = nodesCoarse_[connec[i]] -> getVelocityArlequin(j);
-	                };
-
-                    press_[i] = nodesCoarse_[connec[i]] -> getPressure();
-                    realpress_[i] = nodesCoarse_[connec[i]] -> getPressureArlequin();
-	                distance_[i] = nodesCoarse_[connec[i]] -> getDistFunction(); 
-	                energyW_[i] = nodesCoarse_[connec[i]] -> getWeightFunction(); 
-	         	};
-    
-                //interpolated values (Bézier variables)
-                double Bcoord_[9][2] = {};
-                double Bvel_[9][2]= {};
-                double Brealvel_[9][2]= {};
-                double Bpress_[9]= {};
-                double Brealpress_[9]= {};
-                double Bdistance_[9]= {};
-                double BenergyW_[9] = {};
-
-                for (int i = 0; i < 9; i++){
-
-                    QuadShapeFunction<2> shapeQuad;
-                    double phi_[9],wpc[9],xsi[dim];
-                    for (int k = 0; k < 9; k ++) wpc[k] = nodesCoarse_[connec[k]] -> getWeightPC();  
-                    int *inc_ = nodesCoarse_[connec[8]] -> getINC(); 
-                    int patch = elementsCoarse_[iElem] -> getPatch();
-                    for (int j = 0; j < dim; j++) xsi[j] = xsiCP[i][j]; 
-                    shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParCoarse,patch);
-
-                    for (int j = 0; j < 9; j++){
-                        for (int k = 0; k < dim; k++){
-                        	Bcoord_[i][k] += phi_[j] * coord_[j][k];
-                        	Bvel_[i][k] += phi_[j] * vel_[j][k];
-                        	Brealvel_[i][k] += phi_[j] * realvel_[j][k];
-                        };
-                        Bpress_[i] += phi_[j] * press_[j];
-                        Brealpress_[i] += phi_[j] * realpress_[j];
-                        Bdistance_[i] += phi_[j] * distance_[j];
-                        BenergyW_[i] += phi_[j] * energyW_[j];
-                    };
-
-                };
-
-	            for (int i = 0; i< 9; i++){
-	                for (int j = 0; j < dim; j++){
-	                	Coord[Beconnec[i]][j] = Bcoord_[i][j];
-	                	Vel[Beconnec[i]][j] = Bvel_[i][j];
-	                	realVel[Beconnec[i]][j] = Brealvel_[i][j];
-	                };
-	                Press[Beconnec[i]] = Bpress_[i];
-	                realPress[Beconnec[i]] = Brealpress_[i];
-	                Distance[Beconnec[i]] = Bdistance_[i];
-	                EnergyW[Beconnec[i]] = BenergyW_[i];
-	            };
-	        
-	        };//iElem
-
-	                
-	        for (int i = 0; i< numBezierNodes;i++){
-	        	output_v << Coord[i][0] << " " << Coord[i][1] << " " << 0. << std::endl;
-	        }
-
-	        output_v << "      </DataArray>" << std::endl
-	                 << "    </Points>" << std::endl;
-	        
-	        //WRITE ELEMENT CONNECTIVITY
-	        output_v << "    <Cells>" << std::endl
-	                 << "      <DataArray type=\"Int32\" "
-	                 << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
-
-	        for (int iElem = 0; iElem < numElemCoarse; ++iElem){
-	           
-	            int *Bconnec_ = elementsCoarse_[iElem]->getBezierConnectivity();  
-	            int Bconnec[9];
-	            for (int i = 0; i < 9; i++) Bconnec[i] = Bconnec_[i];            
-	            
-	        	output_v << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
-	            << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " " 
-	            << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4]<<  std::endl;
-
-	        };
-	        output_v << "      </DataArray>" << std::endl;
-	      
-	        //WRITE OFFSETS IN DATA ARRAY
-	        output_v << "      <DataArray type=\"Int32\""
-	                 << " Name=\"offsets\" format=\"ascii\">" << std::endl;
-	        int aux = 0;
-	        for (int i = 0; i < numElemCoarse; i++){
-	            output_v << aux + 9 << std::endl;
-	            aux += 9;
-	        };
-	        output_v << "      </DataArray>" << std::endl;
-	      
-	        //WRITE ELEMENT TYPES
-	        output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
-	                 << "format=\"ascii\">" << std::endl;
-	        
-	        for (int i = 0; i < numElemCoarse; i++){
-	            output_v << 70 << std::endl;
-	        };
-	        output_v << "      </DataArray>" << std::endl
-	                 << "    </Cells>" << std::endl;
-
-	        // WRITE NODAL RESULTS
-	        output_v << "    <PointData>" << std::endl;
-
-	        if (coarseModel.printVelocity){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	                      << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << Vel[i][0] << " "              
-	                          << Vel[i][1] << " " 
-	                          << 0. << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-	        if (coarseModel.printRealVelocity){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	                      << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << realVel[i][0] << " "              
-	                          << realVel[i][1] << " " 
-	                          << 0. << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-
-	        if (coarseModel.printPressure){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	                     << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << 0. << " " << 0. << " " 
-	                          << Press[i] << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-	        if (coarseModel.printRealPressure){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-	                     << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << 0. << " " << 0. << " " 
-	                          << realPress[i] << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-
-	        if (coarseModel.printDistFunction){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	                     << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << Distance[i] << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-	        if (coarseModel.printEnergyWeightFunction){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	                     << "Name=\"Energy Weight Function\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numBezierNodes; i++){
-	                output_v << EnergyW[i] << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-
-
-	        output_v << "    </PointData>" << std::endl; 
-
-	        //WRITE ELEMENT RESULTS
-	        output_v << "    <CellData>" << std::endl;
-	        
-	        if (coarseModel.printProcess){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	                     << "Name=\"Process\" format=\"ascii\">" << std::endl;
-	            for (int i=0; i<numElemCoarse; i++){
-	                output_v << domDecompFine.first[i] << std::endl;
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-
-	        if (fineModel.printGlueZone){
-	            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-	                     << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
-	            int cont=0;
-	            for (int i=0; i<numElemCoarse; i++){
-	                if (elementsGlueZoneCoarse_[cont] == i){
-	                    output_v << 1.0 << std::endl;
-	                    cont += 1; 
-	                }else{
-	                    output_v << 0.0 << std::endl;
-	                };
-	            };
-	            output_v << "      </DataArray> " << std::endl;
-	        };
-
-	        output_v << "    </CellData>" << std::endl; 
-
-	        //FINALIZE OUTPUT FILE
-	        output_v << "  </Piece>" << std::endl
-	               << "  </UnstructuredGrid>" << std::endl
-	               << "</VTKFile>" << std::endl;
-
-        // };
-
-
-    
-        //PRINT FINE MODEL RESULTS - IGA MESH
-        numBezierNodes = fineModel.NumBezierNodes;
-
-        std::string f = "FINEoutput"+result+".vtu";
-        
-        std::fstream output_vf(f.c_str(), std::ios_base::out);
-
-        output_vf << "<?xml version=\"1.0\"?>" << std::endl
+        output_v << "<?xml version=\"1.0\"?>" << std::endl
                  << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
                  << "  <UnstructuredGrid>" << std::endl
                  << "  <Piece NumberOfPoints=\"" << numBezierNodes
-                 << "\"  NumberOfCells=\"" << numElemFine
+                 << "\"  NumberOfCells=\"" << numElemCoarse
                  << "\">" << std::endl;
 
         //WRITE NODAL COORDINATES
-        output_vf << "    <Points>" << std::endl
+        output_v << "    <Points>" << std::endl
                  << "      <DataArray type=\"Float64\" "
                  << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
 
-
         // Bezier Extraction
-        double VelF[numBezierNodes][dim], realVelF[numBezierNodes][dim], CoordF[numBezierNodes][dim], LagMult[numBezierNodes][dim],
-        PressF[numBezierNodes], realPressF[numBezierNodes], DistanceF[numBezierNodes],EnergyWF[numBezierNodes];
+        double Vel[numBezierNodes][dim], realVel[numBezierNodes][dim], Coord[numBezierNodes][dim];
+        double Press[numBezierNodes], realPress[numBezierNodes], Distance[numBezierNodes], EnergyW[numBezierNodes];
 
-        for (int iElem = 0; iElem < numElemFine; ++iElem){
-                         
-            int *Beconnec = elementsFine_[iElem] -> getBezierConnectivity();
-            int *connec = elementsFine_[iElem] -> getConnectivity();
+        //Interpolated variables 
+        double xsiCP[9][dim];
+        xsiCP[0][0] = -1.; xsiCP[0][1] = -1.;
+        xsiCP[1][0] = 0.; xsiCP[1][1] = -1.;
+        xsiCP[2][0] = 1.; xsiCP[2][1] = -1.;
+        xsiCP[3][0] = -1.; xsiCP[3][1] = 0.;
+        xsiCP[4][0] = 0.; xsiCP[4][1] = 0.;
+        xsiCP[5][0] = 1.; xsiCP[5][1] = 0.;
+        xsiCP[6][0] = -1.; xsiCP[6][1] = 1.;
+        xsiCP[7][0] = 0.; xsiCP[7][1] = 1.;
+        xsiCP[8][0] = 1.; xsiCP[8][1] = 1.;
 
-        	// Data in the NURBS control points
-            double coord_[9][dim],vel_[9][dim],realvel_[9][dim],lagmult_[9][dim],
-            	   press_[9],realpress_[9],distance_[9],energyW_[9];
-            
+        for (int iElem = 0; iElem < numElemCoarse; iElem++){
+                            
+            int *Beconnec = elementsCoarse_[iElem] -> getBezierConnectivity();
+            int *connec = elementsCoarse_[iElem] -> getConnectivity();
+	
+			double coord_[9][dim],vel_[9][dim], realvel_[9][dim];
+            double press_[9], realpress_[9], distance_[9], energyW_[9];
+        	
+            //Data in the NURBS control points
             for (int i = 0; i < 9; i++){
-				double *x = nodesFine_[connec[i]] -> getCoordinates();
+				double *x = nodesCoarse_[connec[i]] -> getCoordinates();
                 for (int j = 0; j < dim; j++){
                 	coord_[i][j] = x[j];
-                	vel_[i][j] = nodesFine_[connec[i]] -> getVelocity(j);
-                	realvel_[i][j] = nodesFine_[connec[i]] -> getVelocityArlequin(j);
-                	lagmult_[i][j] = nodesFine_[connec[i]] -> getLagrangeMultiplier(j);
+                	vel_[i][j] = nodesCoarse_[connec[i]] -> getVelocity(j);
+                	realvel_[i][j] = nodesCoarse_[connec[i]] -> getVelocityArlequin(j);
                 };
-                press_[i] = nodesFine_[connec[i]] -> getPressure();
-                realpress_[i] = nodesFine_[connec[i]] -> getPressureArlequin();
-                distance_[i] = nodesFine_[connec[i]] -> getDistFunction();   
-                energyW_[i] = nodesFine_[connec[i]] -> getWeightFunction();              
-         	};  
 
-            //interpolated values (Bezier variables)
+                press_[i] = nodesCoarse_[connec[i]] -> getPressure();
+                realpress_[i] = nodesCoarse_[connec[i]] -> getPressureArlequin();
+                distance_[i] = nodesCoarse_[connec[i]] -> getDistFunction(); 
+                energyW_[i] = nodesCoarse_[connec[i]] -> getWeightFunction(); 
+         	};
+
+            //interpolated values (Bézier variables)
             double Bcoord_[9][2] = {};
             double Bvel_[9][2]= {};
             double Brealvel_[9][2]= {};
@@ -1929,481 +1964,645 @@ void Arlequin<2>::printResults(int step) {
             double Brealpress_[9]= {};
             double Bdistance_[9]= {};
             double BenergyW_[9] = {};
-            double Blagmult_[9][2] = {};
 
             for (int i = 0; i < 9; i++){
 
                 QuadShapeFunction<2> shapeQuad;
                 double phi_[9],wpc[9],xsi[dim];
-                for (int k = 0; k < 9; k ++) wpc[k] = nodesFine_[connec[k]] -> getWeightPC();  
-                int *inc_ = nodesFine_[connec[8]] -> getINC(); 
-                int patch = elementsFine_[iElem] -> getPatch();
+                for (int k = 0; k < 9; k ++) wpc[k] = nodesCoarse_[connec[k]] -> getWeightPC();  
+                int *inc_ = nodesCoarse_[connec[8]] -> getINC(); 
+                int patch = elementsCoarse_[iElem] -> getPatch();
                 for (int j = 0; j < dim; j++) xsi[j] = xsiCP[i][j]; 
-                shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParFine,patch);
+                shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParCoarse,patch);
 
                 for (int j = 0; j < 9; j++){
-                	for (int k = 0; k < dim; k++){
-                		Bcoord_[i][k] += phi_[j] * coord_[j][k];
+                    for (int k = 0; k < dim; k++){
+                    	Bcoord_[i][k] += phi_[j] * coord_[j][k];
                     	Bvel_[i][k] += phi_[j] * vel_[j][k];
                     	Brealvel_[i][k] += phi_[j] * realvel_[j][k];
-                    	Blagmult_[i][k] += phi_[j] * lagmult_[j][k];
-                	};
+                    };
                     Bpress_[i] += phi_[j] * press_[j];
                     Brealpress_[i] += phi_[j] * realpress_[j];
                     Bdistance_[i] += phi_[j] * distance_[j];
                     BenergyW_[i] += phi_[j] * energyW_[j];
                 };
+
             };
 
             for (int i = 0; i< 9; i++){
                 for (int j = 0; j < dim; j++){
-                	CoordF[Beconnec[i]][j] = Bcoord_[i][j];
-                	VelF[Beconnec[i]][j] = Bvel_[i][j];
-                	realVelF[Beconnec[i]][j] = Brealvel_[i][j];
-                	LagMult[Beconnec[i]][j] = Blagmult_[i][j];
+                	Coord[Beconnec[i]][j] = Bcoord_[i][j];
+                	Vel[Beconnec[i]][j] = Bvel_[i][j];
+                	realVel[Beconnec[i]][j] = Brealvel_[i][j];
                 };
-                PressF[Beconnec[i]] = Bpress_[i];
-                realPressF[Beconnec[i]] = Brealpress_[i];
-                DistanceF[Beconnec[i]] = Bdistance_[i];
-                EnergyWF[Beconnec[i]] = BenergyW_[i];
-	       };
+                Press[Beconnec[i]] = Bpress_[i];
+                realPress[Beconnec[i]] = Brealpress_[i];
+                Distance[Beconnec[i]] = Bdistance_[i];
+                EnergyW[Beconnec[i]] = BenergyW_[i];
+            };
+        
+        };//iElem
 
-        };
-
-              
+                
         for (int i = 0; i< numBezierNodes;i++){
-        	output_vf << CoordF[i][0] << " " << CoordF[i][1] << " " << 0.1 << std::endl;
-        };
+        	output_v << Coord[i][0] << " " << Coord[i][1] << " " << 0. << std::endl;
+        }
 
-        output_vf << "      </DataArray>" << std::endl
+        output_v << "      </DataArray>" << std::endl
                  << "    </Points>" << std::endl;
         
         //WRITE ELEMENT CONNECTIVITY
-        output_vf << "    <Cells>" << std::endl
+        output_v << "    <Cells>" << std::endl
                  << "      <DataArray type=\"Int32\" "
                  << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
 
-        for (int iElem = 0; iElem < numElemFine; ++iElem){
+        for (int iElem = 0; iElem < numElemCoarse; ++iElem){
            
-            int *Bconnec_= elementsFine_[iElem]->getBezierConnectivity();  
+            int *Bconnec_ = elementsCoarse_[iElem]->getBezierConnectivity();  
             int Bconnec[9];
             for (int i = 0; i < 9; i++) Bconnec[i] = Bconnec_[i];            
             
-        	output_vf << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
+        	output_v << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
             << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " " 
             << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4]<<  std::endl;
 
         };
-
-        output_vf << "      </DataArray>" << std::endl;
+        output_v << "      </DataArray>" << std::endl;
       
         //WRITE OFFSETS IN DATA ARRAY
-        output_vf << "      <DataArray type=\"Int32\""
+        output_v << "      <DataArray type=\"Int32\""
                  << " Name=\"offsets\" format=\"ascii\">" << std::endl;
-        
-        aux = 0;
-        for (int i = 0; i < numElemFine; i++){
-            output_vf << aux + 9 << std::endl;
+        int aux = 0;
+        for (int i = 0; i < numElemCoarse; i++){
+            output_v << aux + 9 << std::endl;
             aux += 9;
         };
-        output_vf << "      </DataArray>" << std::endl;
+        output_v << "      </DataArray>" << std::endl;
       
         //WRITE ELEMENT TYPES
-        output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+        output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
                  << "format=\"ascii\">" << std::endl;
-        for (int i = 0; i < numElemFine; i++){
-            output_vf << 70 << std::endl;
+        
+        for (int i = 0; i < numElemCoarse; i++){
+            output_v << 70 << std::endl;
         };
-        output_vf << "      </DataArray>" << std::endl
+        output_v << "      </DataArray>" << std::endl
                  << "    </Cells>" << std::endl;
 
         // WRITE NODAL RESULTS
-        output_vf << "    <PointData>" << std::endl;
+        output_v << "    <PointData>" << std::endl;
 
-        if (fineModel.printVelocity){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+        if (coarseModel.printVelocity){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
                       << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << VelF[i][0] << " "              
-                          << VelF[i][1] << " " 
+                output_v << Vel[i][0] << " "              
+                          << Vel[i][1] << " " 
                           << 0. << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-
-        if (fineModel. printRealVelocity){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+        if (coarseModel.printRealVelocity){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
                       << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << realVelF[i][0] << " "              
-                          << realVelF[i][1] << " " 
+                output_v << realVel[i][0] << " "              
+                          << realVel[i][1] << " " 
                           << 0. << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-        if (fineModel.printPressure){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+
+        if (coarseModel.printPressure){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
                      << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << 0. << " " << 0. << " " 
-                          << PressF[i] << std::endl;
+                output_v << 0. << " " << 0. << " " 
+                          << Press[i] << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-         if (fineModel.printRealPressure){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+        if (coarseModel.printRealPressure){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
                      << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << 0. << " " << 0. << " " 
-                          << realPressF[i] << std::endl;
+                output_v << 0. << " " << 0. << " " 
+                          << realPress[i] << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-        if (fineModel.printLagrangeMultipliers){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-                     << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+
+        if (coarseModel.printDistFunction){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                     << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << LagMult[i][0] <<  " "
-                          << LagMult[i][1] << " " 
-                          << 0.0 << " " << std::endl;
+                output_v << Distance[i] << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-
-        if (fineModel.printDistFunction){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-                     << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+        if (coarseModel.printEnergyWeightFunction){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                     << "Name=\"Energy Weight Function\" format=\"ascii\">" << std::endl;
             for (int i=0; i<numBezierNodes; i++){
-                output_vf << DistanceF[i] << std::endl;
+                output_v << EnergyW[i] << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
 
-        if (fineModel.printEnergyWeightFunction){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-                     << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
-            for (int i=0; i<numBezierNodes; i++){
-                output_vf << EnergyWF[i] << std::endl;
-            };
-            output_vf << "      </DataArray> " << std::endl;
-        };
 
-
-        if (fineModel.printNodalCorrespondence){
-            output_vf<<"      <DataArray type=\"Int32\" NumberOfComponents=\"1\" "
-                     << "Name=\"printNodalCorrespondece\" format=\"ascii\">" << std::endl;
-            for (int i=0; i<numBezierNodes; i++){
-                output_vf << 0 << std::endl;
-            };
-            output_vf << "      </DataArray> " << std::endl;
-        };
-
-        output_vf << "    </PointData>" << std::endl; 
+        output_v << "    </PointData>" << std::endl; 
 
         //WRITE ELEMENT RESULTS
-        output_vf << "    <CellData>" << std::endl;
+        output_v << "    <CellData>" << std::endl;
         
-        if (fineModel.printProcess){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+        if (coarseModel.printProcess){
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
                      << "Name=\"Process\" format=\"ascii\">" << std::endl;
-            for (int i=0; i<numElemFine; i++){
-                output_vf << domDecompFine.first[i] << std::endl;
+            for (int i=0; i<numElemCoarse; i++){
+                output_v << domDecompFine.first[i] << std::endl;
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
 
         if (fineModel.printGlueZone){
-            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+            output_v<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
                      << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
             int cont=0;
-            for (int i=0; i<numElemFine; i++){
-                if (elementsGlueZoneFine_[cont] == i){
-                    output_vf << 1.0 << std::endl;
+            for (int i=0; i<numElemCoarse; i++){
+                if (elementsGlueZoneCoarse_[cont] == i){
+                    output_v << 1.0 << std::endl;
                     cont += 1; 
                 }else{
-                    output_vf << 0.0 << std::endl;
+                    output_v << 0.0 << std::endl;
                 };
             };
-            output_vf << "      </DataArray> " << std::endl;
+            output_v << "      </DataArray> " << std::endl;
         };
 
-        output_vf << "    </CellData>" << std::endl; 
+        output_v << "    </CellData>" << std::endl; 
 
         //FINALIZE OUTPUT FILE
-        output_vf << "  </Piece>" << std::endl
+        output_v << "  </Piece>" << std::endl
                << "  </UnstructuredGrid>" << std::endl
                << "</VTKFile>" << std::endl;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-    //           //LAGRANGE MULTIPLIERS
-    //     std::string f = "LAGRANGEoutput"+result+".vtu";
+    
+        //PRINT FINE MODEL RESULTS - IGA MESH or FEM mesh
+        std::string f = "FINEoutput"+result+".vtu";
         
-    //     std::fstream output_vf(f.c_str(), std::ios_base::out);
+        std::fstream output_vf(f.c_str(), std::ios_base::out);
 
-    //     output_vf << "<?xml version=\"1.0\"?>" << std::endl
-    //              << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
-    //              << "  <UnstructuredGrid>" << std::endl
-    //              << "  <Piece NumberOfPoints=\"" << numNodesGlueZoneFine
-    //              << "\"  NumberOfCells=\"" << numElemGlueZoneFine
-    //              << "\">" << std::endl;
+        if (elemTypeFine == 0){ //FEM elements
 
-    //     //WRITE NODAL COORDINATES
-    //     output_vf << "    <Points>" << std::endl
-    //              << "      <DataArray type=\"Float64\" "
-    //              << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+            output_vf << "<?xml version=\"1.0\"?>" << std::endl
+         	<< "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+         	<< "  <UnstructuredGrid>" << std::endl
+         	<< "  <Piece NumberOfPoints=\"" << numNodesFine
+         	<< "\"  NumberOfCells=\"" << numElemFine
+         	<< "\">" << std::endl;
 
+	        //WRITE NODAL COORDINATES
+	        output_vf << "    <Points>" << std::endl
+	                 << "      <DataArray type=\"Float64\" "
+	                 << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
 
-    //     // Bezier Extraction
-    //     double CoordLA[numBezierNodes][dim];
-    //     double PressF[numBezierNodes], realPressF[numBezierNodes], DistanceF[numBezierNodes],EnergyWF[numBezierNodes];
+	        for (int i = 0; i < numNodesFine; i++){
+	            double *x = nodesFine_[i] -> getCoordinates();
+	            double x_[dim];
+	            for (int i = 0; i < dim; i++) x_[i] = x[i];
+	            output_vf << x_[0] << " " << x_[1] << " " << 0.1 << std::endl;
+	        };
 
-    //     for (int iElem = 0; iElem < numElemFine; ++iElem){
-                         
-    //         int *Beconnec = elementsFine_[iElem] -> getBezierConnectivity();
-    //         int *connec = elementsFine_[iElem] -> getConnectivity();
-
-    //     	// Data in the NURBS control points
-    //         double coord_[9][dim],vel_[9][dim],realvel_[9][dim],
-    //         	   press_[9],realpress_[9],distance_[9],energyW_[9];
-            
-    //         for (int i = 0; i < 9; i++){
-				// double *x = nodesFine_[connec[i]] -> getCoordinates();
-    //             for (int j = 0; j < dim; j++){
-    //             	coord_[i][j] = x[j];
-    //             	vel_[i][j] = nodesFine_[connec[i]] -> getVelocity(j);
-    //             	realvel_[i][j] = nodesFine_[connec[i]] -> getVelocityArlequin(j);
-    //             };
-    //             press_[i] = nodesFine_[connec[i]] -> getPressure();
-    //             realpress_[i] = nodesFine_[connec[i]] -> getPressureArlequin();
-    //             distance_[i] = nodesFine_[connec[i]] -> getDistFunction();   
-    //             energyW_[i] = nodesFine_[connec[i]] -> getWeightFunction();              
-    //      	};  
-
-    //         //interpolated values (Bezier variables)
-    //         double Bcoord_[9][2] = {};
-    //         double Bvel_[9][2]= {};
-    //         double Brealvel_[9][2]= {};
-    //         double Bpress_[9]= {};
-    //         double Brealpress_[9]= {};
-    //         double Bdistance_[9]= {};
-    //         double BenergyW_[9] = {};
-
-    //         for (int i = 0; i < 9; i++){
-
-    //             QuadShapeFunction<2> shapeQuad;
-    //             double phi_[9],wpc[9],xsi[dim];
-    //             for (int k = 0; k < 9; k ++) wpc[k] = nodesFine_[connec[k]] -> getWeightPC();  
-    //             int *inc_ = nodesFine_[connec[8]] -> getINC(); 
-    //             int patch = elementsFine_[iElem] -> getPatch();
-    //             for (int j = 0; j < dim; j++) xsi[j] = xsiCP[i][j]; 
-    //             shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParFine,patch);
-
-    //             for (int j = 0; j < 9; j++){
-    //             	for (int k = 0; k < dim; k++){
-    //             		Bcoord_[i][k] += phi_[j] * coord_[j][k];
-    //                 	Bvel_[i][k] += phi_[j] * vel_[j][k];
-    //                 	Brealvel_[i][k] += phi_[j] * realvel_[j][k];
-    //             	};
-    //                 Bpress_[i] += phi_[j] * press_[j];
-    //                 Brealpress_[i] += phi_[j] * realpress_[j];
-    //                 Bdistance_[i] += phi_[j] * distance_[j];
-    //                 BenergyW_[i] += phi_[j] * energyW_[j];
-    //             };
-    //         };
-
-    //         for (int i = 0; i< 9; i++){
-    //             for (int j = 0; j < dim; j++){
-    //             	CoordF[Beconnec[i]][j] = Bcoord_[i][j];
-    //             	VelF[Beconnec[i]][j] = Bvel_[i][j];
-    //             	realVelF[Beconnec[i]][j] = Brealvel_[i][j];
-    //             };
-    //             PressF[Beconnec[i]] = Bpress_[i];
-    //             realPressF[Beconnec[i]] = Brealpress_[i];
-    //             DistanceF[Beconnec[i]] = Bdistance_[i];
-    //             EnergyWF[Beconnec[i]] = BenergyW_[i];
-	   //     };
-
-    //     };
-
-              
-    //     for (int i = 0; i< numBezierNodes;i++){
-    //     	output_vf << CoordF[i][0] << " " << CoordF[i][1] << " " << 0. << std::endl;
-    //     };
-
-    //     output_vf << "      </DataArray>" << std::endl
-    //              << "    </Points>" << std::endl;
+	        output_vf << "      </DataArray>" << std::endl
+	                 << "    </Points>" << std::endl;
         
-    //     //WRITE ELEMENT CONNECTIVITY
-    //     output_vf << "    <Cells>" << std::endl
-    //              << "      <DataArray type=\"Int32\" "
-    //              << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
-
-    //     for (int iElem = 0; iElem < numElemFine; ++iElem){
-           
-    //         int *Bconnec_= elementsFine_[iElem]->getBezierConnectivity();  
-    //         int Bconnec[9];
-    //         for (int i = 0; i < 9; i++) Bconnec[i] = Bconnec_[i];            
-            
-    //     	output_vf << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
-    //         << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " " 
-    //         << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4]<<  std::endl;
-
-    //     };
-
-    //     output_vf << "      </DataArray>" << std::endl;
-      
-    //     //WRITE OFFSETS IN DATA ARRAY
-    //     output_vf << "      <DataArray type=\"Int32\""
-    //              << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+	        //WRITE ELEMENT CONNECTIVITY
+	        output_vf << "    <Cells>" << std::endl
+	                 << "      <DataArray type=\"Int32\" "
+	                 << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+	        
+	        for (int i = 0; i < numElemFine; i++){
+	            int *connec = elementsFine_[i] -> getConnectivity();
+	            int con[6];
+	            for (int i = 0; i < 6; i++) con[i] = connec[i];
+	            output_vf << con[0] << " " << con[1] << " " << con[2] << " " 
+	                     << con[3] << " " << con[4] << " " << con[5] << std::endl;
+	        };
+	        output_vf << "      </DataArray>" << std::endl;
+	      
+	        //WRITE OFFSETS IN DATA ARRAY
+	        output_vf << "      <DataArray type=\"Int32\""
+	                 << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+	        
+	        int aux = 0;
+	        for (int i = 0; i < numElemFine; i++){
+	            output_vf << aux + 6 << std::endl;
+	            aux += 6;
+	        };
+	        output_vf << "      </DataArray>" << std::endl;
+	      
+	        //WRITE ELEMENT TYPES
+	        output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+	                 << "format=\"ascii\">" << std::endl;
         
-    //     aux = 0;
-    //     for (int i = 0; i < numElemFine; i++){
-    //         output_vf << aux + 9 << std::endl;
-    //         aux += 9;
-    //     };
-    //     output_vf << "      </DataArray>" << std::endl;
-      
-    //     //WRITE ELEMENT TYPES
-    //     output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
-    //              << "format=\"ascii\">" << std::endl;
-    //     for (int i = 0; i < numElemFine; i++){
-    //         output_vf << 70 << std::endl;
-    //     };
-    //     output_vf << "      </DataArray>" << std::endl
-    //              << "    </Cells>" << std::endl;
+	        for (int i = 0; i < numElemFine; i++){
+	            output_vf << 22 << std::endl;
+	        };
 
-    //     // WRITE NODAL RESULTS
-    //     output_vf << "    <PointData>" << std::endl;
+	        output_vf << "      </DataArray>" << std::endl
+	                 << "    </Cells>" << std::endl;
 
-    //     if (fineModel.printVelocity){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-    //                   << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << VelF[i][0] << " "              
-    //                       << VelF[i][1] << " " 
-    //                       << 0. << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
+	        //WRITE NODAL RESULTS
+	        output_vf << "    <PointData>" << std::endl;
 
+	        if (fineModel.printVelocity){
+	            output_vf <<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){ 
+	            	     output_vf << nodesFine_[i] -> getVelocity(0) << " "              
+	                               << nodesFine_[i] -> getVelocity(1)  << " " 
+	                               << 0. << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
 
-    //     if (fineModel. printRealVelocity){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-    //                   << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << realVelF[i][0] << " "              
-    //                       << realVelF[i][1] << " " 
-    //                       << 0. << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-    //     if (fineModel.printPressure){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-    //                  << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << 0. << " " << 0. << " " 
-    //                       << PressF[i] << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-    //      if (fineModel.printRealPressure){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
-    //                  << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << 0. << " " << 0. << " " 
-    //                       << realPressF[i] << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-
-    //     if (fineModel.printDistFunction){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-    //                  << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << DistanceF[i] << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-
-    //     if (fineModel.printEnergyWeightFunction){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-    //                  << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << EnergyWF[i] << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-    //     if (fineModel.printNodalCorrespondence){
-    //         output_vf<<"      <DataArray type=\"Int32\" NumberOfComponents=\"1\" "
-    //                  << "Name=\"printNodalCorrespondece\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numBezierNodes; i++){
-    //             output_vf << 0 << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
-
-    //     output_vf << "    </PointData>" << std::endl; 
-
-    //     //WRITE ELEMENT RESULTS
-    //     output_vf << "    <CellData>" << std::endl;
+	        if (fineModel. printRealVelocity){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                      << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	                	output_vf << nodesFine_[i] -> getVelocityArlequin(0) << " "              
+	                              << nodesFine_[i] -> getVelocityArlequin(1)  << " " 
+	                              << 0. << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+       
         
-    //     if (fineModel.printProcess){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-    //                  << "Name=\"Process\" format=\"ascii\">" << std::endl;
-    //         for (int i=0; i<numElemFine; i++){
-    //             output_vf << domDecompFine.first[i] << std::endl;
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
+	        if (fineModel.printPressure){
+	            output_vf <<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	            	output_vf << 0. << " " << 0. << " " 
+	                		  << nodesFine_[i] -> getPressure()<< std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        if (fineModel.printRealPressure){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	                output_vf << 0. << " " << 0. << " " 
+	                		  << nodesFine_[i] -> getPressureArlequin()<< std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        if (fineModel.printLagrangeMultipliers){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	                output_vf << nodesFine_[i] -> getLagrangeMultiplier(0) <<  " "
+	                          << nodesFine_[i] -> getLagrangeMultiplier(1)<< " " 
+	                          << 0.0 << " " << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
 
 
-    //     if (fineModel.printGlueZone){
-    //         output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
-    //                  << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
-    //         int cont=0;
-    //         for (int i=0; i<numElemFine; i++){
-    //             if (elementsGlueZoneFine_[cont] == i){
-    //                 output_vf << 1.0 << std::endl;
-    //                 cont += 1; 
-    //             }else{
-    //                 output_vf << 0.0 << std::endl;
-    //             };
-    //         };
-    //         output_vf << "      </DataArray> " << std::endl;
-    //     };
+	        if (fineModel.printDistFunction){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	                output_vf << nodesFine_[i] -> getDistFunction() << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
 
-    //     output_vf << "    </CellData>" << std::endl; 
 
-    //     //FINALIZE OUTPUT FILE
-    //     output_vf << "  </Piece>" << std::endl
-    //            << "  </UnstructuredGrid>" << std::endl
-    //            << "</VTKFile>" << std::endl;
+	        if (fineModel.printEnergyWeightFunction){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numNodesFine; i++){
+	                output_vf << nodesFine_[i] -> getWeightFunction() << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        output_vf << "    </PointData>" << std::endl; 
+
+	        //WRITE ELEMENT RESULTS
+	        output_vf << "    <CellData>" << std::endl;
+	        
+	        if (fineModel.printProcess){
+	            output_vf <<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"Process\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numElemFine; i++){
+	                output_vf << domDecompFine.first[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        int cont=0;
+	        if (fineModel.printGlueZone){
+	            output_vf <<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+	            cont = 0;
+	            for (int i=0; i<numElemFine; i++){
+	                if (elementsGlueZoneFine_[cont] == i){
+	                    output_vf << 1.0 << std::endl;
+	                    cont++;
+	                }else{
+	                    output_vf << 0.0 << std::endl;
+	                };
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        output_vf << "    </CellData>" << std::endl; 
+
+	        //FINALIZE OUTPUT FILE
+	        
+	        output_vf << "  </Piece>" << std::endl
+	           << "  </UnstructuredGrid>" << std::endl
+	           << "</VTKFile>" << std::endl;
+
+        } else { //IGA elements
+
+	        numBezierNodes = fineModel.NumBezierNodes;
+
+	        output_vf << "<?xml version=\"1.0\"?>" << std::endl
+	                 << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+	                 << "  <UnstructuredGrid>" << std::endl
+	                 << "  <Piece NumberOfPoints=\"" << numBezierNodes
+	                 << "\"  NumberOfCells=\"" << numElemFine
+	                 << "\">" << std::endl;
+
+	        //WRITE NODAL COORDINATES
+	        output_vf << "    <Points>" << std::endl
+	                 << "      <DataArray type=\"Float64\" "
+	                 << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+
+	        // Bezier Extraction
+	        double VelF[numBezierNodes][dim], realVelF[numBezierNodes][dim], CoordF[numBezierNodes][dim], LagMult[numBezierNodes][dim],
+	        PressF[numBezierNodes], realPressF[numBezierNodes], DistanceF[numBezierNodes],EnergyWF[numBezierNodes];
+
+	        for (int iElem = 0; iElem < numElemFine; ++iElem){
+	                         
+	            int *Beconnec = elementsFine_[iElem] -> getBezierConnectivity();
+	            int *connec = elementsFine_[iElem] -> getConnectivity();
+
+	        	// Data in the NURBS control points
+	            double coord_[9][dim],vel_[9][dim],realvel_[9][dim],lagmult_[9][dim],
+	            	   press_[9],realpress_[9],distance_[9],energyW_[9];
+	            
+	            for (int i = 0; i < 9; i++){
+					double *x = nodesFine_[connec[i]] -> getCoordinates();
+	                for (int j = 0; j < dim; j++){
+	                	coord_[i][j] = x[j];
+	                	vel_[i][j] = nodesFine_[connec[i]] -> getVelocity(j);
+	                	realvel_[i][j] = nodesFine_[connec[i]] -> getVelocityArlequin(j);
+	                	lagmult_[i][j] = nodesFine_[connec[i]] -> getLagrangeMultiplier(j);
+	                };
+	                press_[i] = nodesFine_[connec[i]] -> getPressure();
+	                realpress_[i] = nodesFine_[connec[i]] -> getPressureArlequin();
+	                distance_[i] = nodesFine_[connec[i]] -> getDistFunction();   
+	                energyW_[i] = nodesFine_[connec[i]] -> getWeightFunction();              
+	         	};  
+
+	            //interpolated values (Bezier variables)
+	            double Bcoord_[9][2] = {};
+	            double Bvel_[9][2]= {};
+	            double Brealvel_[9][2]= {};
+	            double Bpress_[9]= {};
+	            double Brealpress_[9]= {};
+	            double Bdistance_[9]= {};
+	            double BenergyW_[9] = {};
+	            double Blagmult_[9][2] = {};
+
+	            for (int i = 0; i < 9; i++){
+
+	                QuadShapeFunction<2> shapeQuad;
+	                double phi_[9],wpc[9],xsi[dim];
+	                for (int k = 0; k < 9; k ++) wpc[k] = nodesFine_[connec[k]] -> getWeightPC();  
+	                int *inc_ = nodesFine_[connec[8]] -> getINC(); 
+	                int patch = elementsFine_[iElem] -> getPatch();
+	                for (int j = 0; j < dim; j++) xsi[j] = xsiCP[i][j]; 
+	                shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,IsoParFine,patch);
+
+	                for (int j = 0; j < 9; j++){
+	                	for (int k = 0; k < dim; k++){
+	                		Bcoord_[i][k] += phi_[j] * coord_[j][k];
+	                    	Bvel_[i][k] += phi_[j] * vel_[j][k];
+	                    	Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+	                    	Blagmult_[i][k] += phi_[j] * lagmult_[j][k];
+	                	};
+	                    Bpress_[i] += phi_[j] * press_[j];
+	                    Brealpress_[i] += phi_[j] * realpress_[j];
+	                    Bdistance_[i] += phi_[j] * distance_[j];
+	                    BenergyW_[i] += phi_[j] * energyW_[j];
+	                };
+	            };
+
+	            for (int i = 0; i< 9; i++){
+	                for (int j = 0; j < dim; j++){
+	                	CoordF[Beconnec[i]][j] = Bcoord_[i][j];
+	                	VelF[Beconnec[i]][j] = Bvel_[i][j];
+	                	realVelF[Beconnec[i]][j] = Brealvel_[i][j];
+	                	LagMult[Beconnec[i]][j] = Blagmult_[i][j];
+	                };
+	                PressF[Beconnec[i]] = Bpress_[i];
+	                realPressF[Beconnec[i]] = Brealpress_[i];
+	                DistanceF[Beconnec[i]] = Bdistance_[i];
+	                EnergyWF[Beconnec[i]] = BenergyW_[i];
+		       };
+
+	        };
+
+	              
+	        for (int i = 0; i< numBezierNodes;i++){
+	        	output_vf << CoordF[i][0] << " " << CoordF[i][1] << " " << 0.1 << std::endl;
+	        };
+
+	        output_vf << "      </DataArray>" << std::endl
+	                 << "    </Points>" << std::endl;
+	        
+	        //WRITE ELEMENT CONNECTIVITY
+	        output_vf << "    <Cells>" << std::endl
+	                 << "      <DataArray type=\"Int32\" "
+	                 << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+	        for (int iElem = 0; iElem < numElemFine; ++iElem){
+	           
+	            int *Bconnec_= elementsFine_[iElem]->getBezierConnectivity();  
+	            int Bconnec[9];
+	            for (int i = 0; i < 9; i++) Bconnec[i] = Bconnec_[i];            
+	            
+	        	output_vf << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
+	            << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " " 
+	            << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4]<<  std::endl;
+
+	        };
+
+	        output_vf << "      </DataArray>" << std::endl;
+	      
+	        //WRITE OFFSETS IN DATA ARRAY
+	        output_vf << "      <DataArray type=\"Int32\""
+	                 << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+	        
+	        aux = 0;
+	        for (int i = 0; i < numElemFine; i++){
+	            output_vf << aux + 9 << std::endl;
+	            aux += 9;
+	        };
+	        output_vf << "      </DataArray>" << std::endl;
+	      
+	        //WRITE ELEMENT TYPES
+	        output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+	                 << "format=\"ascii\">" << std::endl;
+	        for (int i = 0; i < numElemFine; i++){
+	            output_vf << 70 << std::endl;
+	        };
+	        output_vf << "      </DataArray>" << std::endl
+	                 << "    </Cells>" << std::endl;
+
+	        // WRITE NODAL RESULTS
+	        output_vf << "    <PointData>" << std::endl;
+
+	        if (fineModel.printVelocity){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                      << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << VelF[i][0] << " "              
+	                          << VelF[i][1] << " " 
+	                          << 0. << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        if (fineModel. printRealVelocity){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                      << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << realVelF[i][0] << " "              
+	                          << realVelF[i][1] << " " 
+	                          << 0. << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        if (fineModel.printPressure){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << 0. << " " << 0. << " " 
+	                          << PressF[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	         if (fineModel.printRealPressure){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << 0. << " " << 0. << " " 
+	                          << realPressF[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        if (fineModel.printLagrangeMultipliers){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+	                     << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << LagMult[i][0] <<  " "
+	                          << LagMult[i][1] << " " 
+	                          << 0.0 << " " << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        if (fineModel.printDistFunction){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << DistanceF[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        if (fineModel.printEnergyWeightFunction){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << EnergyWF[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        if (fineModel.printNodalCorrespondence){
+	            output_vf<<"      <DataArray type=\"Int32\" NumberOfComponents=\"1\" "
+	                     << "Name=\"printNodalCorrespondece\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numBezierNodes; i++){
+	                output_vf << 0 << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        output_vf << "    </PointData>" << std::endl; 
+
+	        //WRITE ELEMENT RESULTS
+	        output_vf << "    <CellData>" << std::endl;
+	        
+	        if (fineModel.printProcess){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"Process\" format=\"ascii\">" << std::endl;
+	            for (int i=0; i<numElemFine; i++){
+	                output_vf << domDecompFine.first[i] << std::endl;
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+
+	        if (fineModel.printGlueZone){
+	            output_vf<<"      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+	                     << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+	            int cont=0;
+	            for (int i=0; i<numElemFine; i++){
+	                if (elementsGlueZoneFine_[cont] == i){
+	                    output_vf << 1.0 << std::endl;
+	                    cont += 1; 
+	                }else{
+	                    output_vf << 0.0 << std::endl;
+	                };
+	            };
+	            output_vf << "      </DataArray> " << std::endl;
+	        };
+
+	        output_vf << "    </CellData>" << std::endl; 
+
+	        //FINALIZE OUTPUT FILE
+	        output_vf << "  </Piece>" << std::endl
+	               << "  </UnstructuredGrid>" << std::endl
+	               << "</VTKFile>" << std::endl;
+        }; //else IGA
 
     };
+
 };
 
 
@@ -2424,7 +2623,12 @@ void Arlequin<2>::printResultsIP(int step) {
         
         std::fstream output_v(s.c_str(), std::ios_base::out);
 
-        int numberIntPoints = elementsFine_[0] -> getNumberOfIntegrationPointsSpecial();
+        int numberIntPoints;
+        if (elemTypeFine == 0){
+        	numberIntPoints = elementsFine_[0] -> getNumberOfIntegrationPointsSpecial_FEM();
+        } else {
+        	numberIntPoints = elementsFine_[0] -> getNumberOfIntegrationPointsSpecial_ISO();
+        }
 
     	output_v << "<?xml version=\"1.0\"?>" << std::endl
                  << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
@@ -2439,22 +2643,33 @@ void Arlequin<2>::printResultsIP(int step) {
 
         for (int i = 0; i < numElemGlueZoneFine; i++){
 
-        	
-
         	for (int ip = 0; ip < numberIntPoints; ip++){
             	
             	QuadShapeFunction<2>  shapeQuad;
-            	
-            	//correspondent integration point in the coarse mesh
             	double qxsiC[2];
-            	qxsiC[0] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue(ip,0);
-            	qxsiC[1] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue(ip,1);
-            	
-            	//coarse element index
-            	int indCoarseElem = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement(ip);
-            	
-                int *connec = elementsCoarse_[indCoarseElem] -> getConnectivity();
+            	int indCoarseElem;
 
+            	if (elemTypeFine == 0){ //FEM fine mesh
+
+            		//correspondent integration point in the coarse mesh
+	            	qxsiC[0] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue_FEM(ip,0);
+	            	qxsiC[1] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue_FEM(ip,1);
+	            	//coarse element index
+            		indCoarseElem = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement_FEM(ip);
+	            	
+            	
+            	} else { //IGA fine mesh
+
+            		//correspondent integration point in the coarse mesh
+	            	qxsiC[0] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue_ISO(ip,0);
+	            	qxsiC[1] = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCoordinatesValue_ISO(ip,1);
+	            	//coarse element index
+	            	indCoarseElem = elementsFine_[elementsGlueZoneFine_[i]] -> getIntegPointCorrespondenceElement_ISO(ip);
+
+            	};
+
+
+                int *connec = elementsCoarse_[indCoarseElem] -> getConnectivity();
 
                 //Computes nurbs basis functions
                 int patch = elementsCoarse_[indCoarseElem] -> getPatch();
@@ -2470,17 +2685,13 @@ void Arlequin<2>::printResultsIP(int step) {
         			coord[1] += x[1]*phi_[j];
         		}
 
-        		output_v << coord[0] << " " << coord[1] << " " << 0.0 << std::endl;
-            	
+        		output_v << coord[0] << " " << coord[1] << " " << 0.2 << std::endl;
+	            	
         	} //loop integration points
         } // loop glue fine mesh elements   
 
         output_v << "      </DataArray>" << std::endl
                  << "    </Points>" << std::endl;
-
-        
-
-        
       
         //WRITE ELEMENT CONNECTIVITY
         output_v << "    <Cells>" << std::endl
@@ -2524,7 +2735,7 @@ void Arlequin<2>::printResultsIP(int step) {
         
 
 
-    	//PRINT FINE MODEL RESULTS
+    	//PRINT FINE MODEL RESULTS (IGA or FEM mesh)
         std::string f = "saidaFineIP"+result+".vtu";
         std::fstream output_vf(f.c_str(), std::ios_base::out);
     
@@ -2545,30 +2756,57 @@ void Arlequin<2>::printResultsIP(int step) {
 		for (int i = 0; i< numElemGlueZoneFine; i++){
 
         	SpecialQuadrature squad;
-            double wpc[9],x1[9], x2[9];
 
-			int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
-            int patch = elementsFine_[elementsGlueZoneFine_[i]] -> getPatch();
-            int *inc = nodesFine_[connec[8]] -> getINC();
+        	if (elemTypeFine == 0) { //FEM mesh
+
+        		
+        		double x1[6], x2[6];
+
+				int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
+
                 	
-            for (int j = 0; j < 9; j++){
-                double *x = nodesFine_[connec[j]] -> getCoordinates();
-                wpc[j] = nodesFine_[connec[j]] -> getWeightPC();
-                x1[j] = x[0];
-                x2[j] = x[1];
-            }; 
+            	for (int j = 0; j < 6; j++){
+                	double *x = nodesFine_[connec[j]] -> getCoordinates();
+                	x1[j] = x[0];
+                	x2[j] = x[1];
+            	}; 
 
-            int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]] -> 
-                                  getNumberOfIntegrationPointsSpecial();
+            	for (int ip = 0; ip < numberIntPoints; ip++){
 
-            for (int ip = 0; ip < numberIntPoints; ip++){
-
-            	double x_[2];
-                x_[0] = squad.interpolateQuadraticVariable(x1,ip,wpc,inc,IsoParFine,patch);
-                x_[1] = squad.interpolateQuadraticVariable(x2,ip,wpc,inc,IsoParFine,patch);
+            		double x_[2];
+                	x_[0] = squad.interpolateQuadraticVariableFem(x1,ip);
+                	x_[1] = squad.interpolateQuadraticVariableFem(x2,ip);
             
-				output_vf << x_[0] << " " << x_[1] << " " << 0.0 << std::endl;
-            }
+					output_vf << x_[0] << " " << x_[1] << " " << 0.2 << std::endl;
+            	}
+
+
+
+        	} else { //IGA mesh
+
+        		double wpc[9],x1[9], x2[9];
+
+				int *connec = elementsFine_[elementsGlueZoneFine_[i]] -> getConnectivity();
+            	int patch = elementsFine_[elementsGlueZoneFine_[i]] -> getPatch();
+            	int *inc = nodesFine_[connec[8]] -> getINC();
+                	
+            	for (int j = 0; j < 9; j++){
+                	double *x = nodesFine_[connec[j]] -> getCoordinates();
+                	wpc[j] = nodesFine_[connec[j]] -> getWeightPC();
+                	x1[j] = x[0];
+                	x2[j] = x[1];
+            	}; 
+
+            	for (int ip = 0; ip < numberIntPoints; ip++){
+
+            		double x_[2];
+                	x_[0] = squad.interpolateQuadraticVariableIso(x1,ip,wpc,inc,IsoParFine,patch);
+                	x_[1] = squad.interpolateQuadraticVariableIso(x2,ip,wpc,inc,IsoParFine,patch);
+            
+					output_vf << x_[0] << " " << x_[1] << " " << 0.0 << std::endl;
+            	}
+        	}
+            
 
 		}
 
@@ -2661,14 +2899,17 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
     arlequinEpsilon = fineModel.arlequinEpsilon;
 
 
-    // //Define coarse elements type
-    // elemType = elementsCoarse_[0] -> getElemType();
+    //Defines coarse elements type
+    elemTypeCoarse = elementsCoarse_[0] -> getElemType();
+
+    //Defines fine elements type
+    elemTypeFine = elementsFine_[0] -> getElemType();
    
-    //Define fine model as true
+    //Defines fine model as true
     for (int i=0; i < numElemFine; i++){
         elementsFine_[i] -> setModel(true); 
     };
-    //Define coarse model elements as false
+    //Defines coarse model elements as false
     for (int i=0; i < numElemCoarse; i++){
         elementsCoarse_[i] -> setModel(false);
     }; 
@@ -2688,7 +2929,7 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
     //Computes the Weight function for all nodes and integration points
     setWeightFunction(); 
 
-     printResults(-1);
+    printResults(-1);
    
 };
 
@@ -2698,65 +2939,74 @@ void Arlequin<2>::setDirichletConstrain(std::vector<int> &dofTemp) {
    
 	int dim = 2;
 
-    //Non coincidente number nodes or control points in fine and coarse mesh
-    int NCNumberNodesF = fineModel.NCNumberNodes;
-    int NCNumberNodesC;
-    // if (elemType == 0){  //fem mesh
-    //     NCNumberNodesC = numNodesCoarse;
-    // } else { //IGA mesh
-        NCNumberNodesC = coarseModel.NCNumberNodes;
-    // };
+    //Non coincidente number nodes/controlPoints in fine and coarse mesh
+    int NCNumberNodesF;
+    if (elemTypeFine == 0){ //FEM mesh
+    	NCNumberNodesF = numNodesFine;
+    } else { //IGA mesh
+    	NCNumberNodesF = fineModel.NCNumberNodes;
+    };
+    
+    //IGA mesh
+    int NCNumberNodesC = coarseModel.NCNumberNodes;
 
-    //Coarse mesh
+
+    //IGA Coarse mesh
     for (int ielem = 0; ielem < numElemCoarse; ielem++){
     	
         int *connec = elementsCoarse_[ielem] -> getConnectivity();
     	
-        // if (elemType == 0){
-        //     for (int i = 0; i < 6 ; i++){
-        //     	//velocity constrain
-        //     	for (int j = 0; j < dim; j++){
-        //     		int constrain = nodesCoarse_[connec[i]] -> getConstrains(j);
-        //     		if ((constrain == 1) || (constrain == 3)){
-        //             	dofTemp.push_back(connec[i]*dim + j);
-        //         	};
-        //     	};
-        //         // //cavity pressure constrain
-        //         // if (connec[i] == 2){
-        //         //  dofTemp.push_back(2*NCNumberNodesC + connec[i]);
-        //         // }    
-        //     };
-        // } else { // IGA mesh
-            for (int i = 0; i < 9 ; i++){
-                int newconi = nodesCoarse_[connec[i]] -> getnewcon();
-                // velocity constrain
-                for (int j = 0; j < dim; j++){
-                	int constrain = nodesCoarse_[connec[i]] -> getConstrains(j);
-                	if ((constrain == 1) || (constrain == 3)){
-                    	dofTemp.push_back(newconi*dim + j);
-                	};
-                };                
-            };
-        // }; end else   
-    };
-
-    //Fine mesh (IGA elements)
-    for (int ielem = 0; ielem < numElemFine; ielem++){
-        int *connec = elementsFine_[ielem] -> getConnectivity();
         for (int i = 0; i < 9 ; i++){
-            int newconi = nodesFine_[connec[i]] -> getnewcon();
+            int newconi = nodesCoarse_[connec[i]] -> getnewcon();
             // velocity constrain
             for (int j = 0; j < dim; j++){
-            	int constrain = nodesFine_[connec[i]] -> getConstrains(j);
+            	int constrain = nodesCoarse_[connec[i]] -> getConstrains(j);
             	if ((constrain == 1) || (constrain == 3)){
-                	dofTemp.push_back(newconi*dim + (dim+1)*NCNumberNodesC + j);
+                	dofTemp.push_back(newconi*dim + j);
             	};
-            };
-            //cavity pressure constrain
-            // if (connec[i] == 0){
-            //  dofTemp.push_back(3*NCNumberNodesC + 2*NCNumberNodesF + newconi);
-            // }  
+            };                
         };
+
+    };
+
+    //Fine mesh (FEM or IGA elements)
+    for (int ielem = 0; ielem < numElemFine; ielem++){
+        int *connec = elementsFine_[ielem] -> getConnectivity();
+        
+        if (elemTypeFine == 0) { //FEM mesh
+
+        	for (int i = 0; i < 6 ; i++){
+	            // velocity constrain
+	            for (int j = 0; j < dim; j++){
+	            	int constrain = nodesFine_[connec[i]] -> getConstrains(j);
+	            	if ((constrain == 1) || (constrain == 3)){
+	                	dofTemp.push_back(connec[i]*dim + (dim+1)*NCNumberNodesC + j);
+	            	};
+	            };
+	            //cavity pressure constrain
+	            // if (connec[i] == 0){
+	            //  dofTemp.push_back(3*NCNumberNodesC + 2*NCNumberNodesF + connec[i]);
+	            // }  
+	        };
+
+        } else {//IGA mesh
+
+        	for (int i = 0; i < 9 ; i++){
+	            int newconi = nodesFine_[connec[i]] -> getnewcon();
+	            // velocity constrain
+	            for (int j = 0; j < dim; j++){
+	            	int constrain = nodesFine_[connec[i]] -> getConstrains(j);
+	            	if ((constrain == 1) || (constrain == 3)){
+	                	dofTemp.push_back(newconi*dim + (dim+1)*NCNumberNodesC + j);
+	            	};
+	            };
+	            //cavity pressure constrain
+	            // if (connec[i] == 0){
+	            //  dofTemp.push_back(3*NCNumberNodesC + 2*NCNumberNodesF + newconi);
+	            // }  
+	        };
+        };
+	        
     };
 };
 
@@ -2764,14 +3014,14 @@ void Arlequin<2>::setDirichletConstrain(std::vector<int> &dofTemp) {
 template<>
 int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
-    Mat               A,F,A_tSUPG,A_tPSPG,A_tLSIC;
-    Vec               b, u, All,b_tSUPG,b_tPSPG,b_tLSIC;
+    Mat               A,F;
+    Vec               b, u, All;
     PetscErrorCode    ierr;
     PetscInt          Istart, Iend, Ii, Ij, Ione, iterations, *dof;
     KSP               ksp;
     PC                pc;
     VecScatter        ctx;
-    PetscScalar       val,val1,val2,val3;
+    PetscScalar       val;
     PetscViewer       viewer;
    
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank); 
@@ -2792,14 +3042,18 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 		dof[i] = dofTemp[i];
 	};
 
-    //Non coincidente number nodes or control points in fine and coarse mesh
-    int NCNumberNodesF = fineModel.NCNumberNodes; //IGA mesh
-    int NCNumberNodesC; //Coarse mesh (FEM mesh or IGA mesh)
-    // if (elemType == 0){ //FEM coarse mesh
-    // 	NCNumberNodesC = numNodesCoarse;	
-    // } else { // IGA coarse mesh
-    	NCNumberNodesC = coarseModel.NCNumberNodes;	
-    // }
+    //Non coincidente number nodes/controlPoints in fine and coarse mesh
+    
+    //Fine mesh (IGA or FEM)
+    int NCNumberNodesF;  
+    if (elemTypeFine == 0){ //FEM coarse mesh
+    	NCNumberNodesF = numNodesFine;	
+    } else { // IGA coarse mesh
+    	NCNumberNodesF = fineModel.NCNumberNodes;
+    };
+
+    //Coarse mesh (IGA)
+    int NCNumberNodesC = coarseModel.NCNumberNodes;	
 
     double &alpha_f = parametersFine -> getAlphaF();
     double &alpha_m = parametersFine -> getAlphaM();
@@ -2988,102 +3242,200 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
                 
                 if (domDecompFine.first[jel] == rank) { 
 
-                    int *connec = elementsFine_[jel] -> getConnectivity();
-                   
-                	double **elemMatrix;
-            		elemMatrix = new double*[27]();
-            		for (int i = 0; i < 27; ++i)  elemMatrix[i] = new double[27]();
-            		double elemVector[27] = {};
+                	if (elemTypeFine == 0) { //FEM mesh
 
-                    elementsFine_[jel] -> getTransientNavierStokes_ISO(elemMatrix,elemVector);
+                		int *connec = elementsFine_[jel] -> getConnectivity();
+	                   
+	                	double **elemMatrix;
+	            		elemMatrix = new double*[18]();
+	            		for (int i = 0; i < 18; ++i)  elemMatrix[i] = new double[18]();
+	            		double elemVector[18] = {};
 
-                    //Disperse local contributions into the global matrix
-                    //Matrix K and C
-                    for (int i=0; i<9; i++){
+	                    elementsFine_[jel] -> getTransientNavierStokes_FEM(elemMatrix,elemVector);
 
-                        int newconi = nodesFine_[connec[i]] -> getnewcon();
-                        
-                        for (int j=0; j<9; j++){
-                                
-                            int newconj = nodesFine_[connec[j]] -> getnewcon();
-                            
-                            int dof_i = 2 * newconi + 3 * NCNumberNodesC;
-                            int dof_j = 2 * newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i,1, &dof_j,
-                                                &elemMatrix[2*i  ][2*j  ],
-                                                ADD_VALUES);
+	                    //Disperse local contributions into the global matrix
+	                    //Matrix K and C
+	                    for (int i=0; i<6; i++){	                        
+	                        for (int j=0; j<6; j++){
+	                                                            
+	                            int dof_i = 2 * connec[i] + 3 * NCNumberNodesC;
+	                            int dof_j = 2 * connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i,1, &dof_j,
+	                                                &elemMatrix[2*i  ][2*j  ],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
-                            dof_j = 2 * newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[2*i+1][2*j  ],
-                                                ADD_VALUES);
+	                            dof_i = 2 * connec[i] + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][2*j  ],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * newconi + 3 * NCNumberNodesC;
-                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[2*i  ][2*j+1],
-                                                ADD_VALUES);
+	                            dof_i = 2 * connec[i] + 3 * NCNumberNodesC;
+	                            dof_j = 2 * connec[j] + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i  ][2*j+1],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
-                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[2*i+1][2*j+1],
-                                                ADD_VALUES);
-                    
-                         //Matrix Q and Qt
-                            dof_i = 2 * newconi + 3 * NCNumberNodesC;
-                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[2*i  ][18+j],
-                                                ADD_VALUES);
+	                            dof_i = 2 * connec[i] + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * connec[j] + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][2*j+1],
+	                                                ADD_VALUES);
+	                    
+	                         //Matrix Q and Qt
+	                            dof_i = 2 * connec[i] + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i  ][12+j],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
-                            dof_j = 2 * newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[18+i][2*j  ],
-                                                ADD_VALUES);
+	                            dof_i = 2 * NCNumberNodesF + connec[i] + 3 * NCNumberNodesC;
+	                            dof_j = 2 * connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[12+i][2*j  ],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
-                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[2*i+1][18+j],
-                                                ADD_VALUES);
+	                            dof_i = 2 * connec[i] + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][12+j],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
-                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[18+i][2*j+1],
-                                                ADD_VALUES);
+	                            dof_i = 2 * NCNumberNodesF + connec[i] + 3 * NCNumberNodesC;
+	                            dof_j = 2 * connec[j] + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[12+i][2*j+1],
+	                                                ADD_VALUES);
 
-                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
-                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrix[18+i][18+j],
-                                                ADD_VALUES);
-                        }; //loop j
-                        
-                        //Rhs vector
-                        int dof_i = 2 * newconi + 3 * NCNumberNodesC;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i  ],
-                                            ADD_VALUES);
+	                            dof_i = 2 * NCNumberNodesF + connec[i] + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + connec[j] + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[12+i][12+j],
+	                                                ADD_VALUES);
+	                        }; //loop j
+	                        
+	                        //Rhs vector
+	                        int dof_i = 2 * connec[i] + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i  ],
+	                                            ADD_VALUES);
 
-                        dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i+1],
-                                            ADD_VALUES);
+	                        dof_i = 2 * connec[i] + 1 + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i+1],
+	                                            ADD_VALUES);
 
-                        dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[18+i],
-                                            ADD_VALUES);
+	                        dof_i = 2 * NCNumberNodesF + connec[i] + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[12+i],
+	                                            ADD_VALUES);
 
-                     };// loop i
-                     for (int i = 0; i < 27; ++i) delete [] elemMatrix[i];
-        			 delete [] elemMatrix;  
+	                     };// loop i
+	                     for (int i = 0; i < 18; ++i) delete [] elemMatrix[i];
+	        			 delete [] elemMatrix;  
+
+	                	
+                	} else { //IGA mesh
+
+                		int *connec = elementsFine_[jel] -> getConnectivity();
+	                   
+	                	double **elemMatrix;
+	            		elemMatrix = new double*[27]();
+	            		for (int i = 0; i < 27; ++i)  elemMatrix[i] = new double[27]();
+	            		double elemVector[27] = {};
+
+	                    elementsFine_[jel] -> getTransientNavierStokes_ISO(elemMatrix,elemVector);
+
+	                    //Disperse local contributions into the global matrix
+	                    //Matrix K and C
+	                    for (int i=0; i<9; i++){
+
+	                        int newconi = nodesFine_[connec[i]] -> getnewcon();
+	                        
+	                        for (int j=0; j<9; j++){
+	                                
+	                            int newconj = nodesFine_[connec[j]] -> getnewcon();
+	                            
+	                            int dof_i = 2 * newconi + 3 * NCNumberNodesC;
+	                            int dof_j = 2 * newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i,1, &dof_j,
+	                                                &elemMatrix[2*i  ][2*j  ],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][2*j  ],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * newconi + 3 * NCNumberNodesC;
+	                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i  ][2*j+1],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][2*j+1],
+	                                                ADD_VALUES);
+	                    
+	                         //Matrix Q and Qt
+	                            dof_i = 2 * newconi + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i  ][18+j],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
+	                            dof_j = 2 * newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[18+i][2*j  ],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[2*i+1][18+j],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
+	                            dof_j = 2 * newconj + 1 + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[18+i][2*j+1],
+	                                                ADD_VALUES);
+
+	                            dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
+	                            dof_j = 2 * NCNumberNodesF + newconj + 3 * NCNumberNodesC;
+	                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                                &elemMatrix[18+i][18+j],
+	                                                ADD_VALUES);
+	                        }; //loop j
+	                        
+	                        //Rhs vector
+	                        int dof_i = 2 * newconi + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i  ],
+	                                            ADD_VALUES);
+
+	                        dof_i = 2 * newconi + 1 + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[2*i+1],
+	                                            ADD_VALUES);
+
+	                        dof_i = 2 * NCNumberNodesF + newconi + 3 * NCNumberNodesC;
+	                        ierr = VecSetValues(b, 1, &dof_i, &elemVector[18+i],
+	                                            ADD_VALUES);
+
+	                     };// loop i
+	                     for (int i = 0; i < 27; ++i) delete [] elemMatrix[i];
+	        			 delete [] elemMatrix;  
+
+                	}; // type of element
+
+	                    
 
 	            }; // domain decomposition
             }; //Elements Fine
 
-            //numElemGlueZoneFine
+            
+
+          //   //numElemGlueZoneFine
             for (int l = 0; l < numElemGlueZoneFine; l++){
 
             	int jel =  elementsGlueZoneFine_[l];
@@ -3094,279 +3446,478 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 	            	int *connec = elementsFine_[jel] -> getConnectivity();
 	            	int *connecL = glueZoneFine_[l] -> getConnectivity();	
 
-	            	//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
-	        		double **elemMatrixLag1;
-	        		elemMatrixLag1 = new double*[18]();
-	        		for (int i = 0; i < 18; ++i)  elemMatrixLag1[i] = new double[18]();
-	        		double elemVectorLag1[18] = {};
-	        		double elemVectorLag2[18] = {};
-	        		
-	        		elementsFine_[jel] -> getLagrangeMultipliersSameMesh(elemMatrixLag1,elemVectorLag1,elemVectorLag2);
+	            	if (elemTypeFine == 0) { //FEM mesh
 
-	        		//ARLEQUIN STABILIZATION MATRIX
-	        		double **elemStabMatrix;
-	        		elemStabMatrix = new double*[18]();
-	        		for (int i = 0; i < 18; ++i)  elemStabMatrix[i] = new double[18]();
-	        		double elemStabVector[18] = {};
+	            		//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+		        		double **elemMatrixLag1;
+		        		elemMatrixLag1 = new double*[12]();
+		        		for (int i = 0; i < 12; ++i)  elemMatrixLag1[i] = new double[12]();
+		        		double elemVectorLag1_1[12] = {};
+		        		double elemVectorLag1_2[12] = {};
+		        		
+		        		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 
-	        		elementsFine_[jel] -> getLagrangeMultipliersArlequinSameMesh(elemStabMatrix, elemStabVector);
+	        			double integ = alpha_f * gamma * dTime;
+		        		for (int i = 0; i < 6; i++){
+		        			for (int j = 0; j < 6; j++){
 
+		        				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				int dof_j = 3*NCNumberNodesC + 2*connec[j];
+		        				double value = integ * elemMatrixLag1[2*i][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i][2*j],
+		                                            ADD_VALUES);
 
-           //          if (inewton == 1) {
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 2*connec[j];
+		        				value = integ * elemMatrixLag1[2*i+1][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i+1][2*j],
+		                                            ADD_VALUES);
 
-           //              for (int i = 0; i < 18; i++) std::cout << elemStabVector [i] << " " << elemVectorLag2[i] << std::endl;
-           //          }
-        		
-        			double integ = alpha_f * gamma * dTime;
-	        		for (int i = 0; i < 9; i++){
-	        			for (int j = 0; j < 9; j++){
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
+		        				value = integ * elemMatrixLag1[2*i][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i][2*j+1],
+		                                            ADD_VALUES);
 
-	        				int newconj = nodesFine_[connec[j]] -> getnewcon();
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
+		        				value = integ * elemMatrixLag1[2*i+1][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i+1][2*j+1],
+		                                            ADD_VALUES);
 
-	        				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				int dof_j = 3*NCNumberNodesC + 2*newconj;
-	        				double value = integ * elemMatrixLag1[2*i][2*j];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i][2*j],
-	                                            ADD_VALUES);
+		        			};//j
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 2*newconj;
-	        				value = integ * elemMatrixLag1[2*i+1][2*j];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i+1][2*j],
-	                                            ADD_VALUES);
-
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 3*NCNumberNodesC + 2*newconj + 1;
-	        				value = integ * elemMatrixLag1[2*i][2*j+1];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i][2*j+1],
-	                                            ADD_VALUES);
-
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 2*newconj + 1;
-	        				value = integ * elemMatrixLag1[2*i+1][2*j+1];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i+1][2*j+1],
-	                                            ADD_VALUES);
-
-	        				//Stabilization Arlequin Terms diagonal
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i][2*j],
-	                                            ADD_VALUES);
-
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i+1][2*j],
-	                                            ADD_VALUES);
-
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i][2*j+1],
-	                                            ADD_VALUES);
-
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i+1][2*j+1],
-	                                            ADD_VALUES);
-
-	        			};//j
-
-	        			int newconi = nodesFine_[connec[i]] -> getnewcon();
-
-	        			int dof_i = 3*NCNumberNodesC + 2*newconi;
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1[2*i],ADD_VALUES);
-	        			dof_i = 3*NCNumberNodesC + 2*newconi + 1;
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1[2*i+1],ADD_VALUES);
+		        			int dof_i = 3*NCNumberNodesC + 2*connec[i];
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i],ADD_VALUES);
+		        			dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i+1],ADD_VALUES);
 
 
-	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i  ],ADD_VALUES);
-	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i+1 ],ADD_VALUES);
-
-	        			//Stabilization Arlequin Term
-	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i  ],ADD_VALUES);
-	        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i+1 ],ADD_VALUES);
-
-	        		};//i
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i  ],ADD_VALUES);
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i+1 ],ADD_VALUES);
 
 
-	        		int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial();
+		        		};//i
 
-            	        		
-	        		std::vector<int> ele, diffElem;
-	            	ele.clear();
-	            	diffElem.clear();
-
-	            	//Finding coarse elements 
-	            	for (int i=0; i<numberIntPoints; i++){
-	                	int aux = elementsFine_[jel] -> getIntegPointCorrespondenceElement(i);
-	                	ele.push_back(aux);
-	            	};
-
-	            	int numElemIntersect = 1;
-	            	int flag = 0;
-	            	diffElem.push_back(ele[0]);
-	            
-		            for (int i = 1; i<numberIntPoints; i++){
-		                flag = 0;
-		                for (int j = 0; j<numElemIntersect; j++){
-		                    if (ele[i] == diffElem[j]) {
-		                        break;
-		                    }else{
-		                        flag++;
-		                    };
-		                    if(flag == numElemIntersect){
-		                        numElemIntersect++;
-		                        diffElem.push_back(ele[i]);
-		                    };
-		                };
-		            };
+		        		for (int i = 0; i < 12; ++i) {
+		                	delete [] elemMatrixLag1[i];
+		                }
+		        		delete [] elemMatrixLag1; 
 
 
-		            for (int ielem = 0; ielem < numElemIntersect; ielem++){
+                        int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial_FEM();
+        
+                        std::vector<int> ele, diffElem;
+                        ele.clear();
+                        diffElem.clear();
 
-		            	for (int i = 0; i < 18; i++){
-	        				elemVectorLag1[i] = 0.0;
-	        				elemVectorLag2[i] = 0.0;
-	        				elemStabVector[i] = 0.0;
-		        			for (int j = 0; j < 18; j++){
-		        				elemMatrixLag1[i][j] = 0.0;
-		        				elemStabMatrix[i][j] = 0.0;
-		        			}
-	        			}
+                        //Finding coarse elements 
+                        for (int i=0; i<numberIntPoints; i++){
+                            int aux = elementsFine_[jel] -> getIntegPointCorrespondenceElement_FEM(i);
+                            ele.push_back(aux);
+                        };
 
-	                
-	                	int iElemCoarse = diffElem[ielem];
-
-	                	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
-	                	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
-	                	
-	                	elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
-													 								  elemMatrixLag1,elemVectorLag1,elemVectorLag2);  
-
-	                	//elementsFine_[jel] -> getLagrangeMultipliersArlequinDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse,
-                  	                                										  // elemStabMatrix,elemStabVector);
-
-
-
-	                	for (int i = 0; i < 9; i++){
-	        				
-	        				for (int j = 0; j < 9; j++){
-
-	        				int newconj = nodesCoarse_[connecC[j]] -> getnewcon();	
-	        				
-	        				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				int dof_j = 2*newconj;
-	        				double value = integ * elemMatrixLag1[2*i][2*j];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i][2*j],
-	                                            ADD_VALUES);
+                        int numElemIntersect = 1;
+                        int flag = 0;
+                        diffElem.push_back(ele[0]);
+                    
+                        for (int i = 1; i<numberIntPoints; i++){
+                            flag = 0;
+                            for (int j = 0; j<numElemIntersect; j++){
+                                if (ele[i] == diffElem[j]) {
+                                    break;
+                                }else{
+                                    flag++;
+                                };
+                                if(flag == numElemIntersect){
+                                    numElemIntersect++;
+                                    diffElem.push_back(ele[i]);
+                                };
+                            };
+                        };
 
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i]+1;
-	        				dof_j = 2*newconj;
-	        				value = integ * elemMatrixLag1[2*i+1][2*j];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i+1][2*j],
-	                                            ADD_VALUES);
+                        for (int ielem = 0; ielem < numElemIntersect; ielem++){
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 2*newconj +1 ;
-	        				value = integ * elemMatrixLag1[2*i][2*j+1];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i][2*j+1],
-	                                            ADD_VALUES);
+                            //LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+                            double **elemMatrixLag0;
+                            elemMatrixLag0 = new double*[12]();
+                            for (int i = 0; i < 12; ++i)  elemMatrixLag0[i] = new double[18]();
+                            double elemVectorLag0_1[18] = {};
+                            double elemVectorLag0_2[12] = {};
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1 ;
-	        				dof_j = 2*newconj +1 ;
-	        				value = integ * elemMatrixLag1[2*i+1][2*j+1];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &value,ADD_VALUES);
-	        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-	                                            &elemMatrixLag1[2*i+1][2*j+1],
-	                                            ADD_VALUES);
+                                                 
+                            int iElemCoarse = diffElem[ielem];
 
-	        				//Arlequin Stabilization Terms
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i][2*j],
-	                                            ADD_VALUES);
+                            int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
+                            int patch = elementsCoarse_[iElemCoarse] -> getPatch();
+                            
+                            elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_FEM(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
+                                                                                          elemMatrixLag0,elemVectorLag0_1,elemVectorLag0_2);
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i+1][2*j],
-	                                            ADD_VALUES);
+                  
+                            for (int i = 0; i < 6; i++){
+                                for (int j = 0; j < 9; j++){
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i][2*j+1],
-	                                            ADD_VALUES);
+                                int newconj = nodesCoarse_[connecC[j]] -> getnewcon();  
+                                
+                                int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+                                int dof_j = 2*newconj;
+                                double value = integ * elemMatrixLag0[2*i][2*j];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value,ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[2*i][2*j],
+                                                    ADD_VALUES);
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-	                                            &elemStabMatrix[2*i+1][2*j+1],
-	                                            ADD_VALUES);
 
-	        				};//i
+                                dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i]+1;
+                                dof_j = 2*newconj;
+                                value = integ * elemMatrixLag0[2*i+1][2*j];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value,ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[2*i+1][2*j],
+                                                    ADD_VALUES);
 
-	        				int newconi = nodesCoarse_[connecC[i]] -> getnewcon();
+                                dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+                                dof_j = 2*newconj +1 ;
+                                value = integ * elemMatrixLag0[2*i][2*j+1];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value,ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[2*i][2*j+1],
+                                                    ADD_VALUES);
 
-	        				int dof_i = 2*newconi;
-	        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1[2*i  ],ADD_VALUES);
-	        				dof_i = 2*newconi + 1 ;
-	        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1[2*i+1],ADD_VALUES);
+                                dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1 ;
+                                dof_j = 2*newconj +1 ;
+                                value = integ * elemMatrixLag0[2*i+1][2*j+1];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value,ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[2*i+1][2*j+1],
+                                                    ADD_VALUES);
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-	        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i  ],ADD_VALUES);
+                                };//j
 
-	        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-	        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag2[2*i+1],ADD_VALUES);
+                                int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+                                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[2*i  ],ADD_VALUES);
 
-	        				//Stabilization Arlequin Term
+                                dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+                                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[2*i+1],ADD_VALUES);
+
+                                
+                            };//j
+
+
+                            for (int i = 0; i < 9; i++){
+                                int newconi = nodesCoarse_[connecC[i]] -> getnewcon();
+                                int dof_i = 2*newconi;
+                                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[2*i  ],ADD_VALUES);
+                                dof_i = 2*newconi + 1 ;
+                                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[2*i+1],ADD_VALUES);
+                            }
+                                
+                            
+                            for (int i = 0; i < 12; ++i) {
+                            delete [] elemMatrixLag0[i];
+                             }
+                            delete [] elemMatrixLag0; 
+                        };//intersect
+          
+
+	            	} else { //IGA mesh
+
+	            		//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+		        		double **elemMatrixLag1;
+		        		elemMatrixLag1 = new double*[18]();
+		        		for (int i = 0; i < 18; ++i)  elemMatrixLag1[i] = new double[18]();
+		        		double elemVectorLag1_1[18] = {};
+		        		double elemVectorLag1_2[18] = {};
+
+                        //ARLEQUIN STABILIZATION MATRIX
+                        double **elemStabMatrix;
+                        elemStabMatrix = new double*[18]();
+                        for (int i = 0; i < 18; ++i)  elemStabMatrix[i] = new double[18]();
+                        double elemStabVector[18] = {};
+		        		
+		        		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_ISO(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2,
+                                                                                elemStabMatrix, elemStabVector);
+
+		        		
+
+	        			double integ = alpha_f * gamma * dTime;
+		        		for (int i = 0; i < 9; i++){
+		        			for (int j = 0; j < 9; j++){
+
+		        				int newconj = nodesFine_[connec[j]] -> getnewcon();
+
+		        				//VER QUESTAO DE NOVA CONECTIVIDADE PARA LAGRANGE MULTIPLICADOOOOR
+		        				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				int dof_j = 3*NCNumberNodesC + 2*newconj;
+		        				double value = integ * elemMatrixLag1[2*i][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 2*newconj;
+		        				value = integ * elemMatrixLag1[2*i+1][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i+1][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 2*newconj + 1;
+		        				value = integ * elemMatrixLag1[2*i][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i][2*j+1],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 2*newconj + 1;
+		        				value = integ * elemMatrixLag1[2*i+1][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag1[2*i+1][2*j+1],
+		                                            ADD_VALUES);
+
+		        				//Stabilization Arlequin Terms diagonal
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i+1][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i][2*j+1],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i+1][2*j+1],
+		                                            ADD_VALUES);
+
+		        			};//j
+
+		        			int newconi = nodesFine_[connec[i]] -> getnewcon();
+
+		        			int dof_i = 3*NCNumberNodesC + 2*newconi;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i],ADD_VALUES);
+		        			dof_i = 3*NCNumberNodesC + 2*newconi + 1;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i+1],ADD_VALUES);
+
+
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i  ],ADD_VALUES);
+		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i+1 ],ADD_VALUES);
+
+		        			//Stabilization Arlequin Term
 		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
 		        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i  ],ADD_VALUES);
 		        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
 		        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i+1 ],ADD_VALUES);
-	        				
-	        			};//j
 
-	                };//intersect
-               
+		        		};//i
 
-	                for (int i = 0; i < 18; ++i) {
-	                	delete [] elemMatrixLag1[i];
-	                	delete [] elemStabMatrix[i];
-	                }
-	        		delete [] elemMatrixLag1; 
-	        		delete [] elemStabMatrix;
+
+		        		for (int i = 0; i < 18; ++i) {
+		                	delete [] elemMatrixLag1[i];
+		                }
+		        		delete [] elemMatrixLag1; 
+
+
+
+		        		int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial_ISO();
+		
+		        		std::vector<int> ele, diffElem;
+		            	ele.clear();
+		            	diffElem.clear();
+
+		            	//Finding coarse elements 
+		            	for (int i=0; i<numberIntPoints; i++){
+		                	int aux = elementsFine_[jel] -> getIntegPointCorrespondenceElement_ISO(i);
+		                	ele.push_back(aux);
+		            	};
+
+		            	int numElemIntersect = 1;
+		            	int flag = 0;
+		            	diffElem.push_back(ele[0]);
+		            
+			            for (int i = 1; i<numberIntPoints; i++){
+			                flag = 0;
+			                for (int j = 0; j<numElemIntersect; j++){
+			                    if (ele[i] == diffElem[j]) {
+			                        break;
+			                    }else{
+			                        flag++;
+			                    };
+			                    if(flag == numElemIntersect){
+			                        numElemIntersect++;
+			                        diffElem.push_back(ele[i]);
+			                    };
+			                };
+			            };
+
+
+			            for (int ielem = 0; ielem < numElemIntersect; ielem++){
+
+			            	//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+		        			double **elemMatrixLag0;
+		        			elemMatrixLag0 = new double*[18]();
+		        			for (int i = 0; i < 18; ++i)  elemMatrixLag0[i] = new double[18]();
+		        			double elemVectorLag0_1[18] = {};
+		        			double elemVectorLag0_2[18] = {};
+
+                            for (int i = 0; i < 18; i ++){
+                                elemStabVector[i] = 0.;
+                                for (int j = 0; j < 18; j++){
+                                    elemStabMatrix[i][j] = 0.;
+                                }
+                            }
+
+		                
+		                	int iElemCoarse = diffElem[ielem];
+
+		                	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
+		                	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
+		                	
+		                	elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
+														 								  elemMatrixLag0,elemVectorLag0_1,elemVectorLag0_2,
+                                                                                          elemStabMatrix,elemStabVector);
+
+		          
+		                	for (int i = 0; i < 9; i++){
+		        				for (int j = 0; j < 9; j++){
+
+		        				int newconj = nodesCoarse_[connecC[j]] -> getnewcon();	
+		        				
+		        				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				int dof_j = 2*newconj;
+		        				double value = integ * elemMatrixLag0[2*i][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag0[2*i][2*j],
+		                                            ADD_VALUES);
+
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i]+1;
+		        				dof_j = 2*newconj;
+		        				value = integ * elemMatrixLag0[2*i+1][2*j];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag0[2*i+1][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 2*newconj +1 ;
+		        				value = integ * elemMatrixLag0[2*i][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag0[2*i][2*j+1],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1 ;
+		        				dof_j = 2*newconj +1 ;
+		        				value = integ * elemMatrixLag0[2*i+1][2*j+1];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &value,ADD_VALUES);
+		        				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+		                                            &elemMatrixLag0[2*i+1][2*j+1],
+		                                            ADD_VALUES);
+
+		        				//Arlequin Stabilization Terms
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i+1][2*j],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i][2*j+1],
+		                                            ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+		                                            &elemStabMatrix[2*i+1][2*j+1],
+		                                            ADD_VALUES);
+
+		        				};//i
+
+		        				int newconi = nodesCoarse_[connecC[i]] -> getnewcon();
+
+		        				int dof_i = 2*newconi;
+		        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[2*i  ],ADD_VALUES);
+		        				dof_i = 2*newconi + 1 ;
+		        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[2*i+1],ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+		        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[2*i  ],ADD_VALUES);
+
+		        				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+		        				ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[2*i+1],ADD_VALUES);
+
+		        				// //Stabilization Arlequin Term
+			        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+			        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i  ],ADD_VALUES);
+			        			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+			        			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector[2*i+1 ],ADD_VALUES);
+		        				
+		        			};//j
+		        			
+		        			for (int i = 0; i < 18; ++i) {
+		                	delete [] elemMatrixLag0[i];
+                            delete [] elemStabMatrix[i];
+		               		 }
+		        			delete [] elemMatrixLag0; 
+                            delete [] elemStabMatrix;
+		                };//intersect
+	      
+	            	}; //else IGA mesh
+
 	        	};//decomposition
 
             };//gluezonefine
@@ -3432,45 +3983,27 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         
             for (int i = 0; i < numNodesCoarse; ++i){
         
-             //   	if (elemType == 0){
-	               
-	            //     Ii = 2*i;
-	            //     ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
-	            //     nodesCoarse_[i] -> incrementAcceleration(0,val);
-	            //     nodesCoarse_[i] -> incrementVelocity(0,val*gamma*dTime);
-	            //     duNorm += val*val;
-	            
-	            //     Ii = 2*i+1;
-	            //     ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
-	            //     nodesCoarse_[i] -> incrementAcceleration(1,val);
-	            //     nodesCoarse_[i] -> incrementVelocity(1,val*gamma*dTime);
-	            //     duNorm += val*val;
+            	int newconi = nodesCoarse_[i] -> getnewcon();
 
-	            //     pressure
-	            
-	            // } else {
+            	Ii = 2*newconi;
+                ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
+                u_ = val;
+                nodesCoarse_[i] -> incrementAcceleration(0,u_);
+                nodesCoarse_[i] -> incrementVelocity(0,u_*gamma*dTime);
+                normU += val*val;
+            
+                Ii = 2*newconi+1;
+                ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
+                u_ = val;
+                nodesCoarse_[i] -> incrementAcceleration(1,u_);
+                nodesCoarse_[i] -> incrementVelocity(1,u_*gamma*dTime);
+                normU += val*val;
 
-	            	int newconi = nodesCoarse_[i] -> getnewcon();
-
-	            	Ii = 2*newconi;
-	                ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
-	                u_ = val;
-	                nodesCoarse_[i] -> incrementAcceleration(0,u_);
-	                nodesCoarse_[i] -> incrementVelocity(0,u_*gamma*dTime);
-	                normU += val*val;
-	            
-	                Ii = 2*newconi+1;
-	                ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
-	                u_ = val;
-	                nodesCoarse_[i] -> incrementAcceleration(1,u_);
-	                nodesCoarse_[i] -> incrementVelocity(1,u_*gamma*dTime);
-	                normU += val*val;
-
-	                Ii = 2*NCNumberNodesC + newconi;
-	                ierr = VecGetValues(All,Ione,&Ii,&val);CHKERRQ(ierr);
-	                p_ = val;
-	                normP += val*val;
-	                nodesCoarse_[i] -> incrementPressure(p_);
+                Ii = 2*NCNumberNodesC + newconi;
+                ierr = VecGetValues(All,Ione,&Ii,&val);CHKERRQ(ierr);
+                p_ = val;
+                normP += val*val;
+                nodesCoarse_[i] -> incrementPressure(p_);
 	                
             };	
              
@@ -3478,27 +4011,55 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
             for (int i = 0; i < numNodesFine; ++i){
 
-                int newconi = nodesFine_[i] -> getnewcon();
-        
-                Ii = 2*newconi + 3*NCNumberNodesC;
-                ierr = VecGetValues(All, Ione, &Ii, &val);
-                u_ = val;
-                nodesFine_[i] -> incrementAcceleration(0,u_);
-                nodesFine_[i] -> incrementVelocity(0,u_*gamma*dTime);
-                normU += val*val;
-            
-                Ii = 2*newconi+1 + 3*NCNumberNodesC;
-                ierr = VecGetValues(All, Ione, &Ii, &val);
-                u_ = val;
-                nodesFine_[i] -> incrementAcceleration(1,u_);
-                nodesFine_[i] -> incrementVelocity(1,u_*gamma*dTime);
-                normU += val*val;
 
-                Ii = 2*NCNumberNodesF + newconi+ 3*NCNumberNodesC;
-                ierr = VecGetValues(All,Ione,&Ii,&val);
-                p_ = val;
-                nodesFine_[i] -> incrementPressure(p_);
-                normP += val*val;
+            	if (elemTypeFine == 0){ //FEM mesh
+
+	                Ii = 2*i + 3*NCNumberNodesC;
+	                ierr = VecGetValues(All, Ione, &Ii, &val);
+	                u_ = val;
+	                nodesFine_[i] -> incrementAcceleration(0,u_);
+	                nodesFine_[i] -> incrementVelocity(0,u_*gamma*dTime);
+	                normU += val*val;
+	            
+	                Ii = 2*i + 1 + 3*NCNumberNodesC;
+	                ierr = VecGetValues(All, Ione, &Ii, &val);
+	                u_ = val;
+	                nodesFine_[i] -> incrementAcceleration(1,u_);
+	                nodesFine_[i] -> incrementVelocity(1,u_*gamma*dTime);
+	                normU += val*val;
+
+	                Ii = 2*NCNumberNodesF + i + 3*NCNumberNodesC;
+	                ierr = VecGetValues(All,Ione,&Ii,&val);
+	                p_ = val;
+	                nodesFine_[i] -> incrementPressure(p_);
+	                normP += val*val;
+
+            	} else { //IGA mesh
+
+            		int newconi = nodesFine_[i] -> getnewcon();
+	        
+	                Ii = 2*newconi + 3*NCNumberNodesC;
+	                ierr = VecGetValues(All, Ione, &Ii, &val);
+	                u_ = val;
+	                nodesFine_[i] -> incrementAcceleration(0,u_);
+	                nodesFine_[i] -> incrementVelocity(0,u_*gamma*dTime);
+	                normU += val*val;
+	            
+	                Ii = 2*newconi+1 + 3*NCNumberNodesC;
+	                ierr = VecGetValues(All, Ione, &Ii, &val);
+	                u_ = val;
+	                nodesFine_[i] -> incrementAcceleration(1,u_);
+	                nodesFine_[i] -> incrementVelocity(1,u_*gamma*dTime);
+	                normU += val*val;
+
+	                Ii = 2*NCNumberNodesF + newconi+ 3*NCNumberNodesC;
+	                ierr = VecGetValues(All,Ione,&Ii,&val);
+	                p_ = val;
+	                nodesFine_[i] -> incrementPressure(p_);
+	                normP += val*val;
+
+            	};
+	                
             };
              
             for (int i = 0; i < numNodesGlueZoneFine; ++i){
@@ -3569,7 +4130,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         };
         
         for (int i = 0; i<numNodesGlueZoneFine; i++){
-            
+
             int elCoarse = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalElemCorrespondence();
             double* xsiC = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalXsiCorrespondence();
 
@@ -3584,9 +4145,9 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             };
 
             int patchC = elementsCoarse_[elCoarse] -> getPatch();
-    		int *incC = nodesCoarse_[connecCoarse[8]] -> getINC();
-    		double wpcC[9],phiC_[9];
-    		for (int k = 0; k<9; k++) wpcC[k] = nodesCoarse_[connecCoarse[k]] -> getWeightPC();
+            int *incC = nodesCoarse_[connecCoarse[8]] -> getINC();
+            double wpcC[9],phiC_[9];
+            for (int k = 0; k<9; k++) wpcC[k] = nodesCoarse_[connecCoarse[k]] -> getWeightPC();
             shapeQuad.evaluateIso(xsiC,phiC_,wpcC,incC,IsoParCoarse,patchC);
             
             double u = 0.;
@@ -3606,16 +4167,16 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             
             nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(0,u_int);
             nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(1,v_int);
-            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(p_int);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(p_int);   
             
         };
        
         
         
-        // Compute and print drag and lift coefficients
-        // if (computeDragAndLift){
-        //     dragAndLiftCoefficients(dragLift);
-        // };
+ //        // Compute and print drag and lift coefficients
+ //        // if (computeDragAndLift){
+ //        //     dragAndLiftCoefficients(dragLift);
+ //        // };
 
         // Printing results
         printResults(iTimeStep);

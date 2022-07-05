@@ -31,11 +31,11 @@ public:
 public:
     
     // Evaluates the shape function value
-    void evaluate(double *xsi, double *phi) const;
+    void evaluateFem(double *xsi, double *phi) const;
     void evaluateIso(double *xsi, double *phi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch);
 
     // Evaluates the values of the shape funtion derivatives
-    void evaluateGradient(double *xsi, double **dphi) const;   
+    void evaluateGradientFem(double *xsi, double **dphi) const;   
     void evaluateGradientIso(double *xsi, double **dphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch);
 
 };
@@ -47,7 +47,7 @@ public:
 // Defines quadratic shape functions and its derivatives 
 // for triangles and tetrahedrons
 template<>
-void QuadShapeFunction<2>::evaluate(double *xsi, double *phi) const {
+void QuadShapeFunction<2>::evaluateFem(double *xsi, double *phi) const {
     
      const double xsi1 = xsi[0];
      const double xsi2 = xsi[1];
@@ -179,7 +179,7 @@ void QuadShapeFunction<2>::evaluateIso(double *xsi, double *phi, double *wpcs, i
 
 
 template<>
-void QuadShapeFunction<3>::evaluate(double *xsi, double *phi) const {
+void QuadShapeFunction<3>::evaluateFem(double *xsi, double *phi) const {
     
      const double xsi1 = xsi[0];
      const double xsi2 = xsi[1];
@@ -355,7 +355,7 @@ void QuadShapeFunction<3>::evaluateIso(double *xsi, double *phi, double *wpcs, i
 //-------------------COMPUTE SHAPE FUNCTION DERIVATIVE VALUE--------------------
 //------------------------------------------------------------------------------
 template<>
-void QuadShapeFunction<2>::evaluateGradient(double *xsi, double **dphi) const {
+void QuadShapeFunction<2>::evaluateGradientFem(double *xsi, double **dphi) const {
 
      const double xsi1 = xsi[0];
      const double xsi2 = xsi[1];
@@ -602,7 +602,7 @@ void QuadShapeFunction<2>::evaluateGradientIso(double *xsi, double **dphi,double
  
 
 template<>
-void QuadShapeFunction<3>::evaluateGradient(double *xsi, double **dphi) const {
+void QuadShapeFunction<3>::evaluateGradientFem(double *xsi, double **dphi) const {
 
      const double xsi1 = xsi[0];
      const double xsi2 = xsi[1];
