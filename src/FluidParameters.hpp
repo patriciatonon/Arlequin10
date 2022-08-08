@@ -34,9 +34,12 @@ public:
     // Sets the time integration scheme
     void setSpectralRadius(double& b){
         spectralRadius = b;
-        alpha_f = 1. / (1. + spectralRadius);
-        alpha_m = 0.5 * (3. - spectralRadius) / (1. + spectralRadius);
-        gamma = 0.5 + alpha_m - alpha_f;
+        // alpha_f = 1. / (1. + spectralRadius);
+        // alpha_m = 0.5 * (3. - spectralRadius) / (1. + spectralRadius);
+        // gamma = 0.5 + alpha_m - alpha_f; 
+        alpha_f = 1.;
+        alpha_m = 1.;
+        gamma = 1.;
     }
 
     // Sets body forces

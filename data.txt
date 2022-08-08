@@ -1,2 +1,0 @@
-Mat Object: 8 MPI processes
-  type: mpiaij
