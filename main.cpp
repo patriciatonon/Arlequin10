@@ -59,7 +59,7 @@ int main(int argc, char **args) {
     FluidModel coarseModel,fineModel; 
     Arlequin   ArlequinProblem; 
 
-//================================================================================
+//===============================================================================
 //=================================PROBLEM MESH===================================
 //================================================================================
 
@@ -76,19 +76,51 @@ int main(int argc, char **args) {
     //data reading functions need two files from coarse or fine mesh:  
     //1- Fluid Flow Data
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
-    //coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
-    //coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
-    //fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
-   // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
 
 
-    //Exemplo do Jeferson da Cavidade 2D
+
+
+    //EXEMPLOS ISO/ISO
+    //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
+    // coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
+
+    //Exemplo tipo do Jeferson - Lembrar de colocar a normal no Set Signaled Distance
+    // coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso3.msh","mirror_fine.txt",0);
+
+
+    //EXEMPLOS FEM/FEM 
+    //Exemplo tipo do Jeferson da Cavidade 2D - Lembrar de colocar os valores de normais no Set Signaled Distance
     // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseT_fem.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
 
-    //Meu exemplo inicial problemático
-    coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("meshfine_data.txt","fineIni_fem.msh","mirror_fine.txt",0);
+    //Exemplo tipo do Jeferson com malha coarse não estruturada - Lembrar de colocar os valores de normais no Set Signaled Distance
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
+
+    //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fineIni_fem.msh","mirror_fine.txt",0);
+    // mais um
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
+    
+    // *****problema quando mais de 1 elemento coarse sobre um elemento fine - nao converge - FUNCIONA NA OUTRA VERSAO DO JEFERSON******
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
+
+
+
+    //EXEMPLOS FEM/ISO (FINE/COARSE) 
+    //Exemplo tipo Jeferson - Lembrar de colocar os valores de normais no Set Signaled Distance
+    // coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
+
+    //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
+    coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
+
 
     //ArlequinProblem needs two objects from fluid:
     //1 - coarseModel;
