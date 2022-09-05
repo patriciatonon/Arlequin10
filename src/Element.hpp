@@ -43,7 +43,7 @@ public:
 private:
     
     //Element basic information
-	FParameters                parameters;          // Fluid parameters
+	FParameters                *parameters;          // Fluid parameters
     std::vector<IParameters *> *iparameters;        // Isogeometric parameters for each patch
 	std::vector<Nodes *>       *nodes_;    			// Nodes
     int*                       connect_;            // Mesh connectivity
@@ -151,11 +151,13 @@ private:
 public:
     // fluid element constructor
     Element(int index, int *connect, std::vector<Nodes *> &nodes, int ElemType, FParameters &param, std::vector<IParameters *> &iparam, int ipatch){
+
+
         index_ = index;
         connect_ = connect;
         nodes_ = &nodes;
         ElemType_ = ElemType;
-        parameters = param;
+        parameters = &param;
         iparameters = &iparam;
         Npatch_ = ipatch;
         glueZone = false;
@@ -628,7 +630,7 @@ void Element<2>::getJacobianMatrix_FEM(double *xsi,  double **Jac,  double **ain
     double dy_dxsi1 = 0.;
     double dy_dxsi2 = 0.;
 
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters -> getAlphaF();
 
     for (int i=0; i<6; i++){
 		
@@ -682,7 +684,7 @@ void Element<2>::getJacobianMatrix_COARSE_FEM(double *xsi,  double **Jac,  doubl
     double dy_dxsi1 = 0.;
     double dy_dxsi2 = 0.;
 
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
 
     for (int i=0; i<6; i++){
         
@@ -725,7 +727,7 @@ void Element<2>::getJacobianMatrix_ISO(double *xsi, double **quadJacMat, double 
 
     QuadShapeFunction<2>    shapeQuad;
 
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
    
     double **dphi;
     dphi = new double*[2];
@@ -806,7 +808,7 @@ void Element<2>::getJacobianMatrix_COARSE_ISO(double *xsi, double **quadJacMat, 
     QuadShapeFunction<2>    shapeQuad;
 
 
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
    
     double **dphi;
     dphi = new double*[2];
@@ -885,7 +887,7 @@ void Element<2>::getQuadJacobianMatrix_ISO(double *xsi, double **quadJacMatInv){
 
     QuadShapeFunction<2>    shapeQuad;
 
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
     
     //data from iga element
     int *inc_ = (*nodes_)[connect_[8]] -> getINC();
@@ -1183,7 +1185,7 @@ void Element<2>::getVelAndDerivatives_FEM(double *phi_, double **dphi_dx) {
     p_ = 0.;
     dp_dx = 0.;       dp_dy = 0.;
       
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
 
     //Interpolates the velocity components and its spatial derivatives
     for (int i = 0; i < 6; i++){
@@ -1261,7 +1263,7 @@ void Element<2>::getVelAndDerivatives_ISO(double *phi_, double **dphi_dx) {
     p_ = 0.;
     dp_dx = 0.;       dp_dy = 0.;
     
-    double &alpha_f = parameters.getAlphaF();
+    double &alpha_f = parameters->getAlphaF();
 
     //Interpolates the velocity components and its spatial derivatives
     for (int i = 0; i < 9; i++){
@@ -1882,7 +1884,7 @@ void Element<2>::getInterpolatedVariablesDifferentMesh_ISO_ISO(double *phi_, dou
 template<>
 void Element<2>::computeDragAndLiftForces_ISO(int bound) {
 
-    // double    &visc_ = parameters.getViscosity();
+    // double    &visc_ = parameters->getViscosity();
     // double    localNodesBoundaryIso_[3][2];
     // double    pcWeightl[3];
     // double    pcWeight[9];
@@ -2474,9 +2476,9 @@ void Element<2>::getNewParameterSUPG_FEM(double **Jac, double *phi_, double **dp
     double r[2] = {}; double ua_[2] = {}; 
     double hrqd,tSUGN1_,tSUGN2_,tSUGN3_;
 
-    double &dTime_ = parameters.getTimeStep();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
+    double &dTime_ = parameters->getTimeStep();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
 
     //Matrix D = polynomial order of the base functions
     MatrixD[0][0] = 2.;
@@ -2588,9 +2590,9 @@ void Element<2>::getNewParameterSUPG_ISO(double **quadJacMat, double *phi_, doub
     double MatrixInvD[2][2],MatrixQh[2][2],MatrixInvQh[2][2],MatrixG[2][2],rr[2][2];   
     double r[2] = {}; double ua_[2] = {}; 
     double hrqd,tSUGN1_,tSUGN2_,tSUGN3_;
-    double &dTime_ = parameters.getTimeStep();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity(); 
+    double &dTime_ = parameters->getTimeStep();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity(); 
 
     
     //Computation of matrix D
@@ -2749,10 +2751,10 @@ void Element<2>::getNewParameterSUPG_ISO(double **quadJacMat, double *phi_, doub
 template<>
 void Element<2>::getParameterArlequin_FEM(double *phi_, double **dphi_dx){
 
-    double &dTime_ = parameters.getTimeStep();
-    double &k1 = parameters.getArlequinK1();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
+    double &dTime_ = parameters->getTimeStep();
+    double &k1 = parameters->getArlequinK1();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
 
     double hRGN_ = 0.;
     double hUGN_ = 0.;
@@ -2870,10 +2872,10 @@ void Element<2>::getParameterArlequin_ISO(double *phi_, double **dphi_dx){
 
 
 
-    double &dTime_ = parameters.getTimeStep();
-    double &k1 = parameters.getArlequinK1();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
+    double &dTime_ = parameters->getTimeStep();
+    double &k1 = parameters->getArlequinK1();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
 
     double hRGN_ = 0.;
     double hUGN_ = 0.;
@@ -2992,12 +2994,12 @@ void Element<2>::getParameterArlequin_ISO(double *phi_, double **dphi_dx){
 template<>
 void Element<2>::getElemMatrix_FEM(int &index,double *phi_, double **dphi_dx,double **jacobianNRMatrix){
     
-    double &dTime_ = parameters.getTimeStep();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &gamma = parameters.getGamma();
+    double &dTime_ = parameters->getTimeStep();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3132,12 +3134,13 @@ void Element<2>::getElemMatrix_FEM(int &index,double *phi_, double **dphi_dx,dou
 template<>
 void Element<2>::getElemMatrix_ISO(int &index, double *phi_, double **dphi_dx, double **jacobianNRMatrix){
     
-    double &dTime_ = parameters.getTimeStep();
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &gamma = parameters.getGamma();
+    double &dTime_ = parameters->getTimeStep();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
+
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3287,10 +3290,10 @@ void Element<2>::getMatrixAndVectorsSameMesh_FEM(double *phi_, double **dphi_dx,
 
 
     //Fluid Data
-    double &alpha_f = parameters.getAlphaF();
-    double &dens_ = parameters.getDensity();
-    double &k1 = parameters.getArlequinK1();
-    double &k2 = parameters.getArlequinK2();
+    double &alpha_f = parameters->getAlphaF();
+    double &dens_ = parameters->getDensity();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3369,9 +3372,9 @@ void Element<2>::getMatrixAndVectorsSameMesh_FEM(double *phi_, double **dphi_dx,
 template<>
 void Element<2>::getMatrixAndVectorsSameMesh_tSUPG_tPSPG_FEM(double *phi_, double **dphi_dx, double **jacobianNRMatrix,double *rhsVector){
 
-	double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-	double &k1 = parameters.getArlequinK1();
+	double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+	double &k1 = parameters->getArlequinK1();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
 	double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3412,11 +3415,11 @@ void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi
                                                          double **arlequinStabD, double *arlequinStabVectorD,
                                                          double **arlequinStab1, double *arlequinStabVector1){
 
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &gamma = parameters.getGamma();
-    double &dTime_ = parameters.getTimeStep();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
+    double &dTime_ = parameters->getTimeStep();
 
     double daxm_dx = alpha_m * dax_dx + (1. - alpha_m) * daxprev_dx;
     double daxm_dy = alpha_m * dax_dy + (1. - alpha_m) * daxprev_dy;
@@ -3525,10 +3528,10 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
                                                  double **arlequinStab, double *arlequinStabVector){
 
 	//Fluid Data
-    double &alpha_f = parameters.getAlphaF();
-    double &dens_ = parameters.getDensity();
-    double &k1 = parameters.getArlequinK1();
-    double &k2 = parameters.getArlequinK2();
+    double &alpha_f = parameters->getAlphaF();
+    double &dens_ = parameters->getDensity();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
 	double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3620,12 +3623,12 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_FEM_FEM(double *phi_, double *
                                                           double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
                                                           double **arlequinStab, double *arlequinStabVector){
 
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &k1 = parameters.getArlequinK1();
-    double &k2 = parameters.getArlequinK2();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3715,12 +3718,12 @@ template<>
 void Element<2>::getMatrixAndVectorsDifferentMesh_FEM_ISO(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
                                                          double **lagrMultMatrix, double *rhsVector1, double *rhsVector2){
 
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &k1 = parameters.getArlequinK1();
-    double &k2 = parameters.getArlequinK2();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3801,9 +3804,9 @@ template<>
 void Element<2>::getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double *phi_,double **dphiC_dx,double **jacobianNRMatrix,
 																	  double *rhsVector){
 
-	double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-	double &k1 = parameters.getArlequinK1();
+	double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+	double &k1 = parameters->getArlequinK1();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
 	double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -3844,11 +3847,11 @@ template<>
 void Element<2>::getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(int &index, double **dphi_dx,double **dphiC_dx,double ***ddphiC_dx,
                                                                   double **arlequinStabD, double *arlequinStabVectorD,
                                                                   double **arlequinStab0, double *arlequinStabVector0){
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &gamma = parameters.getGamma();
-    double &dTime_ = parameters.getTimeStep();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
+    double &dTime_ = parameters->getTimeStep();
 
     double daxm_dx = alpha_m * dax_dx + (1. - alpha_m) * daxprev_dx;
     double daxm_dy = alpha_m * dax_dy + (1. - alpha_m) * daxprev_dy;
@@ -3961,12 +3964,12 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO_ISO(double *phi_, double *
         										          double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
                                                           double **arlequinStab, double *arlequinStabVector){
 
-	double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
-    double &k1 = parameters.getArlequinK1();
-    double &k2 = parameters.getArlequinK2();
+	double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
 	double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -4058,14 +4061,14 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_ISO_ISO(double *phi_, double *
 template<>
 void Element<2>::getResidualVector_FEM(int &index,double *phi_, double **dphi_dx, double *rhsVector){
     
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
 
     double ff[2];
-    ff[0] = parameters.getFieldForce(0);
-    ff[1] = parameters.getFieldForce(1);
+    ff[0] = parameters->getFieldForce(0);
+    ff[1] = parameters->getFieldForce(1);
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -4180,14 +4183,14 @@ void Element<2>::getResidualVector_FEM(int &index,double *phi_, double **dphi_dx
 template<>
 void Element<2>::getResidualVector_ISO(int &index, double *phi_, double **dphi_dx, double *rhsVector){
     
-    double &visc_ = parameters.getViscosity();
-    double &dens_ = parameters.getDensity();
-    double &alpha_f = parameters.getAlphaF();
-    double &alpha_m = parameters.getAlphaM();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
 
     double ff[2];
-    ff[0] = parameters.getFieldForce(0);
-    ff[1] = parameters.getFieldForce(1);
+    ff[0] = parameters->getFieldForce(0);
+    ff[1] = parameters->getFieldForce(1);
 
     double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
     double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
@@ -5243,6 +5246,7 @@ void Element<2>::setBoundaryConditions_ISO(double **jacobianNRMatrix,double *rhs
 template<>
 void Element<2>::getTransientNavierStokes_FEM(double **jacobianNRMatrix,double *rhsVector){
 
+    
     //quadrature and functions local classes
     NormalQuad              nQuad = NormalQuad(); 
     QuadShapeFunction<2>    shapeQuad;
@@ -5312,6 +5316,7 @@ void Element<2>::getTransientNavierStokes_FEM(double **jacobianNRMatrix,double *
 template<>
 void Element<2>::getTransientNavierStokes_ISO(double **jacobianNRMatrix,double *rhsVector){
   
+    
     //quadrature and functions local classes
     NormalQuad              nQuad = NormalQuad(); 
     QuadShapeFunction<2>    shapeQuad;

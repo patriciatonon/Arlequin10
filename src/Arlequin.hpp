@@ -36,8 +36,8 @@ public:
     // Class of isogeometric parameters
     typedef typename FluidMesh::IsoParameters   IsoParameters;
     // Class of fluid parameters
-    typedef FluidParameters<DIM>                Parameters;
-    // Class glue
+    typedef typename FluidMesh::Parameters      Parameters;
+    // Class glueParameters
     typedef Glue<DIM> 					        GlueZone;
 
 
@@ -89,7 +89,7 @@ private:
     int numTimeSteps;           // Number of times steps
     double dTime;               // Time step
     int iTimeStep;              // Time counter   
-    int integScheme;            // Integration scheme (0 - max. dissipation; 1 - without dissipation)
+    double integScheme;            // Integration scheme (0 - max. dissipation; 1 - without dissipation)
     
     //Arlequin parameters
     double glueZoneThickness;	// Thickness from gluing zone
@@ -3362,6 +3362,10 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
     parametersFine = &fineModel.fluidParameters;
     parametersCoarse = &coarseModel.fluidParameters;
 
+    double dd = 0.;
+	parametersFine -> setSpectralRadius(dd);
+	parametersCoarse -> setSpectralRadius(dd);
+
     IsoParFine = fineModel.IsoPar_;
    	IsoParCoarse = coarseModel.IsoPar_;
     
@@ -3370,6 +3374,7 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
     integScheme = fineModel.integScheme;
     glueZoneThickness = fineModel.glueZoneThickness;
     arlequinEpsilon = fineModel.arlequinEpsilon;
+
 
     //Non coincidente number controlPoints in fine and coarse mesh
     //Fine mesh (IGA or FEM)
@@ -3917,8 +3922,8 @@ void Arlequin<2>::setMatVecValuesFineISO(){
 template<>
 void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
 
-	double &alpha_f = parametersFine -> getAlphaF();
-	double &gamma = parametersFine -> getGamma();
+	double &alpha_f = parametersFine ->getAlphaF();
+	double &gamma = parametersFine ->getGamma();
     double integ = alpha_f * gamma * dTime;
 
     for (int l = 0; l < numElemGlueZoneFine; l++){
@@ -4914,7 +4919,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 		dof[i] = dofTemp[i];
 	};
 
-    double &gamma = parametersFine -> getGamma();
+    
 
     int sysSize = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*numNodesGlueZoneFine;
 
@@ -4926,7 +4931,24 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         if (rank == 0) {std::cout << "------------------------- TIME STEP = "
                                   << iTimeStep << " -------------------------"
                                   << std::endl;}
-        
+
+
+        //Não consegui setar aqui os parâmetros no Element. Conversar com o Rodolfo sobre como arrumar
+
+        if (iTimeStep == 0){
+        	double dd = 0.;
+	        parametersFine -> setSpectralRadius(dd);
+	        parametersCoarse -> setSpectralRadius(dd);
+        }; 
+
+        if (iTimeStep == 20){
+	        parametersFine -> setSpectralRadius(integScheme);
+	        parametersCoarse -> setSpectralRadius(integScheme);
+        }; 
+
+        double &gamma = parametersCoarse ->getGamma();
+
+      
         for (int i = 0; i < numNodesCoarse; i++){
             
             double accel[2], u[2];
