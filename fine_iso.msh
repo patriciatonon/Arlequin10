@@ -1158,7 +1158,7 @@ BOUNDARY 2 - CONTROL POINTS INDEXES/DIRECTION(0-u 1-v 2-w)/NUMBER OF PATCH
 BOUNDARY 3         CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 N. CONTROL POINTS  Ux     Uy     Uz                                   Ux     Uy     Uz  
 -------------------------------------------------------------------------------------------
-42                 2      2      2                                    0       0      0
+42                 2      2      0                                    0       0      0
 
 -------------------------------------------------------------------------------------------
 BOUNDARY 3 - CONTROL POINTS INDEXES/DIRECTION(0-u 1-v 2-w)/NUMBER OF PATCH

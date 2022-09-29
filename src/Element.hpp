@@ -361,7 +361,9 @@ public:
     void getSpatialDerivatives_COARSE_ISO(double *xsi, double **ainv_, double **dphi_dx);
 
     void getSecondSpatialDerivatives_FEM(double *xsi, double **ainv_, double ***ddphi_dx);
+    void getSecondSpatialDerivatives_ISO(double *xsi, double **ainv_, double ***ddphi_dx);
     void getSecondSpatialDerivatives_COARSE_ISO(double *xsi, double **ainv_, double ***ddphi_dx);
+
 
     // Compute and stores the interpolated variables
     void getVelAndDerivatives_FEM(double *phi_, double **dphi_dx);
@@ -371,10 +373,13 @@ public:
     void getInterpolatedVariablesSameMesh_FEM(double *phi_, double **dphi_dx);
     void getInterpolatedVariablesSameMeshArlqStab_FEM(double *phi_, double **dphi_dx, double ***ddphi_dx);
     void getInterpolatedVariablesSameMesh_ISO(double *phi_, double **dphi_dx);
+    void getInterpolatedVariablesSameMeshArlqStab_ISO(double *phi_, double **dphi_dx, double ***ddphi_dx);
     void getInterpolatedVariablesDifferentMesh_FEM_ISO(double *phi_, double **dphi_dx,double *phiC_, double **dphiC_dx);
-    void getInterpolatedVariablesDifferentMeshArlqStab_FEM_ISO(double **dphi_dx,double *phiC_, double **dphiC_dx, double ***ddphiC_dx);
+    void getInterpolatedVariablesDifferentMesh_ISO_FEM(double *phi_, double **dphi_dx,double *phiC_, double **dphiC_dx);
     void getInterpolatedVariablesDifferentMesh_FEM_FEM(double *phi_, double **dphi_dx,double *phiC_, double **dphiC_dx);
     void getInterpolatedVariablesDifferentMesh_ISO_ISO(double *phi_, double **dphi_dx,double *phiC_, double **dphiC_dx);
+    void getInterpolatedVariablesDifferentMeshArlqStab_FEM_ISO(double **dphi_dx,double *phiC_, double **dphiC_dx, double ***ddphiC_dx);
+    void getInterpolatedVariablesDifferentMeshArlqStab_ISO_FEM(double **dphi_dx,double *phiC_, double **dphiC_dx, double ***ddphiC_dx);
     void getInterpolateLagMultiplierDerivatives(double **dphi_dx);
 
 
@@ -389,24 +394,11 @@ public:
 
  	//......................Drag and Lift Parameters....................
     // Compute and store the drag and lift forces at the element boundary
-    void computeDragAndLiftForces_ISO(int bound);
-    // Gets the element pressure drag force
-    double getPressureDragForce(){return pressureDragForce;};
-    // Gets the element pressure lift force
-    double getPressureLiftForce(){return pressureLiftForce;};
-    // Gets the element friction drag force
-    double getFrictionDragForce(){return frictionDragForce;};
-    // Gets the element friction lift force
-    double getFrictionLiftForce(){return frictionLiftForce;};
-    // Gets the element drag force
-    double getDragForce(){return dragForce;};
-    // Gets the element lift force
-    double getLiftForce(){return liftForce;};
-    // Gets the element Pitching Moment
-    double getPitchingMoment(){return pitchingMoment;};
-    // Gets the element boundary perimeter
-    double getPerimeter(){return perimeter;};
-   
+    void computeDragAndLiftForces_ISO(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
+                                      double &dForce, double &lForce, double &aux_Mom, double &aux_Per);
+    void computeDragAndLiftForces_FEM(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
+                                      double &dForce, double &lForce, double &aux_Mom, double &aux_Per);
+
    
     //.......................Element vectors and matrices.......................
     // Compute and store the element matrix for the incompressible flow problem
@@ -425,22 +417,32 @@ public:
                                                  double **arlequinStabD, double *arlequinStabVectorD,
                                                  double **arlequinStab1, double *arlequinStabVector1);
     void getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx, double **lagrMultMatrix, 
-        	                             double *rhsVector1, double *rhsVector2,
-                                         double **arlequinStab, double *arlequinStabVector); 
+        	                             double *rhsVector1, double *rhsVector2); 
+    void getMatrixAndVectorsSameMesh_tSUPG_tPSPG_ISO(double *phi_, double **dphi_dx,double **jacobianNRMatrix,
+                                                    double *rhsVector);
+    void getMatrixAndVectorsSameMeshArlqStab_ISO(int &index, double *phi_, double **dphi_dx, double ***ddphi_dx,
+                                                 double **arlequinStabD, double *arlequinStabVectorD,
+                                                 double **arlequinStab1, double *arlequinStabVector1);
     void getMatrixAndVectorsDifferentMesh_FEM_FEM(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
                                                   double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
                                                   double **arlequinStab, double *arlequinStabVector);   
     void getMatrixAndVectorsDifferentMesh_FEM_ISO(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
                                                   double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
-    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double *phi_,double **dphiC_dx,
-                                                  			  double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(int &index,double **dphi_dx, double **dphiC_dx,double ***ddphiC_dx,
-                                                          double **arlequinStabD, double *arlequinStabVectorD,
-                                                          double **arlequinStab0, double *arlequinStabVector0);
+    void getMatrixAndVectorsDifferentMesh_ISO_FEM(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
+                                                  double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
     void getMatrixAndVectorsDifferentMesh_ISO_ISO(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
         									      double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
                                                   double **arlequinStab, double *arlequinStabVector);
-    
+    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double *phi_,double **dphiC_dx,
+                                                              double **jacobianNRMatrix,double *rhsVector);
+    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_ISO_FEM(double *phi_,double **dphiC_dx,
+                                                              double **jacobianNRMatrix,double *rhsVector);
+    void getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(int &index,double **dphi_dx, double **dphiC_dx,double ***ddphiC_dx,
+                                                          double **arlequinStabD, double *arlequinStabVectorD,
+                                                          double **arlequinStab0, double *arlequinStabVector0);
+    void getMatrixAndVectorsDifferentMeshArlqStab_ISO_FEM(int &index,double **dphi_dx, double **dphiC_dx,double ***ddphiC_dx,
+                                                          double **arlequinStabD, double *arlequinStabVectorD,
+                                                          double **arlequinStab0, double *arlequinStabVector0);
 
     //...............................Problem type...............................
     // Compute the Transient Navier-Stokes problem matrices and vectors
@@ -448,12 +450,14 @@ public:
     void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
 
     // Compute and store the Lagrange multiplier operator when integrating the same mesh portion
-    void getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector,
-                                            double **arlequinStab, double *arlequinStabVector);
     void getLagrangeMultipliersSameMesh_FEM(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM(double **arlequinStabD, double *arlequinStabVectorD,
                                                     double **arlequinStab1, double *arlequinStabVector1);
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(double **jacobianNRMatrix, double *rhsVector);
+    void getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
+    void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_ISO(double **jacobianNRMatrix, double *rhsVector);
+    void getLagrangeMultipliersSameMeshArlqStab_ISO(double **arlequinStabD, double *arlequinStabVectorD,
+                                                    double **arlequinStab1, double *arlequinStabVector1);
 
 
     //Compute and store the Lagrange multiplier operator when integrationg the different mesh portion
@@ -471,6 +475,15 @@ public:
                                                              std::vector<IParameters *> &iparamC, int &ielem, 
                                                              double **arlequinStabD, double *arlequinStabVectorD,
                                                              double **arlequinStab0, double *arlequinStabVector0);
+    
+    void getLagrangeMultipliersDifferentMesh_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                    double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    void getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                                double **jacobianNRMatrix, double *rhsVector);
+    void getLagrangeMultipliersDifferentMeshArlqStab_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                             double **arlequinStabD, double *arlequinStabVectorD,
+                                                             double **arlequinStab0, double *arlequinStabVector0);
+
     void getLagrangeMultipliersDifferentMesh_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
                                                      double **lagrMultMatrix,double *rhsVector1, double *rhsVector2,
                                                      double **arlequinStab, double *arlequinStabVector);
@@ -483,6 +496,10 @@ public:
     void getMatrixC(double **MatrixC);
     //Computes inverse Bézier extractor operator    
     void getInvMatrixC(double **MatrixCuInv, double **MatrixCvInv);
+
+    FParameters* getFluidParameters(){
+        return parameters;
+    }
 
 };
 
@@ -1107,6 +1124,65 @@ void Element<2>::getSecondSpatialDerivatives_FEM(double *xsi, double **ainv_, do
     return;     
 };
 
+
+template<>
+void Element<2>::getSecondSpatialDerivatives_ISO(double *xsi, double **ainv_, double ***ddphi_dx){
+
+    QuadShapeFunction<2>    shapeQuad;
+
+    double ainvT_[2][2] = {};
+
+    for (int i = 0; i < 2; i++){
+        for (int j = 0; j < 2; j++){
+            ainvT_[i][j] = ainv_[j][i];
+        };
+    };
+
+    double ***ddphi;
+    ddphi = new double**[2];
+    for (int i = 0; i < 2; ++i) {
+        ddphi[i] = new double*[2];
+        for (int j = 0; j < 2; j++) ddphi[i][j] = new double[9];
+    }
+
+    double wpc[9] = {};
+    for (int i = 0; i < 9; i++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC();       
+    
+    shapeQuad.evaluateHessianIso(xsi,ddphi,wpc,inc_,(*iparameters),Npatch_);
+    
+    //Quadratic shape functions spatial second derivatives
+    double inter[2][2][9] = {};
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            for (int k = 0; k < 2; k++)
+                for (int nf = 0; nf < 9; nf++)
+                    inter[i][j][nf] += ainvT_[i][k]*ddphi[k][j][nf];
+
+    for (int i = 0; i < 2; ++i)
+        for (int j = 0; j < 2; ++j)
+            for (int k = 0; k < 9; ++k)
+                ddphi_dx[i][j][k] = 0.;
+
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            for (int k = 0; k < 2; k++)
+                for (int nf = 0; nf < 9; nf++)
+                    ddphi_dx[i][j][nf] += inter[i][k][nf] * ainv_[k][j];
+
+
+    for (int i = 0; i < 2; ++i){
+        for (int j = 0; j < 2; j++){
+            delete [] ddphi[i][j];
+        };
+        delete [] ddphi[i];
+    };
+    delete [] ddphi;    
+
+    return;
+
+};
+
 template<>
 void Element<2>::getSecondSpatialDerivatives_COARSE_ISO(double *xsi, double **ainv_, double ***ddphi_dx){
 
@@ -1567,6 +1643,133 @@ void Element<2>::getInterpolatedVariablesSameMesh_ISO(double *phi_, double **dph
     return;
 };
 
+template<>
+void Element<2>::getInterpolatedVariablesSameMeshArlqStab_ISO(double *phi_, double **dphi_dx, double ***ddphi_dx) {
+
+
+    u_ = 0.;          v_ = 0.;
+    
+    uprev_ = 0.;      vprev_ = 0.;
+
+    umesh_ = 0.;      vmesh_ = 0.; 
+    
+    umeshprev_ = 0.;  vmeshprev_ = 0.;
+
+    du_dx = 0.;       du_dy = 0.;    
+    dv_dx = 0.;       dv_dy = 0.;
+
+    duprev_dx = 0.;   duprev_dy = 0.;
+    dvprev_dx = 0.;   dvprev_dy = 0.;
+
+    dax_dx = 0.;       dax_dy = 0.;
+    day_dx = 0.;       day_dy = 0.;
+    
+    daxprev_dx = 0.;   daxprev_dy = 0.;
+    dayprev_dx = 0.;   dayprev_dy = 0.;
+    
+    ddu_dxdx = 0.;       ddu_dxdy = 0.;    
+    ddu_dydx = 0.;       ddu_dydy = 0.; 
+    ddv_dxdx = 0.;       ddv_dxdy = 0.;    
+    ddv_dydx = 0.;       ddv_dydy = 0.;
+ 
+    dduprev_dxdx = 0.;   dduprev_dxdy = 0.;
+    dduprev_dydx = 0.;   dduprev_dydy = 0.;
+    ddvprev_dxdx = 0.;   ddvprev_dxdy = 0.;
+    ddvprev_dydx = 0.;   ddvprev_dydy = 0.;
+
+    ddp_dxdx = 0.; ddp_dxdy = 0.;
+    ddp_dydx = 0.; ddp_dydy = 0.;     
+ 
+    lamx_dx = 0.;     lamx_dy = 0.;
+    lamy_dx = 0.;     lamy_dy = 0.;   
+
+
+    //Interpolates the velocity components and its spatial derivatives
+    for (int i = 0; i < 9; i++){
+        
+        //velocity
+        u_ += (*nodes_)[connect_[i]] -> getVelocity(0) * phi_[i];
+        v_ += (*nodes_)[connect_[i]] -> getVelocity(1) * phi_[i];
+
+        //previous velocity
+        uprev_ += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * phi_[i];
+        vprev_ += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * phi_[i];
+
+        //mesh velocity
+        umesh_ += (*nodes_)[connect_[i]] -> getMeshVelocity(0) * phi_[i];
+        vmesh_ += (*nodes_)[connect_[i]] -> getMeshVelocity(1) * phi_[i];
+
+        //previous mesh velocity
+        umeshprev_ += (*nodes_)[connect_[i]] -> getPreviousMeshVelocity(0) * phi_[i];
+        vmeshprev_ += (*nodes_)[connect_[i]] -> getPreviousMeshVelocity(1) * phi_[i];
+
+         //velocity derivatives
+        du_dx += (*nodes_)[connect_[i]] -> getVelocity(0) * dphi_dx[0][i];
+        du_dy += (*nodes_)[connect_[i]] -> getVelocity(0) * dphi_dx[1][i];
+        
+        dv_dx += (*nodes_)[connect_[i]] -> getVelocity(1) * dphi_dx[0][i];
+        dv_dy += (*nodes_)[connect_[i]] -> getVelocity(1) * dphi_dx[1][i];
+
+        //previous velocity derivatives
+        duprev_dx += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * dphi_dx[0][i];
+        duprev_dy += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * dphi_dx[1][i];
+        
+        dvprev_dx += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * dphi_dx[0][i];
+        dvprev_dy += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * dphi_dx[1][i];
+
+        //acceleration
+        dax_dx += (*nodes_)[connect_[i]] -> getAcceleration(0) * dphi_dx[0][i];
+        dax_dy += (*nodes_)[connect_[i]] -> getAcceleration(0) * dphi_dx[1][i];
+        
+        day_dx += (*nodes_)[connect_[i]] -> getAcceleration(1) * dphi_dx[0][i];
+        day_dy += (*nodes_)[connect_[i]] -> getAcceleration(1) * dphi_dx[1][i];
+
+        //previous acceleration
+        daxprev_dx += (*nodes_)[connect_[i]] -> getPreviousAcceleration(0) * dphi_dx[0][i];
+        daxprev_dy += (*nodes_)[connect_[i]] -> getPreviousAcceleration(0) * dphi_dx[1][i];
+        
+        dayprev_dx += (*nodes_)[connect_[i]] -> getPreviousAcceleration(1) * dphi_dx[0][i];
+        dayprev_dy += (*nodes_)[connect_[i]] -> getPreviousAcceleration(1) * dphi_dx[1][i];
+
+        //velocity second derivatives
+        ddu_dxdx += (*nodes_)[connect_[i]] -> getVelocity(0) * ddphi_dx[0][0][i];
+        ddu_dxdy += (*nodes_)[connect_[i]] -> getVelocity(0) * ddphi_dx[0][1][i];
+        ddu_dxdx += (*nodes_)[connect_[i]] -> getVelocity(0) * ddphi_dx[1][0][i];
+        ddu_dxdy += (*nodes_)[connect_[i]] -> getVelocity(0) * ddphi_dx[1][1][i];
+
+        ddv_dxdx += (*nodes_)[connect_[i]] -> getVelocity(1) * ddphi_dx[0][0][i];
+        ddv_dxdy += (*nodes_)[connect_[i]] -> getVelocity(1) * ddphi_dx[0][1][i];
+        ddv_dxdx += (*nodes_)[connect_[i]] -> getVelocity(1) * ddphi_dx[1][0][i];
+        ddv_dxdy += (*nodes_)[connect_[i]] -> getVelocity(1) * ddphi_dx[1][1][i];
+
+        //previous second velocity derivatives
+        dduprev_dxdx += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * ddphi_dx[0][0][i];
+        dduprev_dxdy += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * ddphi_dx[0][1][i];
+        dduprev_dydx += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * ddphi_dx[1][0][i];
+        dduprev_dydy += (*nodes_)[connect_[i]] -> getPreviousVelocity(0) * ddphi_dx[1][1][i];
+       
+        ddvprev_dxdx += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * ddphi_dx[0][0][i];
+        ddvprev_dxdy += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * ddphi_dx[0][1][i];
+        ddvprev_dydx += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * ddphi_dx[1][0][i];
+        ddvprev_dydy += (*nodes_)[connect_[i]] -> getPreviousVelocity(1) * ddphi_dx[1][1][i];
+        
+        //pressure
+        ddp_dxdx += (*nodes_)[connect_[i]] -> getPressure()* ddphi_dx[0][0][i]; 
+        ddp_dxdy += (*nodes_)[connect_[i]] -> getPressure()* ddphi_dx[0][1][i];
+        ddp_dydx += (*nodes_)[connect_[i]] -> getPressure()* ddphi_dx[1][0][i]; 
+        ddp_dydy += (*nodes_)[connect_[i]] -> getPressure()* ddphi_dx[1][1][i]; 
+        
+        //lagrange multipliers derivatives
+        lamx_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[0][i];     
+        lamx_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[1][i];
+        lamy_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[0][i];      
+        lamy_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[1][i];   
+
+    };  
+
+    return;
+};
+
 
 template<>
 void Element<2>::getInterpolateLagMultiplierDerivatives(double **dphi_dx){
@@ -1700,6 +1903,64 @@ void Element<2>::getInterpolatedVariablesDifferentMesh_FEM_ISO(double *phi_, dou
 };
 
 template<>
+void Element<2>::getInterpolatedVariablesDifferentMesh_ISO_FEM(double *phi_, double **dphi_dx,double *phiC_, double **dphiC_dx) {
+
+    u_ = 0.;          v_ = 0.;
+    du_dx = 0.;       du_dy = 0.;    
+    dv_dx = 0.;       dv_dy = 0.;
+    uprev_ = 0.;      vprev_ = 0.;
+    duprev_dx = 0.;   duprev_dy = 0.;
+    dvprev_dx = 0.;   dvprev_dy = 0.;
+    lamx_ = 0.;       lamy_ = 0.;   
+    lamx_dx = 0.;     lamx_dy = 0.;
+    lamy_dx = 0.;     lamy_dy = 0.;  
+    lamx_ = 0.;       lamy_ = 0.;   
+    lamx_dx = 0.;     lamx_dy = 0.;
+    lamy_dx = 0.;     lamy_dy = 0.;      
+        
+    //Interpolates the velocity components and its spatial derivatives
+    for (int i = 0; i < 6; i++){
+
+        //velocity
+        u_ += (*nodesC_)[connectC_[i]] -> getVelocity(0) * phiC_[i];
+        v_ += (*nodesC_)[connectC_[i]] -> getVelocity(1) * phiC_[i];
+
+        //previous velocity
+        uprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * phiC_[i];
+        vprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * phiC_[i];
+
+        //velocity derivatives
+        du_dx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[0][i];
+        du_dy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[1][i];
+        dv_dx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[0][i];
+        dv_dy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[1][i];
+
+        //previous velocity derivatives
+        duprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[0][i];
+        duprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[1][i];
+        dvprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[0][i];
+        dvprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[1][i];
+
+    };  
+
+    for (int i = 0; i < 9; i++){
+
+        //lagrange multipliers
+        lamx_ += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * phi_[i];       
+        lamy_ += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * phi_[i];  
+
+        //lagrange multipliers derivatives
+        lamx_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[0][i];     
+        lamx_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[1][i];
+        lamy_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[0][i];      
+        lamy_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[1][i]; 
+    };
+
+
+    return;
+};
+
+template<>
 void Element<2>::getInterpolatedVariablesDifferentMeshArlqStab_FEM_ISO(double **dphi_dx,double *phiC_, double **dphiC_dx,
                                                                        double ***ddphiC_dx) {
     u_ = 0.;          v_ = 0.;
@@ -1739,77 +2000,199 @@ void Element<2>::getInterpolatedVariablesDifferentMeshArlqStab_FEM_ISO(double **
     for (int i = 0; i < 9; i++){
         
         //velocity
-        u_ += (*nodes_)[connectC_[i]] -> getVelocity(0) * phiC_[i];
-        v_ += (*nodes_)[connectC_[i]] -> getVelocity(1) * phiC_[i];
+        u_ += (*nodesC_)[connectC_[i]] -> getVelocity(0) * phiC_[i];
+        v_ += (*nodesC_)[connectC_[i]] -> getVelocity(1) * phiC_[i];
 
         //previous velocity
-        uprev_ += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * phiC_[i];
-        vprev_ += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * phiC_[i];
+        uprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * phiC_[i];
+        vprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * phiC_[i];
 
         //mesh velocity
-        umesh_ += (*nodes_)[connectC_[i]] -> getMeshVelocity(0) * phiC_[i];
-        vmesh_ += (*nodes_)[connectC_[i]] -> getMeshVelocity(1) * phiC_[i];
+        umesh_ += (*nodesC_)[connectC_[i]] -> getMeshVelocity(0) * phiC_[i];
+        vmesh_ += (*nodesC_)[connectC_[i]] -> getMeshVelocity(1) * phiC_[i];
 
         //previous mesh velocity
-        umeshprev_ += (*nodes_)[connectC_[i]] -> getPreviousMeshVelocity(0) * phiC_[i];
-        vmeshprev_ += (*nodes_)[connectC_[i]] -> getPreviousMeshVelocity(1) * phiC_[i];
+        umeshprev_ += (*nodesC_)[connectC_[i]] -> getPreviousMeshVelocity(0) * phiC_[i];
+        vmeshprev_ += (*nodesC_)[connectC_[i]] -> getPreviousMeshVelocity(1) * phiC_[i];
 
          //velocity derivatives
-        du_dx += (*nodes_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[0][i];
-        du_dy += (*nodes_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[1][i];
-        dv_dx += (*nodes_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[0][i];
-        dv_dy += (*nodes_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[1][i];
+        du_dx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[0][i];
+        du_dy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[1][i];
+        dv_dx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[0][i];
+        dv_dy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[1][i];
 
         //previous velocity derivatives
-        duprev_dx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[0][i];
-        duprev_dy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[1][i];
-        dvprev_dx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[0][i];
-        dvprev_dy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[1][i];
+        duprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[0][i];
+        duprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[1][i];
+        dvprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[0][i];
+        dvprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[1][i];
 
         //acceleration
-        dax_dx += (*nodes_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[0][i];
-        dax_dy += (*nodes_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[1][i];
-        day_dx += (*nodes_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[0][i];
-        day_dy += (*nodes_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[1][i];
+        dax_dx += (*nodesC_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[0][i];
+        dax_dy += (*nodesC_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[1][i];
+        day_dx += (*nodesC_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[0][i];
+        day_dy += (*nodesC_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[1][i];
 
         //previous acceleration
-        daxprev_dx += (*nodes_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[0][i];
-        daxprev_dy += (*nodes_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[1][i];
-        dayprev_dx += (*nodes_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[0][i];
-        dayprev_dy += (*nodes_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[1][i];
+        daxprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[0][i];
+        daxprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[1][i];
+        dayprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[0][i];
+        dayprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[1][i];
 
         //velocity second derivatives
-        ddu_dxdx += (*nodes_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][0][i];
-        ddu_dxdy += (*nodes_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][1][i];
-        ddu_dxdx += (*nodes_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][0][i];
-        ddu_dxdy += (*nodes_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][1][i];
+        ddu_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][0][i];
+        ddu_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][1][i];
+        ddu_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][0][i];
+        ddu_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][1][i];
 
-        ddv_dxdx += (*nodes_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][0][i];
-        ddv_dxdy += (*nodes_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][1][i];
-        ddv_dxdx += (*nodes_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][0][i];
-        ddv_dxdy += (*nodes_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][1][i];
+        ddv_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][0][i];
+        ddv_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][1][i];
+        ddv_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][0][i];
+        ddv_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][1][i];
 
         //previous second velocity derivatives
-        dduprev_dxdx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][0][i];
-        dduprev_dxdy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][1][i];
-        dduprev_dydx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][0][i];
-        dduprev_dydy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][1][i];
-        ddvprev_dxdx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][0][i];
-        ddvprev_dxdy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][1][i];
-        ddvprev_dydx += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][0][i];
-        ddvprev_dydy += (*nodes_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][1][i];
+        dduprev_dxdx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][0][i];
+        dduprev_dxdy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][1][i];
+        dduprev_dydx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][0][i];
+        dduprev_dydy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][1][i];
+        ddvprev_dxdx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][0][i];
+        ddvprev_dxdy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][1][i];
+        ddvprev_dydx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][0][i];
+        ddvprev_dydy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][1][i];
         
         //pressure
-        ddp_dxdx += (*nodes_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][0][i]; 
-        ddp_dxdy += (*nodes_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][1][i];
-        ddp_dydx += (*nodes_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][0][i]; 
-        ddp_dydy += (*nodes_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][1][i]; 
+        ddp_dxdx += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][0][i]; 
+        ddp_dxdy += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][1][i];
+        ddp_dydx += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][0][i]; 
+        ddp_dydy += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][1][i]; 
         
          
 
     };  
 
     for (int i = 0; i < 6; i++){
+
+        //lagrange multipliers derivatives
+        lamx_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[0][i];     
+        lamx_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[1][i];
+        lamy_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[0][i];      
+        lamy_dy += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(1) * dphi_dx[1][i]; 
+    };
+
+    return;
+};
+
+template<>
+void Element<2>::getInterpolatedVariablesDifferentMeshArlqStab_ISO_FEM(double **dphi_dx,double *phiC_, double **dphiC_dx,
+                                                                       double ***ddphiC_dx) {
+    u_ = 0.;          v_ = 0.;
+    uprev_ = 0.;      vprev_ = 0.;
+
+    umesh_ = 0.;      vmesh_ = 0.; 
+    umeshprev_ = 0.;  vmeshprev_ = 0.;
+
+    du_dx = 0.;       du_dy = 0.;    
+    dv_dx = 0.;       dv_dy = 0.;
+
+    duprev_dx = 0.;   duprev_dy = 0.;
+    dvprev_dx = 0.;   dvprev_dy = 0.;
+
+    dax_dx = 0.;       dax_dy = 0.;
+    day_dx = 0.;       day_dy = 0.;
+    daxprev_dx = 0.;   daxprev_dy = 0.;
+    dayprev_dx = 0.;   dayprev_dy = 0.;
+    
+    ddu_dxdx = 0.;       ddu_dxdy = 0.;    
+    ddu_dydx = 0.;       ddu_dydy = 0.; 
+    ddv_dxdx = 0.;       ddv_dxdy = 0.;    
+    ddv_dydx = 0.;       ddv_dydy = 0.;
+ 
+    dduprev_dxdx = 0.;   dduprev_dxdy = 0.;
+    dduprev_dydx = 0.;   dduprev_dydy = 0.;
+    ddvprev_dxdx = 0.;   ddvprev_dxdy = 0.;
+    ddvprev_dydx = 0.;   ddvprev_dydy = 0.;
+ 
+    lamx_dx = 0.;     lamx_dy = 0.;
+    lamy_dx = 0.;     lamy_dy = 0.;   
+
+    ddp_dxdx = 0.; ddp_dxdy = 0.;
+    ddp_dydx = 0.; ddp_dydy = 0.;
+
+    //Interpolates the velocity components and its spatial derivatives
+    for (int i = 0; i < 6; i++){
+        
+        //velocity
+        u_ += (*nodesC_)[connectC_[i]] -> getVelocity(0) * phiC_[i];
+        v_ += (*nodesC_)[connectC_[i]] -> getVelocity(1) * phiC_[i];
+
+        //previous velocity
+        uprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * phiC_[i];
+        vprev_ += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * phiC_[i];
+
+        //mesh velocity
+        umesh_ += (*nodesC_)[connectC_[i]] -> getMeshVelocity(0) * phiC_[i];
+        vmesh_ += (*nodesC_)[connectC_[i]] -> getMeshVelocity(1) * phiC_[i];
+
+        //previous mesh velocity
+        umeshprev_ += (*nodesC_)[connectC_[i]] -> getPreviousMeshVelocity(0) * phiC_[i];
+        vmeshprev_ += (*nodesC_)[connectC_[i]] -> getPreviousMeshVelocity(1) * phiC_[i];
+
+         //velocity derivatives
+        du_dx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[0][i];
+        du_dy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * dphiC_dx[1][i];
+        dv_dx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[0][i];
+        dv_dy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * dphiC_dx[1][i];
+
+        //previous velocity derivatives
+        duprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[0][i];
+        duprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * dphiC_dx[1][i];
+        dvprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[0][i];
+        dvprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * dphiC_dx[1][i];
+
+        //acceleration
+        dax_dx += (*nodesC_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[0][i];
+        dax_dy += (*nodesC_)[connectC_[i]] -> getAcceleration(0) * dphiC_dx[1][i];
+        day_dx += (*nodesC_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[0][i];
+        day_dy += (*nodesC_)[connectC_[i]] -> getAcceleration(1) * dphiC_dx[1][i];
+
+        //previous acceleration
+        daxprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[0][i];
+        daxprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(0) * dphiC_dx[1][i];
+        dayprev_dx += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[0][i];
+        dayprev_dy += (*nodesC_)[connectC_[i]] -> getPreviousAcceleration(1) * dphiC_dx[1][i];
+
+        //velocity second derivatives
+        ddu_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][0][i];
+        ddu_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[0][1][i];
+        ddu_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][0][i];
+        ddu_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(0) * ddphiC_dx[1][1][i];
+
+        ddv_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][0][i];
+        ddv_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[0][1][i];
+        ddv_dxdx += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][0][i];
+        ddv_dxdy += (*nodesC_)[connectC_[i]] -> getVelocity(1) * ddphiC_dx[1][1][i];
+
+        //previous second velocity derivatives
+        dduprev_dxdx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][0][i];
+        dduprev_dxdy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[0][1][i];
+        dduprev_dydx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][0][i];
+        dduprev_dydy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(0) * ddphiC_dx[1][1][i];
+        ddvprev_dxdx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][0][i];
+        ddvprev_dxdy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[0][1][i];
+        ddvprev_dydx += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][0][i];
+        ddvprev_dydy += (*nodesC_)[connectC_[i]] -> getPreviousVelocity(1) * ddphiC_dx[1][1][i];
+        
+        //pressure
+        ddp_dxdx += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][0][i]; 
+        ddp_dxdy += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[0][1][i];
+        ddp_dydx += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][0][i]; 
+        ddp_dydy += (*nodesC_)[connectC_[i]] -> getPressure()* ddphiC_dx[1][1][i]; 
+        
+         
+
+    };  
+
+    for (int i = 0; i < 9; i++){
 
         //lagrange multipliers derivatives
         lamx_dx += (*nodes_)[connect_[i]] -> getLagrangeMultiplier(0) * dphi_dx[0][i];     
@@ -1882,268 +2265,406 @@ void Element<2>::getInterpolatedVariablesDifferentMesh_ISO_ISO(double *phi_, dou
 //-----------------------COMPUTE DRAG AND LIFT FORCES --------------------------
 //------------------------------------------------------------------------------
 template<>
-void Element<2>::computeDragAndLiftForces_ISO(int bound) {
+void Element<2>::computeDragAndLiftForces_ISO(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
+                                              double &dForce, double &lForce, double &aux_Mom, double &aux_Per) {
 
-    // double    &visc_ = parameters->getViscosity();
-    // double    localNodesBoundaryIso_[3][2];
-    // double    pcWeightl[3];
-    // double    pcWeight[9];
-    // int       *incL_;
+    double    &visc_ = parameters->getViscosity();
+    double    localNodesBoundaryIso_[3][2];
+    double    pcWeightl[3];
+    double    pcWeight[9];
+    int       *incL_;
    
-    // for (int i = 0; i<9; i++) pcWeight[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    for (int i = 0; i<9; i++) pcWeight[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_= (*nodes_)[connect_[8]] -> getINC();     
 
-    // int size = elemBound_.size();
+    if(side == 0){
 
-    // for (int iS=0; iS< size;iS++){
+        pcWeightl[0] = (*nodes_)[connect_[0]] -> getWeightPC();
+        pcWeightl[1] = (*nodes_)[connect_[1]] -> getWeightPC();
+        pcWeightl[2] = (*nodes_)[connect_[2]] -> getWeightPC();
+        
+        for (int i=0; i<2; i++){
+            localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[0]] -> getCoordinateValue(i))/pcWeightl[0];
+            localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[1]] -> getCoordinateValue(i))/pcWeightl[1];
+            localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[2]] -> getCoordinateValue(i))/pcWeightl[2];           
+        };
 
-    //     if (elemBound_[iS] == bound){
+        incL_ = (*nodes_)[connect_[2]] -> getINC(); 
 
-    //         if(elemSide_[iS] == 0){
+    }else{
 
-    //             pcWeightl[0] = (*nodes_)[connect_[0]] -> getWeightPC();
-    //             pcWeightl[1] = (*nodes_)[connect_[1]] -> getWeightPC();
-    //             pcWeightl[2] = (*nodes_)[connect_[2]] -> getWeightPC();
+        if(side == 1){
+
+            pcWeightl[0] = (*nodes_)[connect_[2]] -> getWeightPC();
+            pcWeightl[1] = (*nodes_)[connect_[5]] -> getWeightPC();
+            pcWeightl[2] = (*nodes_)[connect_[8]] -> getWeightPC();
+
+            for (int i=0; i<2; i++){
+                localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[2]] -> getCoordinateValue(i))/pcWeightl[0];
+                localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[5]] -> getCoordinateValue(i))/pcWeightl[1];
+                localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[8]] -> getCoordinateValue(i))/pcWeightl[2];
+            };
+
+            incL_ = (*nodes_)[connect_[8]] -> getINC(); 
+
+        if(side == 2){
+
+            pcWeightl[0] = (*nodes_)[connect_[8]] -> getWeightPC();
+            pcWeightl[1] = (*nodes_)[connect_[7]] -> getWeightPC();
+            pcWeightl[2] = (*nodes_)[connect_[6]] -> getWeightPC();
                 
-    //             for (int i=0; i<2; i++){
-    //                 localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[0]] -> getCoordinateValue(i))/pcWeightl[0];
-    //                 localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[1]] -> getCoordinateValue(i))/pcWeightl[1];
-    //                 localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[2]] -> getCoordinateValue(i))/pcWeightl[2];           
-    //             };
+                for (int i=0; i<2; i++){
+                localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[8]] -> getCoordinateValue(i))/pcWeightl[0];
+                localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[7]] -> getCoordinateValue(i))/pcWeightl[1];
+                localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[6]] -> getCoordinateValue(i))/pcWeightl[2];
+            };
 
-    //             incL_ = (*nodes_)[connect_[2]] -> getINC(); 
+            incL_ = (*nodes_)[connect_[8]] -> getINC(); 
+        };
 
-    //         }else{
+        }else{
 
-    //             if(elemSide_[iS] == 1){
-
-    //                 pcWeightl[0] = (*nodes_)[connect_[2]] -> getWeightPC();
-    //                 pcWeightl[1] = (*nodes_)[connect_[5]] -> getWeightPC();
-    //                 pcWeightl[2] = (*nodes_)[connect_[8]] -> getWeightPC();
-
-    //                 for (int i=0; i<2; i++){
-    //                     localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[2]] -> getCoordinateValue(i))/pcWeightl[0];
-    //                     localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[5]] -> getCoordinateValue(i))/pcWeightl[1];
-    //                     localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[8]] -> getCoordinateValue(i))/pcWeightl[2];
-    //                 };
-
-    //                 incL_ = (*nodes_)[connect_[8]] -> getINC(); 
-
-    //             if(elemSide_[iS] == 2){
-
-    //                 pcWeightl[0] = (*nodes_)[connect_[8]] -> getWeightPC();
-    //                 pcWeightl[1] = (*nodes_)[connect_[7]] -> getWeightPC();
-    //                 pcWeightl[2] = (*nodes_)[connect_[6]] -> getWeightPC();
-                        
-    //                     for (int i=0; i<2; i++){
-    //                     localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[8]] -> getCoordinateValue(i))/pcWeightl[0];
-    //                     localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[7]] -> getCoordinateValue(i))/pcWeightl[1];
-    //                     localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[6]] -> getCoordinateValue(i))/pcWeightl[2];
-    //                 };
-
-    //                 incL_ = (*nodes_)[connect_[8]] -> getINC(); 
-    //             };
-
-    //             }else{
-
-    //                 pcWeightl[0] = (*nodes_)[connect_[6]] -> getWeightPC();
-    //                 pcWeightl[1] = (*nodes_)[connect_[3]] -> getWeightPC();
-    //                 pcWeightl[2] = (*nodes_)[connect_[0]] -> getWeightPC();
-                    
-    //                 for (int i=0; i<2; i++){
-    //                     localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[6]] -> getCoordinateValue(i))/pcWeightl[0];
-    //                     localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[3]] -> getCoordinateValue(i))/pcWeightl[1];
-    //                     localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[0]] -> getCoordinateValue(i))/pcWeightl[2];
-    //                 };
-
-    //                 incL_ = (*nodes_)[connect_[6]] -> getINC(); 
-    //             };        
-    //         };
-
-
-
-    //         BoundaryIntegQuadratureIso<2>                      bQuad;    
-    //         QuadShapeFunction<2>                           shapeQuad; 
-    //         BoundShapeFunction<2>                          shapeBound;
-
-    //         double n_vector[2] = {};
-    //         double shearStress[2][2] = {};
-    //         double ident[2][2];
-    //         double load_friction[2] = {};
-    //         double load_pressure[2] = {};
-
-    //         ident[0][0] = 1.;
-    //         ident[0][1] = 0.;
-    //         ident[1][0] = 0.;
-    //         ident[1][1] = 1.;
-
-    //         double *phi_;
-    //         phi_ = new double[9];
-
-    //         double *phiCB_;
-    //         phiCB_ = new double[3];
-
-    //         double **dphiCB_;
-    //         dphiCB_ = new double*[1];
-    //         for (int i = 0; i < 1; ++i) dphiCB_[i] = new double[3];
-
-    //         double **dphi_dx;
-    //         dphi_dx = new double*[2];
-    //         for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[9];
-
-    //         double **ainv_;
-    //         ainv_ = new double*[2];
-    //         for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
-
-    //         double **quadJacMat;
-    //         quadJacMat = new double*[2];
-    //         for (int i = 0; i < 2; ++i) quadJacMat[i] = new double[2];
-
-    //         double xsi[2] = {};
-    //         double xsiB[1] = {};
-    //         double weightB[1] = {};
-
-    //         double moment = 0.;
-    //         double per = 0.;
-    //         int index = 0;
+            pcWeightl[0] = (*nodes_)[connect_[6]] -> getWeightPC();
+            pcWeightl[1] = (*nodes_)[connect_[3]] -> getWeightPC();
+            pcWeightl[2] = (*nodes_)[connect_[0]] -> getWeightPC();
             
-    //         // indexes the base fuction (index space) that starts in the left lower corner of the element
-    //         int *inc_;
-    //         inc_ = (*nodes_)[connect_[8]] -> getINC();  
+            for (int i=0; i<2; i++){
+                localNodesBoundaryIso_[0][i] = ((*nodes_)[connect_[6]] -> getCoordinateValue(i))/pcWeightl[0];
+                localNodesBoundaryIso_[1][i] = ((*nodes_)[connect_[3]] -> getCoordinateValue(i))/pcWeightl[1];
+                localNodesBoundaryIso_[2][i] = ((*nodes_)[connect_[0]] -> getCoordinateValue(i))/pcWeightl[2];
+            };
 
-    //         for(double* it = bQuad.begin(); it != bQuad.end(); it++){
-                
-    //             xsiB[0] = bQuad.PointList(index,0);
-    //             weightB[0] = bQuad.WeightList(index);
+            incL_ = (*nodes_)[connect_[6]] -> getINC(); 
+        };        
+    };
 
-    //             if(elemSide_[iS] == 0){
-    //                 xsi[0] = xsiB[0];
-    //                 xsi[1] = -1;
-    //             };
-    //             if(elemSide_[iS] == 1){
-    //                 xsi[0] = -1;
-    //                 xsi[1] = xsiB[0];
-    //             };
-    //             if(elemSide_[iS] == 2){
-    //                 xsi[0] = xsiB[0];
-    //                 xsi[1] = 1;
-    //             };
-    //             if(elemSide_[iS] == 3){
-    //                 xsi[0] = -1;
-    //                 xsi[1] = xsiB[0];
-    //             };
 
-    //             //Computes the shape functions
-    //             shapeQuad.evaluateIso(xsi,phi_,pcWeight,inc_,(*iparameters),Npatch_);
-                
-    //             //Computes the jacobian matrix
-    //             getJacobianMatrixIso(xsi,quadJacMatInv,quadJacMat,ainv_);
+    BoundaryIntegQuadratureIso<2>                      bQuad;    
+    QuadShapeFunction<2>                           shapeQuad; 
+    BoundShapeFunction<2>                          shapeBound;
 
-    //             //Computes spatial derivatives
-    //             getSpatialDerivativesIso(xsi,ainv_,dphi_dx);
+    double n_vector[2] = {};
+    double shearStress[2][2] = {};
+    double load_friction[2] = {};
+    double load_pressure[2] = {};
 
-    //             //Interpolates velocity and its derivatives values
-    //             getVelAndDerivativesIso(phi_,dphi_dx);   
+    double ident[2][2];
+    ident[0][0] = 1.;
+    ident[0][1] = 0.;
+    ident[1][0] = 0.;
+    ident[1][1] = 1.;
 
-    //             //Get Functions and Derivatives on the boundary
-    //             shapeBound.evaluateBoundaryIso(xsiB,phiCB_,pcWeightl,elemSide_[iS],incL_,(*iparameters),Npatch_);
-    //             shapeBound.evaluateGradientBoundaryIso(xsiB,dphiCB_,pcWeightl,elemSide_[iS],incL_,(*iparameters),Npatch_);
-               
-    //             double Tx=0.; double Ty = 0.;
-                
-    //             // (Jacobian parametric space to physical one)
-    //             for (int i=0; i<3; i++){
-    //                 Tx += localNodesBoundaryIso_[i][0] * dphiCB_[0][i];
-    //                 Ty += localNodesBoundaryIso_[i][1] * dphiCB_[0][i];
-    //             };
+    double phi_[9], phiCB_[3], xsi[2], xsiB[1], weightB;
 
-    //             // (Jacobian parental space to the physical one)
-    //             if ((elemSide_[iS] == 0) || (elemSide_[iS] == 2)){
-                    
-    //                 int degm = (*iparameters)[Npatch_] -> getDegree(0);
-    //                 int npcm = (*iparameters)[Npatch_] -> getNcp(0);  
-    //                 double *uknot_;
-    //                 uknot_ = (*iparameters)[Npatch_] -> getuKnot();
+    double **dphiCB_;
+    dphiCB_ = new double*[1];
+    for (int i = 0; i < 1; ++i) dphiCB_[i] = new double[3];
 
-    //                 int uind = incL_[0];
+    double **dphi_dx;
+    dphi_dx = new double*[2];
+    for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[9];
 
-    //                 double u1 = uknot_[uind];
-    //                 double u2 = uknot_[uind+1];
+    double **ainv_;
+    ainv_ = new double*[2];
+    for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
 
-    //                 double dxsi1_dqxsi1 = (u2-u1)*0.5;
-                    
-    //                 Tx *= dxsi1_dqxsi1;
-    //                 Ty *= dxsi1_dqxsi1;
-         
-    //             } else {
+    double **quadJacMat;
+    quadJacMat = new double*[2];
+    for (int i = 0; i < 2; ++i) quadJacMat[i] = new double[2];
 
-    //                 int degn = (*iparameters)[Npatch_] -> getDegree(1);
-    //                 int npcn = (*iparameters)[Npatch_] -> getNcp(1);   
-    //                 double *vknot_;
-    //                 vknot_ = (*iparameters)[Npatch_] -> getvKnot();  
+    double moment = 0.;
+    double per = 0.;
 
-    //                 int vind = incL_[1]; 
 
-    //                 double v1 = vknot_[vind];
-    //                 double v2 = vknot_[vind +1];
+    int index = 0;
+    for(double* it = bQuad.begin(); it != bQuad.end(); it++){
+        
+        xsiB[0] = bQuad.PointList(index,0);
+        weightB = bQuad.WeightList(index);
 
-    //                 double dxsi2_dqxsi2 = (v2-v1)*0.5;
+        if(side == 0){
+            xsi[0] = xsiB[0];
+            xsi[1] = -1;
+        };
+        if(side == 1){
+            xsi[0] = -1;
+            xsi[1] = xsiB[0];
+        };
+        if(side == 2){
+            xsi[0] = xsiB[0];
+            xsi[1] = 1;
+        };
+        if(side == 3){
+            xsi[0] = -1;
+            xsi[1] = xsiB[0];
+        };
 
-    //                 Tx *= dxsi2_dqxsi2;
-    //                 Ty *= dxsi2_dqxsi2;
-    //             }
-                
-    //             double jacb_ = sqrt(Tx*Tx + Ty*Ty);
-                
-    //             n_vector[0] =  Ty / jacb_;
-    //             n_vector[1] = -Tx / jacb_;
+        //Computes the shape functions
+        shapeQuad.evaluateIso(xsi,phi_,pcWeight,inc_,(*iparameters),Npatch_);
+        
+        //Computes the jacobian matrix
+        getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
 
-    //             shearStress[0][0] = 2. * visc_ * du_dx;
-    //             shearStress[0][1] = visc_ * (du_dy + dv_dx);
-    //             shearStress[1][0] = visc_ * (du_dy + dv_dx);
-    //             shearStress[1][1] = 2. * visc_ * dv_dy;
+        //Computes spatial derivatives
+        getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
 
-    //             for (int i = 0; i < 2; i++){
-    //                 for (int j = 0; j < 2; j++){
-    //                     load_pressure[i] += -p_*ident[i][j]*n_vector[j] * jacb_ * weightB[0];
-    //                     load_friction[i] += shearStress[i][j]*n_vector[j] * jacb_ * weightB[0];
-    //                 }
-    //             }
+        //Interpolates velocity and its derivatives values
+        getVelAndDerivatives_ISO(phi_,dphi_dx);   
 
-    //             moment +=  (-(load_pressure[0]+load_friction[0]) * (y_- 4.) 
-    //                        + (load_pressure[0]+load_friction[0]) * (x_ - 4.)) * jacb_ * weightB[0];
-    //             per += jacb_ * weightB[0];
-                
-    //             index++;
-    //         };
+        //Get Functions and Derivatives on the boundary
+        shapeBound.evaluateBoundaryIso(xsiB,phiCB_,pcWeightl,side,incL_,(*iparameters),Npatch_);
+        shapeBound.evaluateGradientBoundaryIso(xsiB,dphiCB_,pcWeightl,side,incL_,(*iparameters),Npatch_);
+       
+    
+        // (Jacobian parametric space to physical one)
+        double Tx=0.; double Ty = 0.;
+        for (int i=0; i<3; i++){
+            Tx += localNodesBoundaryIso_[i][0] * dphiCB_[0][i];
+            Ty += localNodesBoundaryIso_[i][1] * dphiCB_[0][i];
+        };
 
-    //         perimeter = per;
-    //         pitchingMoment = moment;
-
-    //         pressureDragForce = -load_pressure[0];
-    //         pressureLiftForce = -load_pressure[1];
+        // (Jacobian parental space to the physical one)
+        if ((side == 0) || (side == 2)){
             
-    //         frictionDragForce = -load_friction[0];
-    //         frictionLiftForce = -load_friction[1]; 
+            int degm = (*iparameters)[Npatch_] -> getDegree(0);
+            int npcm = (*iparameters)[Npatch_] -> getNcp(0);  
+            double *uknot_= (*iparameters)[Npatch_] -> getuKnot();
 
-    //         dragForce = pressureDragForce + frictionDragForce;
-    //         liftForce = pressureLiftForce + frictionLiftForce;
+            int uind = incL_[0];
+
+            double u1 = uknot_[uind];
+            double u2 = uknot_[uind+1];
+
+            double dxsi1_dqxsi1 = (u2-u1)*0.5;
+            
+            Tx *= dxsi1_dqxsi1;
+            Ty *= dxsi1_dqxsi1;
+ 
+        } else {
+
+            int degn = (*iparameters)[Npatch_] -> getDegree(1);
+            int npcn = (*iparameters)[Npatch_] -> getNcp(1);   
+            double *vknot_= (*iparameters)[Npatch_] -> getvKnot();  
+
+            int vind = incL_[1]; 
+
+            double v1 = vknot_[vind];
+            double v2 = vknot_[vind +1];
+
+            double dxsi2_dqxsi2 = (v2-v1)*0.5;
+
+            Tx *= dxsi2_dqxsi2;
+            Ty *= dxsi2_dqxsi2;
+        }
+        
+        double jacb_ = sqrt(Tx*Tx + Ty*Ty);
+        
+        n_vector[0] =  Ty / jacb_;
+        n_vector[1] = -Tx / jacb_;
+
+        shearStress[0][0] = 2. * visc_ * du_dx;
+        shearStress[0][1] = visc_ * (du_dy + dv_dx);
+        shearStress[1][0] = visc_ * (du_dy + dv_dx);
+        shearStress[1][1] = 2. * visc_ * dv_dy;
+
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 2; j++){
+                load_pressure[i] += -p_ * ident[i][j] * n_vector[j] * jacb_ * weightB;
+                load_friction[i] += shearStress[i][j] * n_vector[j] * jacb_ * weightB;
+            }
+        }
+
+        // moment +=  (-(load_pressure[0]+load_friction[0]) * (y_- 4.) 
+        //            + (load_pressure[0]+load_friction[0]) * (x_ - 4.)) * jacb_ * weightB[0];
+        per += jacb_ * weightB;
+        
+        index++;
+    };
+
+    aux_Per = per;
+    aux_Mom = moment;
+
+    pDForce = -load_pressure[0];
+    pLForce = -load_pressure[1];
+    
+    fDForce = -load_friction[0];
+    fLForce = -load_friction[1]; 
+
+    dForce = pDForce + fDForce;
+    lForce = pLForce + fLForce;
 
 
-    //         delete [] phi_;
-    //         delete [] phiCB_;
-    //         for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
-    //         delete [] dphi_dx;
-    //         for (int i = 0; i < 1; ++i) delete [] dphiCB_[i];
-    //         delete [] dphiCB_;   
-    //         for (int i = 0; i < 2; ++i) delete [] ainv_[i];
-    //         delete [] ainv_;
-    //         for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
-    //         delete [] quadJacMat;
-    //     };
-    // };
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 1; ++i) delete [] dphiCB_[i];
+    delete [] dphiCB_;   
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
 
 
     return;
+};
+
+
+template<>
+void Element<2>::computeDragAndLiftForces_FEM(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
+                                              double &dForce, double &lForce, double &aux_Mom, double &aux_Per) {
+
+    double localNodesBoundary_[3][2];
+    double &visc_ = parameters->getViscosity();
+
+    if(side == 0){
+        for (int i=0; i<2; i++){
+            localNodesBoundary_[0][i] = (*nodes_)[connect_[1]] -> getCoordinateValue(i);
+            localNodesBoundary_[1][i] = (*nodes_)[connect_[4]] -> getCoordinateValue(i);
+            localNodesBoundary_[2][i] = (*nodes_)[connect_[2]] -> getCoordinateValue(i);
+        };
+    }else{
+        if(side == 1){
+            for (int i=0; i<2; i++){
+                localNodesBoundary_[0][i] = (*nodes_)[connect_[2]] -> getCoordinateValue(i);
+                localNodesBoundary_[1][i] = (*nodes_)[connect_[5]] -> getCoordinateValue(i);
+                localNodesBoundary_[2][i] = (*nodes_)[connect_[0]] -> getCoordinateValue(i);
+            };
+        }else{
+            for (int i=0; i<2; i++){
+                localNodesBoundary_[0][i] = (*nodes_)[connect_[0]] -> getCoordinateValue(i);
+                localNodesBoundary_[1][i] = (*nodes_)[connect_[3]] -> getCoordinateValue(i);
+                localNodesBoundary_[2][i] = (*nodes_)[connect_[1]] -> getCoordinateValue(i);
+            };
+        };        
+    };
+
+    BoundaryIntegQuadrature<2>   bQuad;    
+    QuadShapeFunction<2>         shapeQuad; 
+    BoundShapeFunction<2>        shapeBound;
+
+
+    double n_vector[2] = {};
+    double shearStress[2][2] = {};
+    double ident[2][2];
+    double load_friction[2] = {};
+    double load_pressure[2] = {};
+
+    ident[0][0] = 1.;
+    ident[0][1] = 0.;
+    ident[1][0] = 0.;
+    ident[1][1] = 1.;
+
+    double phi_[6], phiB_[3], xsi[2], xsiB[1], weightB;
+
+    double **dphiB_;
+    dphiB_ = new double*[1];
+    for (int i = 0; i < 1; ++i) dphiB_[i] = new double[3];
+
+    double **dphi_dx;
+    dphi_dx = new double*[2];
+    for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[6];
+
+    double **ainv_;
+    ainv_ = new double*[2];
+    for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
+
+    double **Jac;
+    Jac = new double*[2];
+    for (int i = 0; i < 2; ++i) Jac[i] = new double[2];
+
+    double moment = 0.;
+    double per = 0.;
+    
+    int index = 0;
+
+    for(double* it = bQuad.begin(); it != bQuad.end(); it++){    
+        
+        xsiB[0] = bQuad.PointList(index,0);
+        weightB= bQuad.WeightList(index);
+
+        if(side == 2){
+            xsi[0] = (-xsiB[0] + 1.) / 2.;
+            xsi[1] = 0.;
+        };
+        if(side == 1){
+            xsi[1] = (xsiB[0] + 1.) / 2.;
+            xsi[0] = 0.;
+        };
+        if(side == 0){
+            xsi[0] = (xsiB[0] + 1.) / 2.;
+            xsi[1] = 1. - xsi[0];
+        };
+
+        //Computes the velocity shape functions
+        shapeQuad.evaluateFem(xsi,phi_);
+        
+        //Computes the jacobian matrix
+        getJacobianMatrix_FEM(xsi,Jac,ainv_);
+
+        //Computes spatial derivatives
+        getSpatialDerivatives_FEM(xsi,ainv_,dphi_dx);
+
+        //Interpolates velocity and its derivatives values
+        getVelAndDerivatives_FEM(phi_,dphi_dx);    
+
+        shapeBound.evaluateBoundaryFem(xsiB,phiB_);
+        shapeBound.evaluateGradientBoundaryFem(xsiB,dphiB_);
+
+        //computes the normal vector in the linear element
+        double Tx=0.; double Ty = 0.;
+        for (int i = 0; i < 3; i++){
+            Tx += localNodesBoundary_[i][0] * dphiB_[0][i];
+            Ty += localNodesBoundary_[i][1] * dphiB_[0][i];
+        };
+
+        double jacb_ = sqrt(Tx*Tx + Ty*Ty);
+        
+        n_vector[0] =  Ty/jacb_;
+        n_vector[1] = -Tx/jacb_;
+
+        shearStress[0][0] = 2. * visc_ * du_dx;
+        shearStress[0][1] = visc_ * (du_dy + dv_dx);
+        shearStress[1][0] = visc_ * (du_dy + dv_dx);
+        shearStress[1][1] = 2. * visc_ * dv_dy;
+
+        for (int i = 0; i < 2; i++){
+            for (int j = 0; j < 2; j++){
+                load_pressure[i] += -p_ * ident[i][j] * n_vector[j] * jacb_ * weightB;
+                load_friction[i] += shearStress[i][j] * n_vector[j] * jacb_ * weightB;
+            }
+        }
+
+        // moment += ((-p_ + shearStress[0][0] + shearStress[1][0]) * y_ 
+        //          -(-p_ + shearStress[0][1] + shearStress[1][1]) * (x_ - 0.248792267683901))
+        //          * jacb_ * weightB;
+        per += jacb_ * weightB;
+        
+        index++;
+    };
+
+    aux_Per = per;
+    aux_Mom = moment;
+
+    pDForce = -load_pressure[0];
+    pLForce = -load_pressure[1];
+    
+    fDForce = -load_friction[0];
+    fLForce = -load_friction[1]; 
+
+    dForce = pDForce + fDForce;
+    lForce = pLForce + fLForce;
+
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 1; ++i) delete [] dphiB_[i];
+    delete [] dphiB_;   
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] Jac[i];
+    delete [] Jac;
+  
+    return;
+
 };
 
 //------------------------------------------------------------------------------
@@ -2736,6 +3257,8 @@ void Element<2>::getNewParameterSUPG_ISO(double **quadJacMat, double *phi_, doub
 
     //Computing tSUPG parameter
     tSUPG_ = 1./(sqrt(tSUGN1_ + (1./(tSUGN2_ * tSUGN2_)) + (tSUGN3_ * tSUGN3_)));
+
+    tPSPG_ = tSUPG_;
    
     tLSIC_ = hrqd * hrqd / tSUPG_;
 
@@ -3410,6 +3933,7 @@ void Element<2>::getMatrixAndVectorsSameMesh_tSUPG_tPSPG_FEM(double *phi_, doubl
 	};
 };
 
+
 template<>
 void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi_, double **dphi_dx, double ***ddphi_dx,
                                                          double **arlequinStabD, double *arlequinStabVectorD,
@@ -3453,20 +3977,20 @@ void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi
     for (int i = 0; i < 6; i++){
         for (int j = 0; j < 6; j++){
 
-            //tarlq x mass matrix
-            double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphi_dx[0][j] + dphi_dx[1][i]* dphi_dx[1][j]);
+            // //tarlq x mass matrix
+            // double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphi_dx[0][j] + dphi_dx[1][i]* dphi_dx[1][j]);
 
-            arlequinStab1[2*i][2*j] -= mass * WJ * alpha_m;
-            arlequinStab1[2*i+1][2*j+1] -= mass * WJ * alpha_m;
+            // arlequinStab1[2*i][2*j] -= mass * WJ * alpha_m;
+            // arlequinStab1[2*i+1][2*j+1] -= mass * WJ * alpha_m;
 
             //tarlq x convecction matrix
-            double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphi_dx[0][0][j] * (una_ - umeshna_) + ddphi_dx[0][1][j]* (vna_ - vmeshna_))) + 
-                                              (dphi_dx[1][i] * (ddphi_dx[1][0][j] * (una_ - umeshna_) + ddphi_dx[1][1][j]* (vna_ - vmeshna_))));
-            double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphi_dx[0][j] * duna_dx + dphi_dx[1][j]* dvna_dx)) + 
-                                              (dphi_dx[1][i] * (dphi_dx[0][j] * duna_dy  + dphi_dx[1][j]* dvna_dy)));
+            // double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphi_dx[0][0][j] * (una_ - umeshna_) + ddphi_dx[0][1][j]* (vna_ - vmeshna_))) + 
+            //                                   (dphi_dx[1][i] * (ddphi_dx[1][0][j] * (una_ - umeshna_) + ddphi_dx[1][1][j]* (vna_ - vmeshna_))));
+            // double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphi_dx[0][j] * duna_dx + dphi_dx[1][j]* dvna_dx)) + 
+            //                                   (dphi_dx[1][i] * (dphi_dx[0][j] * duna_dy  + dphi_dx[1][j]* dvna_dy)));
 
-            arlequinStab1[2*i][2*j] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
-            arlequinStab1[2*i+1][2*j+1] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+            // arlequinStab1[2*i][2*j] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+            // arlequinStab1[2*i+1][2*j+1] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
 
             //tarlq x pressure term
             // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphi_dx[0][0][j] + dphi_dx[1][i]* ddphi_dx[0][1][j]);
@@ -3483,26 +4007,26 @@ void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi
 
 
         //tarlq x mass matrix
-        double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
-        double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
+        // double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
+        // double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
 
-        arlequinStabVector1[2*i] += massx * WJ;
-        arlequinStabVector1[2*i+1] += massy * WJ;
+        // arlequinStabVector1[2*i] += massx * WJ;
+        // arlequinStabVector1[2*i+1] += massy * WJ;
 
         //tarlq x convecction matrix
-        double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
-                                           (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
-        double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy* dvna_dx)) + 
-                                           (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy* dvna_dy)));
-        double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
-                                           (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
-        double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy* dvna_dx)) + 
-                                           (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy* dvna_dy)));
+        // double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
+        //                                    (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
+        // double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy* dvna_dx)) + 
+        //                                    (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy* dvna_dy)));
+        // double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
+        //                                    (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
+        // double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy* dvna_dx)) + 
+        //                                    (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy* dvna_dy)));
 
-        arlequinStabVector1[2*i] += (convec1x + convec2x) * WJ;
-        arlequinStabVector1[2*i+1] += (convec1y + convec2y) * WJ;
+        // arlequinStabVector1[2*i] += (convec1x + convec2x) * WJ;
+        // arlequinStabVector1[2*i+1] += (convec1y + convec2y) * WJ;
 
-        //tarlq x pressure term
+        // //tarlq x pressure term
         // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdx + dphi_dx[1][i]* ddp_dydx);
         // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdy + dphi_dx[1][i]* ddp_dydy);
         
@@ -3510,7 +4034,7 @@ void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi
         // arlequinStabVector1[2*i+1] += pressy * WJ;
 
 
-        //Diagona matrix
+        //Diagonal matrix
         double LLx = (dphi_dx[0][i] * lamx_dx + dphi_dx[1][i] * lamx_dy) * tARLQ_ / dens_;
         double LLy = (dphi_dx[0][i] * lamy_dx + dphi_dx[1][i] * lamy_dy) * tARLQ_ / dens_;
 
@@ -3524,8 +4048,7 @@ void Element<2>::getMatrixAndVectorsSameMeshArlqStab_FEM(int &index, double *phi
 
 template<>
 void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx, double **lagrMultMatrix, 
-        	                                     double *rhsVector1, double *rhsVector2,
-                                                 double **arlequinStab, double *arlequinStabVector){
+        	                                     double *rhsVector1, double *rhsVector2){
 
 	//Fluid Data
     double &alpha_f = parameters->getAlphaF();
@@ -3565,13 +4088,6 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 			lagrMultMatrix[2*i][2*j+1] -= H1xy  * WJ;
 			lagrMultMatrix[2*i+1][2*j+1] -= H1yy  * WJ;
 
-            //Stabilization term
-            double LL = (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * tARLQ_ / dens_;
-
-            arlequinStab[2*i][2*j] += LL * WJ;
-            arlequinStab[2*i+1][2*j+1] += LL * WJ; 
-
-
 		};
 
 		//L2 operator - Lagrange
@@ -3606,14 +4122,161 @@ void Element<2>::getMatrixAndVectorsSameMesh_ISO(double *phi_, double **dphi_dx,
 		rhsVector2[2*i] += (l2ux_ + h1ux_) * WJ;
 		rhsVector2[2*i+1] += (l2uy_ + h1uy_)  * WJ;
 
-        //Stabilization term
+	};
+
+};
+
+
+template<>
+void Element<2>::getMatrixAndVectorsSameMesh_tSUPG_tPSPG_ISO(double *phi_, double **dphi_dx, double **jacobianNRMatrix,double *rhsVector){
+
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &k1 = parameters->getArlequinK1();
+
+    double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
+    double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
+
+    double umeshna_ = alpha_f * umesh_ + (1. - alpha_f) * umeshprev_;
+    double vmeshna_ = alpha_f * vmesh_ + (1. - alpha_f) * umeshprev_; 
+
+    double WJ = weight_ * djac_;
+
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++){
+
+            double msupg = -((una_ - umeshna_) * dphi_dx[0][i] + (vna_ - vmeshna_) * dphi_dx[1][i]) * phi_[j] * tSUPG_;
+            jacobianNRMatrix[2*i][2*j] += msupg * WJ * k1;
+            jacobianNRMatrix[2*i+1][2*j+1] += msupg * WJ * k1;
+
+            double mpspgx = -(dphi_dx[0][i] * phi_[j]) * tPSPG_ / dens_;
+            double mpspgy = -(dphi_dx[1][i] * phi_[j]) * tPSPG_ / dens_;
+
+            jacobianNRMatrix[18+i][2*j] += mpspgx * WJ * k1;
+            jacobianNRMatrix[18+i][2*j+1] += mpspgy * WJ * k1;
+        };
+
+        double vsupgx = ((una_ - umeshna_) * dphi_dx[0][i] + (vna_ - vmeshna_) * dphi_dx[1][i]) * lamx_ * tSUPG_;
+        double vsupgy = ((una_ - umeshna_) * dphi_dx[0][i] + (vna_ - vmeshna_) * dphi_dx[1][i]) * lamy_ * tSUPG_;
+
+        double vpspg = (dphi_dx[0][i] * lamx_ + dphi_dx[1][i] * lamy_) * tPSPG_ / dens_;
+
+        rhsVector[2*i] += vsupgx * WJ * k1;
+        rhsVector[2*i+1] += vsupgy * WJ * k1;
+        rhsVector[18+i] += vpspg * WJ * k1;
+
+    };
+};
+
+
+template<>
+void Element<2>::getMatrixAndVectorsSameMeshArlqStab_ISO(int &index, double *phi_, double **dphi_dx, double ***ddphi_dx,
+                                                         double **arlequinStabD, double *arlequinStabVectorD,
+                                                         double **arlequinStab1, double *arlequinStabVector1){
+
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
+    double &dTime_ = parameters->getTimeStep();
+
+    double daxm_dx = alpha_m * dax_dx + (1. - alpha_m) * daxprev_dx;
+    double daxm_dy = alpha_m * dax_dy + (1. - alpha_m) * daxprev_dy;
+    double daym_dx = alpha_m * day_dx + (1. - alpha_m) * dayprev_dx;
+    double daym_dy = alpha_m * day_dy + (1. - alpha_m) * dayprev_dy;
+
+    double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
+    double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
+
+    double umeshna_ = alpha_f * umesh_ + (1. - alpha_f) * umeshprev_;
+    double vmeshna_ = alpha_f * vmesh_ + (1. - alpha_f) * umeshprev_;
+
+    double duna_dx = alpha_f * du_dx + (1. - alpha_f) * duprev_dx;
+    double duna_dy = alpha_f * du_dy + (1. - alpha_f) * duprev_dy;
+    double dvna_dx = alpha_f * dv_dx + (1. - alpha_f) * dvprev_dx;
+    double dvna_dy = alpha_f * dv_dy + (1. - alpha_f) * dvprev_dy;
+
+    double dduna_dxdx = alpha_f * ddu_dxdx + (1. - alpha_f) * dduprev_dxdx;
+    double dduna_dxdy = alpha_f * ddu_dxdy + (1. - alpha_f) * dduprev_dxdy;
+    double dduna_dydx = alpha_f * ddu_dydx + (1. - alpha_f) * dduprev_dydx;
+    double dduna_dydy = alpha_f * ddu_dydy + (1. - alpha_f) * dduprev_dydy;
+
+    double ddvna_dxdx = alpha_f * ddv_dxdx + (1. - alpha_f) * ddvprev_dxdx;
+    double ddvna_dxdy = alpha_f * ddv_dxdy + (1. - alpha_f) * ddvprev_dxdy;
+    double ddvna_dydx = alpha_f * ddv_dydx + (1. - alpha_f) * ddvprev_dydx;
+    double ddvna_dydy = alpha_f * ddv_dydy + (1. - alpha_f) * ddvprev_dydy;
+
+    double wna_ = alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
+    double WJ = weight_ * djac_;
+
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++){
+
+            //tarlq x mass matrix
+            // double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphi_dx[0][j] + dphi_dx[1][i]* dphi_dx[1][j]);
+
+            // arlequinStab1[2*i][2*j] -= mass * WJ * alpha_m;
+            // arlequinStab1[2*i+1][2*j+1] -= mass * WJ * alpha_m;
+
+            //tarlq x convecction matrix
+            // double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphi_dx[0][0][j] * (una_ - umeshna_) + ddphi_dx[0][1][j]* (vna_ - vmeshna_))) + 
+            //                                   (dphi_dx[1][i] * (ddphi_dx[1][0][j] * (una_ - umeshna_) + ddphi_dx[1][1][j]* (vna_ - vmeshna_))));
+            // double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphi_dx[0][j] * duna_dx + dphi_dx[1][j]* dvna_dx)) + 
+            //                                   (dphi_dx[1][i] * (dphi_dx[0][j] * duna_dy  + dphi_dx[1][j]* dvna_dy)));
+
+            // arlequinStab1[2*i][2*j] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+            // arlequinStab1[2*i+1][2*j+1] -= (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+
+            // //tarlq x pressure term
+            // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphi_dx[0][0][j] + dphi_dx[1][i]* ddphi_dx[0][1][j]);
+            // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphi_dx[1][0][j] + dphi_dx[1][i]* ddphi_dx[1][1][j]);
+            // arlequinStab1[2*i][18+j] -= pressx * WJ;
+            // arlequinStab1[2*i+1][18+j] -= pressy * WJ;
+
+            //Diagonal matrix
+            double LL = (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * tARLQ_ / dens_;
+
+            arlequinStabD[2*i][2*j] += LL * WJ;
+            arlequinStabD[2*i+1][2*j+1] += LL * WJ; 
+        };
+
+
+        // //tarlq x mass matrix
+        // double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
+        // double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
+
+        // arlequinStabVector1[2*i] += massx * WJ;
+        // arlequinStabVector1[2*i+1] += massy * WJ;
+
+        // tarlq x convecction matrix
+        // double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
+        //                                    (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
+        // double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy* dvna_dx)) + 
+        //                                    (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy* dvna_dy)));
+        // double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
+        //                                    (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
+        // double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy* dvna_dx)) + 
+        //                                    (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy* dvna_dy)));
+
+        // arlequinStabVector1[2*i] += (convec1x + convec2x) * WJ;
+        // arlequinStabVector1[2*i+1] += (convec1y + convec2y) * WJ;
+
+        // //tarlq x pressure term
+        // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdx + dphi_dx[1][i]* ddp_dydx);
+        // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdy + dphi_dx[1][i]* ddp_dydy);
+        
+        // arlequinStabVector1[2*i] += pressx * WJ;
+        // arlequinStabVector1[2*i+1] += pressy * WJ;
+
+
+        //Diagonal matrix
         double LLx = (dphi_dx[0][i] * lamx_dx + dphi_dx[1][i] * lamx_dy) * tARLQ_ / dens_;
         double LLy = (dphi_dx[0][i] * lamy_dx + dphi_dx[1][i] * lamy_dy) * tARLQ_ / dens_;
 
-        arlequinStabVector[2*i] -= LLx * WJ;
-        arlequinStabVector[2*i+1] -= LLy * WJ;
+        arlequinStabVectorD[2*i] -= LLx * WJ;
+        arlequinStabVectorD[2*i+1] -= LLy * WJ;
 
-	};
+    };
 
 };
 
@@ -3801,6 +4464,92 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_FEM_ISO(double *phi_, double *
 };
 
 template<>
+void Element<2>::getMatrixAndVectorsDifferentMesh_ISO_FEM(double *phi_, double **dphi_dx, double *phiC_, double **dphiC_dx,
+                                                         double **lagrMultMatrix, double *rhsVector1, double *rhsVector2){
+
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &k1 = parameters->getArlequinK1();
+    double &k2 = parameters->getArlequinK2();
+
+    double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
+    double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
+
+    double duna_dx = alpha_f * du_dx + (1. - alpha_f) * duprev_dx;
+    double duna_dy = alpha_f * du_dy + (1. - alpha_f) * duprev_dy;
+    double dvna_dx = alpha_f * dv_dx + (1. - alpha_f) * dvprev_dx;
+    double dvna_dy = alpha_f * dv_dy + (1. - alpha_f) * dvprev_dy;
+    
+    double WJ = weight_ * djac_;
+    
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 6; j++){
+
+            //L2 operator
+            double L2 = phi_[i] * phiC_[j] * k1;
+
+            lagrMultMatrix[2*i][2*j] += L2 * WJ;
+            lagrMultMatrix[2*i+1][2*j+1] += L2 * WJ;
+
+            //H1 operator
+            double H1xx = (2. * dphi_dx[0][i] * dphiC_dx[0][j] + 
+                           dphi_dx[1][i] * dphiC_dx[1][j]) * k2;
+            double H1xy = dphi_dx[1][i] * dphiC_dx[0][j]* k2;
+            double H1yx = dphi_dx[0][i] * dphiC_dx[1][j]* k2;
+            double H1yy = (2. * dphi_dx[1][i] * dphiC_dx[1][j] + 
+                           dphi_dx[0][i] * dphiC_dx[0][j])* k2;
+
+            lagrMultMatrix[2*i][2*j] += H1xx * WJ;
+            lagrMultMatrix[2*i+1][2*j] += H1yx * WJ;
+            lagrMultMatrix[2*i][2*j+1] += H1xy * WJ;
+            lagrMultMatrix[2*i+1][2*j+1] += H1yy * WJ;
+
+        };
+
+        //L2 operator - Velocity
+        double l2ux_ = phi_[i] * una_ * k1;
+        double l2uy_ = phi_[i] * vna_ * k1;
+
+        //H1 operator - Velocity
+        double h1ux_ = (2. * dphi_dx[0][i] * duna_dx+ 
+                       dphi_dx[1][i] * duna_dy + 
+                       dphi_dx[1][i] * dvna_dx) * k2;
+        
+        double h1uy_= (dphi_dx[0][i] * duna_dy + 
+                      2. * dphi_dx[1][i] * dvna_dy + 
+                      dphi_dx[0][i] * dvna_dx) * k2; 
+
+        rhsVector2[2*i] -= (l2ux_ + h1ux_) * WJ;
+        rhsVector2[2*i+1] -= (l2uy_ + h1uy_) * WJ;
+
+    };
+
+
+    for (int i = 0; i < 6; i ++){
+
+        //L2 operator - Lagrange
+        double l2x_ = phiC_[i] * lamx_ * k1;
+        double l2y_ = phiC_[i] * lamy_ * k1;
+
+        //H1 operator - Lagrange
+        double h1x_ = (2. * dphiC_dx[0][i] * lamx_dx + 
+                      dphiC_dx[1][i] * lamx_dy + 
+                      dphiC_dx[1][i] * lamy_dx) * k2 ;
+        
+        double h1y_ = (dphiC_dx[0][i] * lamx_dy + 
+                      2. * dphiC_dx[1][i] * lamy_dy + 
+                      dphiC_dx[0][i] * lamy_dx) * k2;  
+
+        rhsVector1[2*i] -= (l2x_+ h1x_)  * WJ;
+        rhsVector1[2*i+1] -= (l2y_+ h1y_)  * WJ;
+
+    };
+
+};
+
+template<>
 void Element<2>::getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double *phi_,double **dphiC_dx,double **jacobianNRMatrix,
 																	  double *rhsVector){
 
@@ -3844,6 +4593,49 @@ void Element<2>::getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double *ph
 };
 
 template<>
+void Element<2>::getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_ISO_FEM(double *phi_,double **dphiC_dx,double **jacobianNRMatrix,
+                                                                      double *rhsVector){
+
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &k1 = parameters->getArlequinK1();
+
+    double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
+    double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
+
+    double umeshna_ = alpha_f * umesh_ + (1. - alpha_f) * umeshprev_;
+    double vmeshna_ = alpha_f * vmesh_ + (1. - alpha_f) * umeshprev_; 
+
+    double WJ = weight_ * djac_;
+
+    for (int i = 0; i < 6; i++){
+        for (int j = 0; j < 9; j++){
+
+            double msupg = -((una_ - umeshna_) * dphiC_dx[0][i] + (vna_ - vmeshna_) * dphiC_dx[1][i]) * phi_[j] * tSUPG_;
+            jacobianNRMatrix[2*i][2*j] += msupg * WJ * k1;
+            jacobianNRMatrix[2*i+1][2*j+1] += msupg * WJ * k1;
+
+            double mpspgx = -(dphiC_dx[0][i] * phi_[j]) * tPSPG_ / dens_;
+            double mpspgy = -(dphiC_dx[1][i] * phi_[j]) * tPSPG_ / dens_;
+
+            jacobianNRMatrix[12+i][2*j] += mpspgx * WJ * k1;
+            jacobianNRMatrix[12+i][2*j+1] += mpspgy * WJ * k1;
+        };
+
+        double vsupgx = ((una_ - umeshna_) * dphiC_dx[0][i] + (vna_ - vmeshna_) * dphiC_dx[1][i]) * lamx_ * tSUPG_;
+        double vsupgy = ((una_ - umeshna_) * dphiC_dx[0][i] + (vna_ - vmeshna_) * dphiC_dx[1][i]) * lamy_ * tSUPG_;
+
+        double vpspg = (dphiC_dx[0][i] * lamx_ + dphiC_dx[1][i] * lamy_) * tPSPG_ / dens_;
+
+        rhsVector[2*i] += vsupgx * WJ * k1;
+        rhsVector[2*i+1] += vsupgy * WJ * k1;
+        rhsVector[12+i] += vpspg * WJ * k1;
+
+    };
+
+};
+
+template<>
 void Element<2>::getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(int &index, double **dphi_dx,double **dphiC_dx,double ***ddphiC_dx,
                                                                   double **arlequinStabD, double *arlequinStabVectorD,
                                                                   double **arlequinStab0, double *arlequinStabVector0){
@@ -3883,64 +4675,180 @@ void Element<2>::getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(int &index, do
     double WJ = weight_ * djac_;
    
 
-    for (int i = 0; i < 6; i++){
-        for (int j = 0; j < 9; j++){
+    // for (int i = 0; i < 6; i++){
+    //     for (int j = 0; j < 9; j++){
 
-            //tarlq x mass matrix
-            double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphiC_dx[0][j] + dphi_dx[1][i]* dphiC_dx[1][j]);
+    //         //tarlq x mass matrix
+    //         // double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphiC_dx[0][j] + dphi_dx[1][i]* dphiC_dx[1][j]);
 
-            arlequinStab0[2*i][2*j] += mass * WJ * alpha_m;
-            arlequinStab0[2*i+1][2*j+1] += mass * WJ * alpha_m;;
+    //         // arlequinStab0[2*i][2*j] += mass * WJ * alpha_m;
+    //         // arlequinStab0[2*i+1][2*j+1] += mass * WJ * alpha_m;;
 
-            //tarlq x convecction matrix
-            double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphiC_dx[0][0][j] * (una_ - umeshna_) + ddphiC_dx[0][1][j]* (vna_ - vmeshna_))) + 
-                                              (dphi_dx[1][i] * (ddphiC_dx[1][0][j] * (una_ - umeshna_) + ddphiC_dx[1][1][j]* (vna_ - vmeshna_))));
-            double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphiC_dx[0][j] * duna_dx + dphiC_dx[1][j]* dvna_dx)) + 
-                                              (dphi_dx[1][i] * (dphiC_dx[0][j] * duna_dy  + dphiC_dx[1][j]* dvna_dy)));
+    //        //tarlq x convecction matrix
+    //         // double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphiC_dx[0][0][j] * (una_ - umeshna_) + ddphiC_dx[0][1][j]* (vna_ - vmeshna_))) + 
+    //         //                                   (dphi_dx[1][i] * (ddphiC_dx[1][0][j] * (una_ - umeshna_) + ddphiC_dx[1][1][j]* (vna_ - vmeshna_))));
+    //         // double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphiC_dx[0][j] * duna_dx + dphiC_dx[1][j]* dvna_dx)) + 
+    //         //                                   (dphi_dx[1][i] * (dphiC_dx[0][j] * duna_dy  + dphiC_dx[1][j]* dvna_dy)));
 
-            arlequinStab0[2*i][2*j] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
-            arlequinStab0[2*i+1][2*j+1] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+    //         // arlequinStab0[2*i][2*j] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+    //         // arlequinStab0[2*i+1][2*j+1] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
 
-            //tarlq x pressure term
-            // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[0][0][j] + dphi_dx[1][i]* ddphiC_dx[0][1][j]);
-            // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[1][0][j] + dphi_dx[1][i]* ddphiC_dx[1][1][j]);
-            // arlequinStab0[2*i][18+j] += pressx * WJ;
-            // arlequinStab0[2*i+1][18+j] += pressy * WJ;
+    //         // tarlq x pressure term
+    //         // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[0][0][j] + dphi_dx[1][i]* ddphiC_dx[0][1][j]);
+    //         // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[1][0][j] + dphi_dx[1][i]* ddphiC_dx[1][1][j]);
+    //         // arlequinStab0[2*i][18+j] += pressx * WJ;
+    //         // arlequinStab0[2*i+1][18+j] += pressy * WJ;
 
-        };
+    //     };
 
 
-        //tarlq x mass matrix
-        double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
-        double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
+    //     //tarlq x mass matrix
+    //     // double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
+    //     // double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
 
-        arlequinStabVector0[2*i] -= massx * WJ;
-        arlequinStabVector0[2*i+1] -= massy * WJ;
+    //     // arlequinStabVector0[2*i] -= massx * WJ;
+    //     // arlequinStabVector0[2*i+1] -= massy * WJ;
 
-        //tarlq x convecction matrix
-        double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
-                                           (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
-        double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy * dvna_dx)) + 
-                                           (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy * dvna_dy)));
-        double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
-                                           (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
-        double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy * dvna_dx)) + 
-                                           (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy * dvna_dy)));
+    //     //tarlq x convecction matrix
+    //     // double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
+    //     //                                    (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
+    //     // double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy * dvna_dx)) + 
+    //     //                                    (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy * dvna_dy)));
+    //     // double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
+    //     //                                    (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
+    //     // double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy * dvna_dx)) + 
+    //     //                                    (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy * dvna_dy)));
 
-        arlequinStabVector0[2*i] -= (convec1x + convec2x) * WJ;
-        arlequinStabVector0[2*i+1] -= (convec1y + convec2y) * WJ;
+    //     // arlequinStabVector0[2*i] -= (convec1x + convec2x) * WJ;
+    //     // arlequinStabVector0[2*i+1] -= (convec1y + convec2y) * WJ;
 
-        // //tarlq x pressure term
-        // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdx + dphi_dx[1][i]* ddp_dydx);
-        // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdy + dphi_dx[1][i]* ddp_dydy);
-        // arlequinStabVector0[2*i] -= pressx * WJ;
-        // arlequinStabVector0[2*i+1] -= pressy * WJ;
+    //     //tarlq x pressure term
+    //     // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdx + dphi_dx[1][i]* ddp_dydx);
+    //     // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdy + dphi_dx[1][i]* ddp_dydy);
+    //     // arlequinStabVector0[2*i] -= pressx * WJ;
+    //     // arlequinStabVector0[2*i+1] -= pressy * WJ;
 
-    };
+    // };
 
     //Arlequin Diagonal Stabilization terms
     for (int i = 0; i < 6; i++){
         for (int j = 0; j < 6; j++){
+
+            double LL = (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * tARLQ_ / dens_;
+
+            arlequinStabD[2*i][2*j] += LL * WJ;
+            arlequinStabD[2*i+1][2*j+1] += LL * WJ; 
+
+        };
+
+        //Stabilization term
+        double LLx = (dphi_dx[0][i] * lamx_dx + dphi_dx[1][i] * lamx_dy) * tARLQ_ / dens_;
+        double LLy = (dphi_dx[0][i] * lamy_dx + dphi_dx[1][i] * lamy_dy) * tARLQ_ / dens_;
+
+        arlequinStabVectorD[2*i] -= LLx * WJ;
+        arlequinStabVectorD[2*i+1] -= LLy * WJ;
+    };
+
+};
+
+template<>
+void Element<2>::getMatrixAndVectorsDifferentMeshArlqStab_ISO_FEM(int &index, double **dphi_dx,double **dphiC_dx,double ***ddphiC_dx,
+                                                                  double **arlequinStabD, double *arlequinStabVectorD,
+                                                                  double **arlequinStab0, double *arlequinStabVector0){
+    double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters->getGamma();
+    double &dTime_ = parameters->getTimeStep();
+
+    double daxm_dx = alpha_m * dax_dx + (1. - alpha_m) * daxprev_dx;
+    double daxm_dy = alpha_m * dax_dy + (1. - alpha_m) * daxprev_dy;
+    double daym_dx = alpha_m * day_dx + (1. - alpha_m) * dayprev_dx;
+    double daym_dy = alpha_m * day_dy + (1. - alpha_m) * dayprev_dy;
+
+    double una_ = alpha_f * u_ + (1. - alpha_f) * uprev_;
+    double vna_ = alpha_f * v_ + (1. - alpha_f) * vprev_;
+
+    double umeshna_ = alpha_f * umesh_ + (1. - alpha_f) * umeshprev_;
+    double vmeshna_ = alpha_f * vmesh_ + (1. - alpha_f) * umeshprev_;
+
+    double duna_dx = alpha_f * du_dx + (1. - alpha_f) * duprev_dx;
+    double duna_dy = alpha_f * du_dy + (1. - alpha_f) * duprev_dy;
+    double dvna_dx = alpha_f * dv_dx + (1. - alpha_f) * dvprev_dx;
+    double dvna_dy = alpha_f * dv_dy + (1. - alpha_f) * dvprev_dy;
+
+    double dduna_dxdx = alpha_f * ddu_dxdx + (1. - alpha_f) * dduprev_dxdx;
+    double dduna_dxdy = alpha_f * ddu_dxdy + (1. - alpha_f) * dduprev_dxdy;
+    double dduna_dydx = alpha_f * ddu_dydx + (1. - alpha_f) * dduprev_dydx;
+    double dduna_dydy = alpha_f * ddu_dydy + (1. - alpha_f) * dduprev_dydy;
+
+    double ddvna_dxdx = alpha_f * ddv_dxdx + (1. - alpha_f) * ddvprev_dxdx;
+    double ddvna_dxdy = alpha_f * ddv_dxdy + (1. - alpha_f) * ddvprev_dxdy;
+    double ddvna_dydx = alpha_f * ddv_dydx + (1. - alpha_f) * ddvprev_dydx;
+    double ddvna_dydy = alpha_f * ddv_dydy + (1. - alpha_f) * ddvprev_dydy;
+
+    double wna_ = alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
+    double WJ = weight_ * djac_;
+   
+
+    // for (int i = 0; i < 9; i++){
+    //     for (int j = 0; j < 6; j++){
+
+    //         // tarlq x mass matrix
+    //         // double mass = tARLQ_ * wna_ * (dphi_dx[0][i]* dphiC_dx[0][j] + dphi_dx[1][i]* dphiC_dx[1][j]);
+
+    //         // arlequinStab0[2*i][2*j] += mass * WJ * alpha_m;
+    //         // arlequinStab0[2*i+1][2*j+1] += mass * WJ * alpha_m;;
+
+    //        // tarlq x convecction matrix
+    //         // double convec1 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddphiC_dx[0][0][j] * (una_ - umeshna_) + ddphiC_dx[0][1][j]* (vna_ - vmeshna_))) + 
+    //         //                                   (dphi_dx[1][i] * (ddphiC_dx[1][0][j] * (una_ - umeshna_) + ddphiC_dx[1][1][j]* (vna_ - vmeshna_))));
+    //         // double convec2 = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dphiC_dx[0][j] * duna_dx + dphiC_dx[1][j]* dvna_dx)) + 
+    //         //                                   (dphi_dx[1][i] * (dphiC_dx[0][j] * duna_dy  + dphiC_dx[1][j]* dvna_dy)));
+
+    //         // arlequinStab0[2*i][2*j] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+    //         // arlequinStab0[2*i+1][2*j+1] += (convec1 + convec2) * WJ * alpha_f * gamma * dTime_;
+
+    //         // tarlq x pressure term
+    //         // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[0][0][j] + dphi_dx[1][i]* ddphiC_dx[0][1][j]);
+    //         // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddphiC_dx[1][0][j] + dphi_dx[1][i]* ddphiC_dx[1][1][j]);
+    //         // arlequinStab0[2*i][12+j] += pressx * WJ;
+    //         // arlequinStab0[2*i+1][12+j] += pressy * WJ;
+
+    //     };
+
+
+    //     // //tarlq x mass matrix
+    //     // double massx = tARLQ_ * wna_ * (dphi_dx[0][i]* daxm_dx + dphi_dx[1][i]* daxm_dy);
+    //     // double massy = tARLQ_ * wna_ * (dphi_dx[0][i]* daym_dx + dphi_dx[1][i]* daym_dy);
+
+    //     // arlequinStabVector0[2*i] -= massx * WJ;
+    //     // arlequinStabVector0[2*i+1] -= massy * WJ;
+
+    //     // tarlq x convecction matrix
+    //     double convec1x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dduna_dxdx * (una_ - umeshna_) + dduna_dxdy * (vna_ - vmeshna_))) + 
+    //                                        (dphi_dx[1][i] * (dduna_dydx * (una_ - umeshna_) + dduna_dydy * (vna_ - vmeshna_))));
+    //     double convec2x = tARLQ_ * wna_ * ((dphi_dx[0][i] * (duna_dx * duna_dx + duna_dy * dvna_dx)) + 
+    //                                        (dphi_dx[1][i] * (duna_dx * duna_dy  + duna_dy * dvna_dy)));
+    //     double convec1y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (ddvna_dxdx * (una_ - umeshna_) + ddvna_dxdy * (vna_ - vmeshna_))) + 
+    //                                        (dphi_dx[1][i] * (ddvna_dydx * (una_ - umeshna_) + ddvna_dydy * (vna_ - vmeshna_))));
+    //     double convec2y = tARLQ_ * wna_ * ((dphi_dx[0][i] * (dvna_dx * duna_dx + dvna_dy * dvna_dx)) + 
+    //                                        (dphi_dx[1][i] * (dvna_dx * duna_dy  + dvna_dy * dvna_dy)));
+
+    //     arlequinStabVector0[2*i] -= (convec1x + convec2x) * WJ;
+    //     arlequinStabVector0[2*i+1] -= (convec1y + convec2y) * WJ;
+
+    //     // tarlq x pressure term
+    //     // double pressx = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdx + dphi_dx[1][i]* ddp_dydx);
+    //     // double pressy = tARLQ_/dens_ * wna_ * (dphi_dx[0][i]* ddp_dxdy + dphi_dx[1][i]* ddp_dydy);
+    //     // arlequinStabVector0[2*i] -= pressx * WJ;
+    //     // arlequinStabVector0[2*i+1] -= pressy * WJ;
+
+    // };
+
+    //Arlequin Diagonal Stabilization terms
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++){
 
             double LL = (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * tARLQ_ / dens_;
 
@@ -4374,6 +5282,8 @@ void Element<2>::getLagrangeMultipliersSameMesh_FEM(double **lagrMultMatrix, dou
       
 };
 
+
+
 template<>
 void Element<2>::getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(double **jacobianNRMatrix, double *rhsVector){
 
@@ -4526,8 +5436,7 @@ void Element<2>::getLagrangeMultipliersSameMeshArlqStab_FEM(double **arlequinSta
 
 
 template<>
-void Element<2>::getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
-                                                    double **arlequinStab, double *arlequinStabVector){
+void Element<2>::getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *rhsVector1, double *rhsVector2){
 
 	//quadrature and functions local classes
     NormalQuad              nQuad = NormalQuad(); 
@@ -4571,13 +5480,9 @@ void Element<2>::getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, dou
         //Interpolates variables
         getInterpolatedVariablesSameMesh_ISO(phi_,dphi_dx);
 
-        //get Arlequin stabilization parameter
-        getParameterArlequin_ISO(phi_,dphi_dx);
-
         //Computes matrixes and vectors
         getMatrixAndVectorsSameMesh_ISO(phi_,dphi_dx,lagrMultMatrix, 
-        	                            rhsVector1,rhsVector2,arlequinStab,
-                                        arlequinStabVector);
+        	                            rhsVector1,rhsVector2);
 
        
         index++; 
@@ -4594,6 +5499,165 @@ void Element<2>::getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, dou
     return;
       
 };
+
+template<>
+void Element<2>::getLagrangeMultipliersSameMesh_tSUPG_tPSPG_ISO(double **jacobianNRMatrix, double *rhsVector){
+
+
+    //quadrature and functions local classes
+    NormalQuad              nQuad = NormalQuad(); 
+    QuadShapeFunction<2>    shapeQuad;
+
+    //data for computation of IGA basis functions
+    double wpc[9],xsi[2], phi_[9];
+    for (int i = 0; i < 9; i ++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC();  
+
+    double **dphi_dx;
+    dphi_dx = new double*[2];
+    for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[9];
+
+    double **ainv_;
+    ainv_ = new double*[2];
+    for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
+
+    double **quadJacMat;
+    quadJacMat = new double*[2];
+    for (int i = 0; i < 2; ++i) quadJacMat[i] = new double[2];
+    
+
+    int index = 0;
+    for(double* it = nQuad.beginIso(); it != nQuad.endIso(); it++){
+
+        //Defines the integration points adimentional coordinates
+        xsi[0] = nQuad.PointListIso(index,0);
+        xsi[1] = nQuad.PointListIso(index,1);
+        //Returns the quadrature integration weight
+        weight_ = nQuad.WeightListIso(index);
+
+        //Computes the velocity shape functions
+        shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,(*iparameters),Npatch_);
+       
+        //Computes the jacobian matrix
+        getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
+
+        //Computes spatial derivatives
+        getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
+
+        //Interpolates variables
+        getInterpolatedVariablesSameMesh_ISO(phi_,dphi_dx);
+       
+        //Computes stabilization parameters
+        getNewParameterSUPG_ISO(quadJacMat,phi_,dphi_dx);
+
+        //Computes matrixes and vectors
+        getMatrixAndVectorsSameMesh_tSUPG_tPSPG_ISO(phi_,dphi_dx,jacobianNRMatrix,rhsVector);
+      
+        index++; 
+
+    };
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
+
+    return;
+};
+
+
+
+template<>
+void Element<2>::getLagrangeMultipliersSameMeshArlqStab_ISO(double **arlequinStabD, double *arlequinStabVectorD,
+                                                            double **arlequinStab1, double *arlequinStabVector1){
+
+        //quadrature and functions local classes
+    NormalQuad              nQuad = NormalQuad(); 
+    QuadShapeFunction<2>    shapeQuad;
+
+
+    //data for computation of IGA basis functions
+    double wpc[9],xsi[2], phi_[9];
+    for (int i = 0; i < 9; i ++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC();  
+
+    double **dphi_dx;
+    dphi_dx = new double*[2];
+    for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[9];
+
+    double **ainv_;
+    ainv_ = new double*[2];
+    for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
+
+    double **quadJacMat;
+    quadJacMat = new double*[2];
+    for (int i = 0; i < 2; ++i) quadJacMat[i] = new double[2];
+
+    double ***ddphi_dx;
+    ddphi_dx = new double**[2];
+    for (int i = 0; i < 2; ++i) {
+        ddphi_dx[i] = new double*[2];
+        for (int j = 0; j < 2; j++) ddphi_dx[i][j] = new double[9];
+    };
+  
+    int index = 0;
+    for(double* it = nQuad.beginIso(); it != nQuad.endIso(); it++){
+
+       
+        //Defines the integration points adimentional coordinates
+        xsi[0] = nQuad.PointListIso(index,0);
+        xsi[1] = nQuad.PointListIso(index,1);
+        //Returns the quadrature integration weight
+        weight_ = nQuad.WeightListIso(index);
+
+        //Computes the velocity shape functions
+        shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,(*iparameters),Npatch_);
+       
+        //Computes the jacobian matrix
+        getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
+
+        //Computes spatial derivatives
+        getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
+
+        //Computes spatial second derivatives
+        getSecondSpatialDerivatives_ISO(xsi,ainv_,ddphi_dx);
+
+        //get Arlequin stabilization parameter
+        getParameterArlequin_ISO(phi_,dphi_dx);
+
+        //Interpolates variables
+        getInterpolatedVariablesSameMeshArlqStab_ISO(phi_,dphi_dx,ddphi_dx);
+
+        //Computes matrixes and vectors
+        getMatrixAndVectorsSameMeshArlqStab_ISO(index,phi_,dphi_dx,ddphi_dx,arlequinStabD,arlequinStabVectorD,
+                                                arlequinStab1,arlequinStabVector1);
+      
+        index++; 
+
+  
+    };
+
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
+    
+    for (int i = 0; i < 2; ++i) {
+        for (int j = 0; j < 2; ++j) delete [] ddphi_dx[i][j];
+        delete [] ddphi_dx[i];
+    };
+    delete [] ddphi_dx;
+
+    return;
+
+};
+
+
 
 template<>
 void Element<2>::getLagrangeMultipliersDifferentMesh_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem,
@@ -5079,6 +6143,366 @@ void Element<2>::getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(int &ipatch
 
 };
 
+template<>
+void Element<2>::getLagrangeMultipliersDifferentMesh_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                             double **lagrMultMatrix,double *rhsVector1, double *rhsVector2){
+    
+
+
+
+    int dim = 2;
+    //quadrature and functions local classes
+    SpecialQuad              sQuad = SpecialQuad(); 
+    QuadShapeFunction<2>     shapeQuad;
+    
+    //Data for FEM coarse mesh computation (w function)
+    nodesC_ = &nodesCoarse_;
+    connectC_ = connecC;
+
+    double xsiC[dim], phiC_[6];
+
+    double **dphiC_dx;
+    dphiC_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphiC_dx[i] = new double[6];
+
+    double **ainvC_;
+    ainvC_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainvC_[i] = new double[dim];
+
+    double **JacC;
+    JacC = new double*[dim];
+    for (int i = 0; i < dim; ++i) JacC[i] = new double[dim];
+
+   
+    //Data for IGA fine mesh computation (Lagrange field)
+    double wpc[9],xsi[dim], phi_[9];
+    for (int i = 0; i < 9; i ++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC(); 
+
+    double **dphi_dx;
+    dphi_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphi_dx[i] = new double[9];
+
+    double **ainv_;
+    ainv_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainv_[i] = new double[dim];
+
+    double **quadJacMat;
+    quadJacMat = new double*[dim];
+    for (int i = 0; i < dim; ++i) quadJacMat[i] = new double[dim];
+
+    int index = 0;    
+    for(double* it = sQuad.beginIso(); it != sQuad.endIso(); it++){
+        
+        if ((intPointCorrespElem_ISO[index] == ielem)){
+
+            
+            //Fine mesh computation
+            //Defines the integration points adimentional coordinates
+            for (int k = 0; k < dim; k ++) xsi[k] = sQuad.PointListIso(index,k);
+            
+            //Returns the quadrature integration weight
+            weight_ = sQuad.WeightListIso(index);
+
+            //Computes the velocity shape functions
+            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,(*iparameters),Npatch_);
+        
+            //Computes the jacobian matrix
+            getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
+
+           
+            
+            //Coarse mesh computatation
+            //Defines the equivalent integration point in coarse mesh
+            for (int k = 0; k < dim; k++) xsiC[k] = intPointCorrespXsi_ISO[index][k];
+
+            //Computes the velocity shape function
+            shapeQuad.evaluateFem(xsiC,phiC_);
+
+            //Computes the jacobian matrix
+            getJacobianMatrix_COARSE_FEM(xsiC,JacC,ainvC_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_FEM(xsiC, ainvC_, dphiC_dx);
+
+            
+
+            //Interpolates Lagrange multiplier and velocity
+            getInterpolatedVariablesDifferentMesh_ISO_FEM(phi_,dphi_dx,phiC_,dphiC_dx);
+
+            //Computes Matrix and vectors
+            getMatrixAndVectorsDifferentMesh_ISO_FEM(phi_,dphi_dx,phiC_,dphiC_dx,
+                                                     lagrMultMatrix,rhsVector1,rhsVector2);
+
+
+        };
+        index++;        
+    };  
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
+
+    for (int i = 0; i < 2; ++i) delete [] dphiC_dx[i];
+    delete [] dphiC_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainvC_[i];
+    delete [] ainvC_;
+    for (int i = 0; i < 2; ++i) delete [] JacC[i];
+    delete [] JacC;  
+
+    return;
+};
+
+template<>
+void Element<2>::getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                                         double **jacobianNRMatrix, double *rhsVector){
+
+
+
+    int dim = 2;
+    //quadrature and functions local classes
+    SpecialQuad              sQuad = SpecialQuad(); 
+    QuadShapeFunction<2>     shapeQuad;
+    
+    //Data for FEM coarse mesh computation (w function)
+    nodesC_ = &nodesCoarse_;
+    connectC_ = connecC;
+
+    double xsiC[dim], phiC_[6];
+
+    double **dphiC_dx;
+    dphiC_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphiC_dx[i] = new double[6];
+
+    double **ainvC_;
+    ainvC_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainvC_[i] = new double[dim];
+
+    double **JacC;
+    JacC = new double*[dim];
+    for (int i = 0; i < dim; ++i) JacC[i] = new double[dim];
+
+   
+    //Data for IGA fine mesh computation (Lagrange field)
+    double wpc[9],xsi[dim], phi_[9];
+    for (int i = 0; i < 9; i ++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC(); 
+
+    double **dphi_dx;
+    dphi_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphi_dx[i] = new double[9];
+
+    double **ainv_;
+    ainv_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainv_[i] = new double[dim];
+
+    double **quadJacMat;
+    quadJacMat = new double*[dim];
+    for (int i = 0; i < dim; ++i) quadJacMat[i] = new double[dim];
+
+    int index = 0;    
+    for(double* it = sQuad.beginIso(); it != sQuad.endIso(); it++){
+        
+        if ((intPointCorrespElem_ISO[index] == ielem)){
+
+            
+            //Fine mesh computation
+            //Defines the integration points adimentional coordinates
+            for (int k = 0; k < dim; k ++) xsi[k] = sQuad.PointListIso(index,k);
+            
+            //Returns the quadrature integration weight
+            weight_ = sQuad.WeightListIso(index);
+
+            //Computes the velocity shape functions
+            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,(*iparameters),Npatch_);
+        
+            //Computes the jacobian matrix
+            getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
+
+            //Computes stabilization parameters
+            getNewParameterSUPG_ISO(quadJacMat,phi_,dphi_dx);
+            
+            //Coarse mesh computatation
+            //Defines the equivalent integration point in coarse mesh
+            for (int k = 0; k < dim; k++) xsiC[k] = intPointCorrespXsi_ISO[index][k];
+
+            //Computes the velocity shape function
+            shapeQuad.evaluateFem(xsiC,phiC_);
+
+            //Computes the jacobian matrix
+            getJacobianMatrix_COARSE_FEM(xsiC,JacC,ainvC_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_FEM(xsiC, ainvC_, dphiC_dx);
+
+            
+
+            //Interpolates Lagrange multiplier and velocity
+            getInterpolatedVariablesDifferentMesh_ISO_FEM(phi_,dphi_dx,phiC_,dphiC_dx);
+
+            //Computes Matrix and vectors
+            getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_ISO_FEM(phi_,dphiC_dx,
+                                                                jacobianNRMatrix,rhsVector);
+
+
+        };
+        index++;        
+    };  
+     
+
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
+
+    for (int i = 0; i < 2; ++i) delete [] dphiC_dx[i];
+    delete [] dphiC_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainvC_[i];
+    delete [] ainvC_;
+    for (int i = 0; i < 2; ++i) delete [] JacC[i];
+    delete [] JacC;  
+
+    return;
+};
+
+template<>
+void Element<2>::getLagrangeMultipliersDifferentMeshArlqStab_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                                    double **arlequinStabD, double *arlequinStabVectorD,
+                                                                    double **arlequinStab0, double *arlequinStabVector0){
+        int dim = 2;
+    //quadrature and functions local classes
+    SpecialQuad              sQuad = SpecialQuad(); 
+    QuadShapeFunction<2>     shapeQuad;
+    
+    //Data for FEM coarse mesh computation (w function)
+    nodesC_ = &nodesCoarse_;
+    connectC_ = connecC;
+
+    double xsiC[dim], phiC_[6];
+
+    double **dphiC_dx;
+    dphiC_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphiC_dx[i] = new double[6];
+
+    double **ainvC_;
+    ainvC_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainvC_[i] = new double[dim];
+
+    double **JacC;
+    JacC = new double*[dim];
+    for (int i = 0; i < dim; ++i) JacC[i] = new double[dim];
+
+    double ***ddphiC_dx;
+    ddphiC_dx = new double**[dim];
+    for (int i = 0; i < dim; ++i) {
+        ddphiC_dx[i] = new double*[2];
+        for (int j = 0; j < dim; j++) ddphiC_dx[i][j] = new double[6];
+    }; 
+
+   
+    //Data for IGA fine mesh computation (Lagrange field)
+    double wpc[9],xsi[dim], phi_[9];
+    for (int i = 0; i < 9; i ++) wpc[i] = (*nodes_)[connect_[i]] -> getWeightPC();
+    int *inc_ = (*nodes_)[connect_[8]] -> getINC(); 
+
+    double **dphi_dx;
+    dphi_dx = new double*[dim];
+    for (int i = 0; i < dim; ++i) dphi_dx[i] = new double[9];
+
+    double **ainv_;
+    ainv_ = new double*[dim];
+    for (int i = 0; i < dim; ++i) ainv_[i] = new double[dim];
+
+    double **quadJacMat;
+    quadJacMat = new double*[dim];
+    for (int i = 0; i < dim; ++i) quadJacMat[i] = new double[dim];
+
+    int index = 0;    
+    for(double* it = sQuad.beginIso(); it != sQuad.endIso(); it++){
+        
+        if ((intPointCorrespElem_ISO[index] == ielem)){
+
+            
+            //Fine mesh computation
+            //Defines the integration points adimentional coordinates
+            for (int k = 0; k < dim; k ++) xsi[k] = sQuad.PointListIso(index,k);
+            
+            //Returns the quadrature integration weight
+            weight_ = sQuad.WeightListIso(index);
+
+            //Computes the velocity shape functions
+            shapeQuad.evaluateIso(xsi,phi_,wpc,inc_,(*iparameters),Npatch_);
+        
+            //Computes the jacobian matrix
+            getJacobianMatrix_ISO(xsi,quadJacMat,ainv_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_ISO(xsi,ainv_,dphi_dx);
+
+            //get Arlequin stabilization parameter
+            getParameterArlequin_ISO(phi_,dphi_dx);
+
+            
+            //Coarse mesh computatation
+            //Defines the equivalent integration point in coarse mesh
+            for (int k = 0; k < dim; k++) xsiC[k] = intPointCorrespXsi_ISO[index][k];
+
+            //Computes the velocity shape function
+            shapeQuad.evaluateFem(xsiC,phiC_);
+
+            //Computes the jacobian matrix
+            getJacobianMatrix_COARSE_FEM(xsiC,JacC,ainvC_);
+
+            //Computes spatial derivatives
+            getSpatialDerivatives_FEM(xsiC, ainvC_, dphiC_dx);
+
+            //Computes second spatial derivatives
+            getSecondSpatialDerivatives_FEM(xsiC,ainvC_,ddphiC_dx);
+
+
+            //Interpolates Lagrange multiplier and velocity
+            getInterpolatedVariablesDifferentMeshArlqStab_ISO_FEM(dphi_dx,phiC_,dphiC_dx,ddphiC_dx);
+
+            //Computes Matrix and vectors
+            getMatrixAndVectorsDifferentMeshArlqStab_ISO_FEM(index,dphi_dx,dphiC_dx,ddphiC_dx,
+                                                             arlequinStabD,arlequinStabVectorD,
+                                                             arlequinStab0,arlequinStabVector0);
+
+        };
+        index++;        
+    };  
+
+
+    for (int i = 0; i < 2; ++i) delete [] dphi_dx[i];
+    delete [] dphi_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainv_[i];
+    delete [] ainv_;
+    for (int i = 0; i < 2; ++i) delete [] quadJacMat[i];
+    delete [] quadJacMat;
+
+    for (int i = 0; i < 2; ++i) delete [] dphiC_dx[i];
+    delete [] dphiC_dx;
+    for (int i = 0; i < 2; ++i) delete [] ainvC_[i];
+    delete [] ainvC_;
+    for (int i = 0; i < 2; ++i) delete [] JacC[i];
+    delete [] JacC;  
+
+    return;
+};
+
+
 
 template<>
 void Element<2>::getLagrangeMultipliersDifferentMesh_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
@@ -5361,7 +6785,6 @@ void Element<2>::getTransientNavierStokes_ISO(double **jacobianNRMatrix,double *
 
         //Compute Stabilization Parameters
         getNewParameterSUPG_ISO(quadJacMat,phi_,dphi_dx);
-        tPSPG_ = tSUPG_;
 
         //Computes the element matrix
         getElemMatrix_ISO(index,phi_,dphi_dx,jacobianNRMatrix);

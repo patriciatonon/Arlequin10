@@ -55,8 +55,6 @@ private:
     int numElem;                         //Number of elements by thread
     int numFemElem;                      //Number of FEM elements 
     int numIsoElem;                      //Number of IGA elements 
-    int numberOfLines;                   //Number of the boundaries in the problem to compute Drag and Lift parameters 
-    std::vector<int> dragAndLiftBoundary;//Store the number of boundary that match with numberOfLines 
     int numFemBoundaries;                //Number of fluid boundaries (FEM MESH)
     int numFemBoundElem;                 //Number of elements in fluid boundaries (FEM MESH)
     int numBoundariesIso;                //Number of fluid boundaries (IGA MESH)
@@ -67,9 +65,10 @@ private:
     double pressInf;       			     //Undisturbed pressure 
     double rhoInf;         			     //Density
     double viscInf;        				 //Viscosity
-    double velocityInf[3]; 				 //Undisturbed velocity
     double fieldForces[3]; 				 //Field forces (constant) 
-    
+    double arlequinK1;                   //L2
+    double arlequinK2;                   //H1
+
     //MPI variables
     idx_t* part_elem;      				 //Fluid Domain Decomposition - Elements
     idx_t* part_nodes;     				 //Fluid Domain Decomposition - Nodes
@@ -99,12 +98,12 @@ public:
     int numTimeSteps;                     //Number of Time Steps
     double dTime;                         //Time Step
     double integScheme;                   //Time Integration Scheme (0 - max. dissipation; 1 - no dissipation)
+
     
     //Arlequin Problem
     double glueZoneThickness;			  //Thickness from gluing zone
     double arlequinEpsilon;				  //Constant > 0
-    double arlequinK1;                    //L2
-    double arlequinK2;                    //H1
+
 
     //Print data
     bool printVelocity;
@@ -120,9 +119,13 @@ public:
     bool printEnergyWeightFunction;
     bool printNodalCorrespondence;
     
+    //Drag and Lift coefficients
     bool computeDragAndLift;			 //Check if is necessary compute Drag and Lift parameters
-    
+    int numberOfLines;                   //Number of the boundaries in the problem to compute Drag and Lift parameters
+    double velocityInf[3];               //Undisturbed velocity
+    std::vector<int> dragAndLiftBoundary;//Store the number of boundary that match with numberOfLines 
 
+    
 public:
     //Reads the input file 
     void dataReading_FEM(const std::string& inputFile, const std::string& inputMesh, const std::string& mirror, const bool& deleteFiles);
@@ -738,6 +741,7 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     fluidParameters.setArlequink1(arlequinK1);
     fluidParameters.setArlequink2(arlequinK2);
 
+
     //Read and print out Drag and lift coeficients
     inputData >> computeDragAndLift >> numberOfLines; 
 
@@ -985,7 +989,7 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
                         boundary_[i] -> setElementSide(2);
                         boundElem[i] = j;
                     };   
-                } 
+                };
             }; 
         }; 
     }; 
@@ -1414,7 +1418,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
                             }
                         }               
                         Elements *el = new Elements(index++,connect,nodes_,1,
-                                                   fluidParameters,IsoPar_,ipatch); 
+                                                    fluidParameters,IsoPar_,ipatch); 
                         //1 - it's the element type to IA elements.
                         elements_.push_back(el);
                         for (int k = 0; k <9; k++){

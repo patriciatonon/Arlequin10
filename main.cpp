@@ -99,6 +99,11 @@ int main(int argc, char **args) {
     // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
 
+
+    //EXEMPLO CILINDRO
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem_cylinder_jefe.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fine_fem_cylinder_jefe.msh","mirror_fine.txt",0);
+
     //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
     // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("meshfine_data.txt","fineIni_fem.msh","mirror_fine.txt",0);
@@ -118,9 +123,30 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
 
     //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
-    coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("meshfine_data.txt","fine_fem.msh","mirror_fine.txt",0);
 
+    //EXEMPLO CILINDRO - VER SINAL DA NORMAL NA MALHA FEM
+    coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso_cylinder.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("meshfine_data.txt","fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
+
+
+    //EXEMPLOS ISO/FEM
+    //PROBLEMA 1 - Cavidade com uma faixa de elementos mais refinidos na parte inferior
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
+
+    //PROBLEMA 1 - opção 2 - malha coarse não estruturada
+	// coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
+ //    fineModel.dataReading_ISO("meshfine_data.txt","fine_iso.msh","mirror_fine.txt",0);
+
+
+    //PROBLEMA 2  - Cavidade com faixa ao redor de elementos refinados - Lembrar de colocar valores normais no Set Signaled Distance
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarseIni_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso3.msh","mirror_fine.txt",0);
+    //Problema 2 - opção 3 - malha não estruturada coarse
+    // coarseModel.dataReading_FEM("meshcoarse_data.txt","coarse_fem.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("meshfine_data.txt","fine_iso3.msh","mirror_fine.txt",0);
 
     //ArlequinProblem needs two objects from fluid:
     //1 - coarseModel;
@@ -130,7 +156,7 @@ int main(int argc, char **args) {
     //solveArlequinProblem function needs two parameters:  
     //1- The maximum number of iterations in the Newton-Raphson process
     //2- The maximum relative error in the Newton-Raphson process (DU) 
-    ArlequinProblem.solveArlequinProblem(4, 1.e-6);
+    ArlequinProblem.solveArlequinProblem(10, 1.e-6);
     
     //Finalize main program   
     PetscFinalize();

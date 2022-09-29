@@ -29,11 +29,11 @@ public:
 
 public:
 
-void evaluateBoundary(double *Xsi, double *phiB_);
+void evaluateBoundaryFem(double *Xsi, double *phiB_);
 
 void evaluateBoundaryIso(double *Xsi, double *phiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
 
-void evaluateGradientBoundary(double *Xsi, double **dphiB_);
+void evaluateGradientBoundaryFem(double *Xsi, double **dphiB_);
 
 void evaluateGradientBoundaryIso(double *Xsi, double **dphiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
 
@@ -46,10 +46,10 @@ void evaluateGradientBoundaryIso(double *Xsi, double **dphiB_, double *wpcs, int
 
 // Evaluates the shape function value in a line boundary
 template<>
-void BoundShapeFunction<2>::evaluateBoundary(double *Xsi, double *phiB_) {
+void BoundShapeFunction<2>::evaluateBoundaryFem(double *Xsi, double *phiB_) {
 
-    double xsi[1];
-    xsi[0] = Xsi[0];
+    double xsi;
+    xsi = Xsi[0];
 
     double aux;
     double Nnos = 3;
@@ -63,7 +63,7 @@ void BoundShapeFunction<2>::evaluateBoundary(double *Xsi, double *phiB_) {
         for (int i = 0; i < Nnos; i++) {
             aux = 1.0;
             if(i != j){                
-                phiB_[j]= phiB_[j] * (xsi[0] - AdimCoord[i]) / 
+                phiB_[j]= phiB_[j] * (xsi - AdimCoord[i]) / 
                     (AdimCoord[j] - AdimCoord[i]);                
             };
         };
@@ -77,7 +77,7 @@ void BoundShapeFunction<2>::evaluateBoundary(double *Xsi, double *phiB_) {
 
 /// Returns the shape function value in a surface boundary
 template<>
-void BoundShapeFunction<3>::evaluateBoundary(double *Xsi, double *phiB_) {
+void BoundShapeFunction<3>::evaluateBoundaryFem(double *Xsi, double *phiB_) {
     
     const double xsi1 = Xsi[0];
     const double xsi2 = Xsi[1];
@@ -103,8 +103,8 @@ void BoundShapeFunction<2>::evaluateBoundaryIso(double *Xsi, double *phiB_, doub
             //1  2  3
             //side 0
 
-    double xsi[1];
-    xsi[0] = Xsi[0];
+    double xsi;
+    xsi = Xsi[0];
 
     std::vector<IParameters_ *> *ipar_;
     ipar_ = &iparameters;
@@ -131,7 +131,7 @@ void BoundShapeFunction<2>::evaluateBoundaryIso(double *Xsi, double *phiB_, doub
         double u2 = uknot[uind+1];
 
         // relates integration space with the parametric one
-        const double xsi1 =((u2 - u1) * xsi[0] + (u2 + u1)) * 0.5;
+        const double xsi1 =((u2 - u1) * xsi + (u2 + u1)) * 0.5;
         uBF[0][0] = 1.0;
         for (int j = 1; j < (degm+1); j++) {   
             uLeft[j] = xsi1 - uknot[uind + 1 - j];
@@ -185,7 +185,7 @@ void BoundShapeFunction<2>::evaluateBoundaryIso(double *Xsi, double *phiB_, doub
         double v2 = vknot[vind +1];
 
         // relates integration space with the parametric one
-        const double xsi2 =((v2 - v1) * xsi[0] + (v2 + v1)) * 0.5; 
+        const double xsi2 =((v2 - v1) * xsi + (v2 + v1)) * 0.5; 
 
         vBF[0][0] = 1.0;
         for (int j = 1; j < (degn + 1); j++) {
@@ -553,10 +553,9 @@ void BoundShapeFunction<3>::evaluateBoundaryIso(double *Xsi, double *phiB_, doub
 //-------------------COMPUTE SHAPE FUNCTION DERIVATIVE VALUE--------------------
 //------------------------------------------------------------------------------
 template<>
-void BoundShapeFunction<2>::evaluateGradientBoundary(double *Xsi, double **dphiB_) {
+void BoundShapeFunction<2>::evaluateGradientBoundaryFem(double *Xsi, double **dphiB_) {
 
-    double xsi[1];
-    xsi[0] = Xsi[0];
+    double xsi = Xsi[0];
     double aux;
     double Nnos = 3;
     double AdimCoord[3];
@@ -571,7 +570,7 @@ void BoundShapeFunction<2>::evaluateGradientBoundary(double *Xsi, double **dphiB
             aux = 1.0;
             if(i != j){                             
                 for (int k = 0; k < Nnos; k++) {
-                    if ((i != k) && (j != k)) aux = aux*(xsi[0] - AdimCoord[k]);
+                    if ((i != k) && (j != k)) aux = aux*(xsi - AdimCoord[k]);
                 };
                 dphiB_[0][j] += aux;
             };
@@ -589,7 +588,7 @@ void BoundShapeFunction<2>::evaluateGradientBoundary(double *Xsi, double **dphiB
 };
 
 template<>
-void BoundShapeFunction<3>::evaluateGradientBoundary(double *Xsi, double **dphiB_) {
+void BoundShapeFunction<3>::evaluateGradientBoundaryFem(double *Xsi, double **dphiB_) {
 
     const double xsi1 = Xsi[0];
     const double xsi2 = Xsi[1];
@@ -620,8 +619,7 @@ void BoundShapeFunction<3>::evaluateGradientBoundary(double *Xsi, double **dphiB
 template<>
 void BoundShapeFunction<2>::evaluateGradientBoundaryIso(double *Xsi, double **dphiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch){
 
-    double xsi[1];
-    xsi[0] = Xsi[0];
+    double xsi = Xsi[0];
 
     int           s = side;    
     //exemplo of type and side
@@ -658,7 +656,7 @@ void BoundShapeFunction<2>::evaluateGradientBoundaryIso(double *Xsi, double **dp
         double u2 = uknot[uind+1];
        
         // relates integration space with the parametric one
-        const double xsi1 =((u2 - u1) * xsi[0] + (u2 + u1)) * 0.5;
+        const double xsi1 =((u2 - u1) * xsi + (u2 + u1)) * 0.5;
         // Base function u direction
         uBF[0][0] = 1.0;
 
@@ -772,7 +770,7 @@ void BoundShapeFunction<2>::evaluateGradientBoundaryIso(double *Xsi, double **dp
         double v2 = vknot[vind +1];
 
         // relates integration space with the parametric one
-        const double xsi2 =((v2 - v1) * xsi[0] + (v2 + v1)) * 0.5;
+        const double xsi2 =((v2 - v1) * xsi + (v2 + v1)) * 0.5;
         
         // Base function u direction       
         vBF[0][0] = 1.0;

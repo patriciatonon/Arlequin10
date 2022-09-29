@@ -19,7 +19,8 @@
 template<int DIM>
 class Glue{
 private:
-    int *connect_;          //New connectivity from the gluing zone           
+    int *connect_;          //New connectivity from the gluing zone 
+    int *newconnect_;          //New connectivity from the gluing zone          
     int index_;             //Element Number in the gluing zone
     int elemCorrespondent_; //Correspondent number in the fluid mesh
  
@@ -37,8 +38,14 @@ public:
     // Sets the element connectivity
     void setConnectivity(int *connect){connect_ = connect;};
 
+    // Sets the new element connectivity
+    void setNewConnectivity(int *connect){newconnect_ = connect;};
+
     // Gets the element connectivity
     int *getConnectivity(){return connect_;};
+
+    // Gets the new element connectivity
+    int *getNewConnectivity(){return newconnect_;};
     
 };
 
