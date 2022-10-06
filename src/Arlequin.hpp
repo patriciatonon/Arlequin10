@@ -1021,25 +1021,25 @@ void Arlequin<2>::setSignaledDistance(){
     
 
     //Gambiarra para malha FEM fine
-    // n[0] = 1.;
-    // n[1] = 1.;
+    n[0] = 1.;
+    n[1] = 1.;
 
-    // nodesFine_[6] -> setInnerNormal(n);
+    nodesFine_[6] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = 1.;
+    n[0] = -1.;
+    n[1] = 1.;
 
-    // nodesFine_[8] -> setInnerNormal(n);
+    nodesFine_[8] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = -1.;
+    n[0] = -1.;
+    n[1] = -1.;
 
-    // nodesFine_[17] -> setInnerNormal(n);
+    nodesFine_[17] -> setInnerNormal(n);
     
-    // n[0] = 1.;
-    // n[1] = -1.;
+    n[0] = 1.;
+    n[1] = -1.;
 
-    // nodesFine_[15] -> setInnerNormal(n);
+    nodesFine_[15] -> setInnerNormal(n);
 
 
 
@@ -4191,187 +4191,232 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
         	int *connec = elementsFine_[jel] -> getConnectivity();
         	int *connecL = glueZoneFine_[l] -> getConnectivity();	
 
-    		//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
-    		double **elemMatrixLag1;
-    		elemMatrixLag1 = new double*[12]();
-    		for (int i = 0; i < 12; ++i)  elemMatrixLag1[i] = new double[18]();
-    		double elemVectorLag1_1[18] = {};
-    		double elemVectorLag1_2[12] = {};
-            
-            //tSUPG and tPSPG STABILIZATION
-            double **jacobianNRMatrix;
-            jacobianNRMatrix = new double*[18]();
-            for (int i = 0; i < 18; ++i)  jacobianNRMatrix[i] = new double[12]();
-            double rhsVector[18] = {};
+        	//Sets global nodal equivalent velocities
+            // for (int i = 0; i < 6; i++){
+                
+            //     int iElemCoarse = nodesFine_[connec[i]] -> getNodalElemCorrespondence();
+            //     int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
 
-    		//ARLEQUIN STABILIZATION MATRIXES
-            double **elemStabMatrixD;
-            elemStabMatrixD = new double*[12]();
-            for (int i = 0; i < 12; ++i)  elemStabMatrixD[i] = new double[12]();
-            double elemStabVectorD[12] = {};
+            //     double u1[9],u2[9];
+            //     for (int j = 0; j < 9; j++){
+            //         u1[j] = nodesCoarse_[connecC[j]] -> getVelocity(0);
+            //         u2[j] = nodesCoarse_[connecC[j]] -> getVelocity(1);
+            //     };
 
-        	double **elemStabMatrix1;
-            elemStabMatrix1 = new double*[12]();
-            for (int i = 0; i < 12; ++i)  elemStabMatrix1[i] = new double[18]();
-            double elemStabVector1[12] = {};
-    		
-    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
+            //     //Computing velocity in the coarse mesh
+            //     double *xsi = nodesFine_[connec[i]] -> getNodalXsiCorrespondence();
+            //     QuadShapeFunction<2>  shapeQuad;
+            //     double phi_[9],wpc[9];
+            //     int patch = elementsCoarse_[iElemCoarse] -> getPatch();
+            //     int *inc = nodesCoarse_[connecC[8]] -> getINC();
+            //     for (int i = 0; i < 9; i++) wpc[i] = nodesCoarse_[connecC[i]] -> getWeightPC();
+            //     shapeQuad.evaluateIso(xsi,phi_,wpc,inc,IsoParCoarse,patch);
+                
+            //     double u_[2] = {};
+            //     for (int j = 0; j < 9; j++){
+            //         u_[0] += u1[j] * phi_[j];
+            //         u_[1] += u2[j] * phi_[j];
+            //     };
 
-            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
+            //     nodesFine_[connec[i]] -> setGlobalVelocity(u_);
+            // };
 
-            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(elemStabMatrixD,elemStabVectorD,
-    																		 elemStabMatrix1,elemStabVector1);
 
-		
-    		for (int i = 0; i < 6; i++){
-    			for (int j = 0; j < 6; j++){
+            int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial_FEM();
 
-    				//Lagrange Multipliers
-    				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    				int dof_j = 3*NCNumberNodesC + 2*connec[j];
-    				double value = integ * elemMatrixLag1[2*i][2*j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &value,ADD_VALUES);
-    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[2*i][2*j],
-                                        ADD_VALUES);
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    				dof_j = 3*NCNumberNodesC + 2*connec[j];
-    				value = integ * elemMatrixLag1[2*i+1][2*j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &value,ADD_VALUES);
-    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[2*i+1][2*j],
-                                        ADD_VALUES);
+            for (int ip = 0; ip< numberIntPoints; ip++){
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
-    				value = integ * elemMatrixLag1[2*i][2*j+1];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &value,ADD_VALUES);
-    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[2*i][2*j+1],
-                                        ADD_VALUES);
+            	int iElemCoarse = elementsFine_[jel] -> getIntegPointCorrespondenceElement_FEM(ip);
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
-    				value = integ * elemMatrixLag1[2*i+1][2*j+1];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &value,ADD_VALUES);
-    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[2*i+1][2*j+1],
-                                        ADD_VALUES);
+            	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
+            	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
 
-                    //tSUPG 
-                    dof_i = 3*NCNumberNodesC + 2*connec[i];
-                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &jacobianNRMatrix[2*i][2*j],ADD_VALUES);
- 
-                    dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
-                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &jacobianNRMatrix[2*i+1][2*j+1],ADD_VALUES);
+	            	//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+	    		double **elemMatrixLag1;
+	    		elemMatrixLag1 = new double*[12]();
+	    		for (int i = 0; i < 12; ++i)  elemMatrixLag1[i] = new double[18]();
+	    		double elemVectorLag1_1[18] = {};
+	    		double elemVectorLag1_2[12] = {};
+	            
+	            //tSUPG and tPSPG STABILIZATION
+	            double **jacobianNRMatrix;
+	            jacobianNRMatrix = new double*[18]();
+	            for (int i = 0; i < 18; ++i)  jacobianNRMatrix[i] = new double[12]();
+	            double rhsVector[18] = {};
 
-                    //tPSPG
-                    dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
-                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &jacobianNRMatrix[12+i][2*j],ADD_VALUES);
+	    		//ARLEQUIN STABILIZATION MATRIXES
+	            double **elemStabMatrixD;
+	            elemStabMatrixD = new double*[12]();
+	            for (int i = 0; i < 12; ++i)  elemStabMatrixD[i] = new double[12]();
+	            double elemStabVectorD[12] = {};
 
-                    dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
-                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &jacobianNRMatrix[12+i][2*j+1],ADD_VALUES);
+	        	double **elemStabMatrix1;
+	            elemStabMatrix1 = new double*[12]();
+	            for (int i = 0; i < 12; ++i)  elemStabMatrix1[i] = new double[18]();
+	            double elemStabVector1[12] = {};
 
-                    //Arlequin Stabilization from diagonal matrix
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrixD[2*i][2*j],
-                                        ADD_VALUES);
+	            
+	    		elementsFine_[jel] -> setTimeStep(iTimeStep);
+	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrixD[2*i+1][2*j+1],
-                                        ADD_VALUES);
+	            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
 
-    				//Stabilization Arlequin terms from fine mesh matrix
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    				dof_j = 3*NCNumberNodesC + 2*connec[j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrix1[2*i][2*j],
-                                        ADD_VALUES);
+	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
+                                                                                 elemStabMatrixD,elemStabVectorD,
+	    																	     elemStabMatrix1,elemStabVector1);
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i]+1;
-    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrix1[2*i+1][2*j+1],
-                                        ADD_VALUES);
+			
+	    		for (int i = 0; i < 6; i++){
+	    			for (int j = 0; j < 6; j++){
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    				dof_j = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrix1[2*i][12+j],
-                                        ADD_VALUES);
+	    				//Lagrange Multipliers
+	    				int dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    				int dof_j = 3*NCNumberNodesC + 2*connec[j];
+	    				double value = integ * elemMatrixLag1[2*i][2*j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &value,ADD_VALUES);
+	    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+	                                        &elemMatrixLag1[2*i][2*j],
+	                                        ADD_VALUES);
 
-    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    				dof_j = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[j];
-    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemStabMatrix1[2*i+1][12+j],
-                                        ADD_VALUES);
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    				dof_j = 3*NCNumberNodesC + 2*connec[j];
+	    				value = integ * elemMatrixLag1[2*i+1][2*j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &value,ADD_VALUES);
+	    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+	                                        &elemMatrixLag1[2*i+1][2*j],
+	                                        ADD_VALUES);
 
-    			};//j
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
+	    				value = integ * elemMatrixLag1[2*i][2*j+1];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &value,ADD_VALUES);
+	    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+	                                        &elemMatrixLag1[2*i][2*j+1],
+	                                        ADD_VALUES);
 
-    			//Lagrange Multipliers
-    			int dof_i = 3*NCNumberNodesC + 2*connec[i];
-    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i],ADD_VALUES);
-    			dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
-    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i+1],ADD_VALUES);
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
+	    				value = integ * elemMatrixLag1[2*i+1][2*j+1];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &value,ADD_VALUES);
+	    				ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+	                                        &elemMatrixLag1[2*i+1][2*j+1],
+	                                        ADD_VALUES);
 
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i  ],ADD_VALUES);
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i+1 ],ADD_VALUES);
+	                    //tSUPG 
+	                    dof_i = 3*NCNumberNodesC + 2*connec[i];
+	                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
+	                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &jacobianNRMatrix[2*i][2*j],ADD_VALUES);
+	 
+	                    dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
+	                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
+	                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &jacobianNRMatrix[2*i+1][2*j+1],ADD_VALUES);
 
-                //tSUPG 
-                dof_i = 3*NCNumberNodesC + 2*connec[i];
-                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[2*i],ADD_VALUES);
-                dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
-                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[2*i+1],ADD_VALUES);
+	                    //tPSPG
+	                    dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
+	                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
+	                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &jacobianNRMatrix[12+i][2*j],ADD_VALUES);
 
-                //tPSPG
-                dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
-                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[12+i],ADD_VALUES);
+	                    dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
+	                    dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
+	                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &jacobianNRMatrix[12+i][2*j+1],ADD_VALUES);
 
-    			//Arlequin stabilization term from diagonal
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[2*i  ],ADD_VALUES);
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[2*i+1 ],ADD_VALUES);
+	                    //Arlequin Stabilization from diagonal matrix
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrixD[2*i][2*j],
+	                                        ADD_VALUES);
 
-    			//Arlequin stabilization term from fine mesh
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
-    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i  ],ADD_VALUES);
-    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
-    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i+1 ],ADD_VALUES);
-    		};//i
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    				dof_j = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[j] + 1;
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrixD[2*i+1][2*j+1],
+	                                        ADD_VALUES);
 
-    		for (int i = 0; i < 12; ++i) {
-            	delete [] elemMatrixLag1[i];
-            	delete [] elemStabMatrixD[i];
-            	delete [] elemStabMatrix1[i];
-            }
-            delete [] elemMatrixLag1;
-            delete [] elemStabMatrixD;
-            delete [] elemStabMatrix1;
+	    				//Stabilization Arlequin terms from fine mesh matrix
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    				dof_j = 3*NCNumberNodesC + 2*connec[j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrix1[2*i][2*j],
+	                                        ADD_VALUES);
 
-            for (int i = 0; i < 18; ++i) {
-                delete [] jacobianNRMatrix[i];
-            }
-    		delete [] jacobianNRMatrix; 
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i]+1;
+	    				dof_j = 3*NCNumberNodesC + 2*connec[j] + 1;
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrix1[2*i+1][2*j+1],
+	                                        ADD_VALUES);
+
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    				dof_j = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrix1[2*i][12+j],
+	                                        ADD_VALUES);
+
+	    				dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    				dof_j = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[j];
+	    				ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+	                                        &elemStabMatrix1[2*i+1][12+j],
+	                                        ADD_VALUES);
+
+	    			};//j
+
+	    			//Lagrange Multipliers
+	    			int dof_i = 3*NCNumberNodesC + 2*connec[i];
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i],ADD_VALUES);
+	    			dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[2*i+1],ADD_VALUES);
+
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i  ],ADD_VALUES);
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[2*i+1 ],ADD_VALUES);
+
+	                //tSUPG 
+	                dof_i = 3*NCNumberNodesC + 2*connec[i];
+	                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[2*i],ADD_VALUES);
+	                dof_i = 3*NCNumberNodesC + 2*connec[i] + 1;
+	                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[2*i+1],ADD_VALUES);
+
+	                //tPSPG
+	                dof_i = 3*NCNumberNodesC + 2*NCNumberNodesF + connec[i];
+	                ierr = VecSetValues(b, 1, &dof_i, &rhsVector[12+i],ADD_VALUES);
+
+	    			//Arlequin stabilization term from diagonal
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[2*i  ],ADD_VALUES);
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[2*i+1 ],ADD_VALUES);
+
+	    			//Arlequin stabilization term from fine mesh
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i];
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i  ],ADD_VALUES);
+	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
+	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i+1 ],ADD_VALUES);
+	    		};//i
+
+	    		for (int i = 0; i < 12; ++i) {
+	            	delete [] elemMatrixLag1[i];
+	            	delete [] elemStabMatrixD[i];
+	            	delete [] elemStabMatrix1[i];
+	            }
+	            delete [] elemMatrixLag1;
+	            delete [] elemStabMatrixD;
+	            delete [] elemStabMatrix1;
+
+	            for (int i = 0; i < 18; ++i) {
+	                delete [] jacobianNRMatrix[i];
+	            }
+	    		delete [] jacobianNRMatrix; 
+            }//integration points		
 
     	};//decomposition
 
@@ -4855,13 +4900,15 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(){
                 int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
                 int patch = elementsCoarse_[iElemCoarse] -> getPatch();
                 
+                elementsFine_[jel] ->setTimeStep(iTimeStep);
+
                 elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
                                                                                   elemMatrixLag0,elemVectorLag0_1,elemVectorLag0_2);
                 // elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,
                 //  																			 iElemCoarse, jacobianNRMatrix,rhsVector);
-                elementsFine_[jel] -> getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
-                                                                                          elemStabMatrixD,elemStabVectorD,elemStabMatrix0,
-                                                                                          elemStabVector0);
+                // elementsFine_[jel] -> getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
+                //                                                                           elemStabMatrixD,elemStabVectorD,elemStabMatrix0,
+                //                                                                           elemStabVector0);
       
                 for (int i = 0; i < 6; i++){
                     for (int j = 0; j < 9; j++){

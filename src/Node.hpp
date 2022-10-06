@@ -61,7 +61,7 @@ private:
     double           lagMultiplier_[DIM];           //Nodal lagrange multiplier
     double           presArlequin_;                 //Glue zone pressure    
     double           velArlequin_[DIM];             //Glue zone velocity
-
+    double           globalVelocity_[DIM];          //Global velocity for Arlequin stabilization problem
 
 public:
     // Constructor - Defines a node with index,coordinates,weight and beloging patch
@@ -313,6 +313,12 @@ public:
 
     // Gets the interpolated Arlequin velocity component
     double getVelocityArlequin(int dir) {return velArlequin_[dir];};
+
+    // Sets global velocity for the Arlequin stabilization paremeter computation
+    void setGlobalVelocity(double *u) {for (int i=0; i < DIM; i++) globalVelocity_[i] = u[i];};
+
+    // Returns global velocity for the Arlequin stabilization paremeter computation
+    double getGlobalVelocity(int dir) {return globalVelocity_[dir];}
 
 };
 
