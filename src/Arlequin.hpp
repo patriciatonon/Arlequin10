@@ -4228,7 +4228,6 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
             for (int ip = 0; ip< numberIntPoints; ip++){
 
             	int iElemCoarse = elementsFine_[jel] -> getIntegPointCorrespondenceElement_FEM(ip);
-
             	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
             	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
 
@@ -4258,13 +4257,16 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
 
 	            
 	    		elementsFine_[jel] -> setTimeStep(iTimeStep);
-	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
-
+	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(ip,elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
+	    		// elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 	            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
 
 	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
                                                                                  elemStabMatrixD,elemStabVectorD,
 	    																	     elemStabMatrix1,elemStabVector1);
+
+	             // elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(elemStabMatrixD,elemStabVectorD,
+	    									// 								     elemStabMatrix1,elemStabVector1);
 
 			
 	    		for (int i = 0; i < 6; i++){
@@ -4833,7 +4835,6 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(){
     	if (domDecompFine.first[jel] == rank) {
 
         	int *connecL = glueZoneFine_[l] -> getConnectivity();	
-
 
             int numberIntPoints = elementsFine_[jel] -> getNumberOfIntegrationPointsSpecial_FEM();
 
