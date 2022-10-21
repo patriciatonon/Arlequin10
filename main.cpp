@@ -29,8 +29,8 @@ static char help[] = "Solves the Incompressible flow problem";
 #include <fstream> 
   
 // Developed Header Files
-#include "src/FluidData.hpp"
-#include "src/Arlequin.hpp" 
+#include "src/FluidData.h"
+#include "src/Arlequin.h" 
 
 
 int main(int argc, char **args) {
@@ -119,8 +119,8 @@ int main(int argc, char **args) {
 
     //EXEMPLOS FEM/ISO (FINE/COARSE) 
     //Exemplo tipo Jeferson - Lembrar de colocar os valores de normais no Set Signaled Distance
-    coarseModel.dataReading_ISO("meshfine_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("meshfine_data.txt","fineT_fem.msh","mirror_fine.txt",0);
+    coarseModel.dataReading_ISO("../../meshfine_data.txt","../../coarse_iso2.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../meshfine_data.txt","../../fineT_fem.msh","mirror_fine.txt",0);
 
     //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
     //coarseModel.dataReading_ISO("meshcoarse_data.txt","coarse_iso2.msh","mirror_coarse.txt",0);
