@@ -1681,6 +1681,8 @@ void Arlequin<2>::setSignaledDistance(){
 template<>
 void Arlequin<2>::setGluingZone(){
 
+    double& glueZoneThickness = parametersFine -> getGlueZoneThickness();
+
 	int dim = 2;
     int flag;
     int nodesCZ[numNodesFine];
@@ -1978,6 +1980,9 @@ template<>
 void Arlequin<2>::setWeightFunction(){
 
 	double wFuncValue;
+
+    double& glueZoneThickness = parametersFine -> getGlueZoneThickness();
+    double& arlequinEpsilon = parametersFine -> getArlequinEpsilon();
 
 	glueZoneThickness *= 1.01;	// Thickness from gluing zone
 	
@@ -3231,7 +3236,7 @@ void Arlequin<2>::printResultsIP(int step) {
 };
 
 template<>
-void Arlequin<2>::dragAndLiftCoefficientsFEM(std::ofstream& dragLift){
+void Arlequin<2>::dragAndLiftCoefficientsFEM(std::ofstream& dragLift, int& iTimeStep){
 
     double dragCoefficient = 0.;
     double liftCoefficient = 0.;
@@ -3242,8 +3247,9 @@ void Arlequin<2>::dragAndLiftCoefficientsFEM(std::ofstream& dragLift){
     double pitchingMomentCoefficient = 0.;
     double pMom = 0.;
     double per = 0.;
-    double velocityInf = fineModel.velocityInf[0];
+    double& velocityInf = parametersFine -> getVelocityInf(0);
     double& rhoInf = parametersFine ->getDensity();
+    double& dTime = parametersFine -> getTimeStep();
 
     
     for (int jel = 0; jel < numBoundElemFine; jel++){   
@@ -3320,7 +3326,7 @@ return;
 };
 
 template<>
-void Arlequin<2>::dragAndLiftCoefficientsISO(std::ofstream& dragLift){
+void Arlequin<2>::dragAndLiftCoefficientsISO(std::ofstream& dragLift, int &iTimeStep){
 
     
     double dragCoefficient = 0.;
@@ -3332,7 +3338,8 @@ void Arlequin<2>::dragAndLiftCoefficientsISO(std::ofstream& dragLift){
     double pitchingMomentCoefficient = 0.;
     double pMom = 0.;
     double per = 0.;
-    double velocityInf = fineModel.velocityInf[0];
+    double& velocityInf = parametersFine -> getVelocityInf(0);
+    double& dTime = parametersFine -> getTimeStep();
     double& rhoInf = parametersFine ->getDensity();
 
     
@@ -3419,11 +3426,6 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
     fineModel = fine;
 
     //Gets Fine and Coarse models basic information from fluid data
-    numElemCoarse = coarseModel.elements_.size();
-    numElemFine   = fineModel.elements_.size();
-    numNodesCoarse = coarseModel.nodes_.size();
-    numNodesFine   = fineModel.nodes_.size();
-
     nodesCoarse_  = coarseModel.nodes_;
     nodesFine_    = fineModel.nodes_;
 
@@ -3432,6 +3434,11 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
  
     boundaryCoarse_ = coarseModel.boundary_;
     boundaryFine_   = fineModel.boundary_;
+
+    numElemCoarse = coarseModel.elements_.size();
+    numElemFine   = fineModel.elements_.size();
+    numNodesCoarse = coarseModel.nodes_.size();
+    numNodesFine   = fineModel.nodes_.size();
 
     numBoundElemFine = boundaryFine_.size();
     numBoundElemCoarse = boundaryCoarse_.size();
@@ -3444,14 +3451,9 @@ void Arlequin<2>::setFluidModels(FluidMesh& coarse, FluidMesh& fine){
 
     IsoParFine = fineModel.IsoPar_;
    	IsoParCoarse = coarseModel.IsoPar_;
-    
-    numTimeSteps = fineModel.numTimeSteps;
-    dTime = fineModel.dTime;
-    integScheme = fineModel.integScheme;
-    glueZoneThickness = fineModel.glueZoneThickness;
-    arlequinEpsilon = fineModel.arlequinEpsilon;
 
     //starting the program with maximum dissipation
+    double& integScheme = parametersFine -> getSpectralRadius();
     double dd = 0.;
     parametersCoarse -> setSpectralRadius(dd);
     parametersFine -> setSpectralRadius(dd);
@@ -4004,10 +4006,11 @@ void Arlequin<2>::setMatVecValuesFineISO(){
 };
 
 template<>
-void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
+void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 
 	double &alpha_f = parametersFine ->getAlphaF();
 	double &gamma = parametersFine ->getGamma();
+    double& dTime = parametersFine -> getTimeStep();
     double integ = alpha_f * gamma * dTime;
 
     for (int l = 0; l < numElemGlueZoneFine; l++){
@@ -4087,7 +4090,8 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(){
 	    		elementsFine_[jel] -> setTimeStep(iTimeStep);
 	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(ip,elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 	    		// elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
-	            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
+	            //elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(ip,jacobianNRMatrix,rhsVector);
+                //elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
 
 	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
                                                                                  elemStabMatrixD,elemStabVectorD,
@@ -4259,6 +4263,8 @@ void Arlequin<2>::setMatVecValuesLagrangeFineISO(){
 
 	double &alpha_f = parametersFine -> getAlphaF();
 	double &gamma = parametersFine -> getGamma();
+    double& dTime = parametersFine -> getTimeStep();
+
     double integ = alpha_f * gamma * dTime;
 
 
@@ -4472,7 +4478,8 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_FEM(){
 
 	double &alpha_f = parametersFine -> getAlphaF();
 	double &gamma = parametersFine -> getGamma();
-
+    double& dTime = parametersFine -> getTimeStep();
+    
     double integ = alpha_f * gamma * dTime;
 
      //numElemGlueZoneFine
@@ -4648,10 +4655,11 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_FEM(){
 };
 
 template<>
-void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(){
+void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(int &iTimeStep){
 
 	double &alpha_f = parametersFine -> getAlphaF();
 	double &gamma = parametersFine -> getGamma();
+    double& dTime = parametersFine -> getTimeStep();
 
     double integ = alpha_f * gamma * dTime;
 
@@ -4823,13 +4831,13 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(){
                     ierr = VecSetValues(b, 1, &dof_i, &elemStabVector0[2*i+1 ],ADD_VALUES);  
 
 
-
-                    
                 };//j
 
 
                 for (int i = 0; i < 9; i++){
-      				int newconi = nodesCoarse_[connecC[i]] -> getnewcon(); 
+      				
+                    int newconi = nodesCoarse_[connecC[i]] -> getnewcon(); 
+                    
                     for (int j = 0; j < 6; j++){
                     
                     //tSUPG stabilization
@@ -4931,6 +4939,7 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseISO_FEM(){
 
     double &alpha_f = parametersFine -> getAlphaF();
     double &gamma = parametersFine -> getGamma();
+    double& dTime = parametersFine -> getTimeStep();
 
     double integ = alpha_f * gamma * dTime;
 
@@ -5202,6 +5211,7 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseISO_ISO(){
 
 	double &alpha_f = parametersFine -> getAlphaF();
 	double &gamma = parametersFine -> getGamma();
+    double& dTime = parametersFine -> getTimeStep();
 
     double integ = alpha_f * gamma * dTime;
 
@@ -5410,6 +5420,10 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
     int sysSize = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*NCnumNodesGlueZoneFine;
 
     double sumtime = 0;
+
+    int& numTimeSteps = parametersFine -> getNumTimeSteps();
+    double& dTime = parametersFine -> getTimeStep();
+    int iTimeStep;
  
     for (iTimeStep = 0; iTimeStep < numTimeSteps; iTimeStep++){
 
@@ -5511,7 +5525,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             
            //  //Matrix and vectors - Lagrange multiplieres - FINE MESH
             if (elemTypeFine == 0){ //FEM fine mesh
-            	setMatVecValuesLagrangeFineFEM();
+            	setMatVecValuesLagrangeFineFEM(iTimeStep);
             } else { //IGA fine mesh
             	setMatVecValuesLagrangeFineISO();
             }
@@ -5521,7 +5535,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             	if (elemTypeCoarse == 0){ //FEM coarse mesh
             		setMatVecValuesLagrangeCoarseFEM_FEM();
             	} else { //IGA coarse mesh
-            		setMatVecValuesLagrangeCoarseFEM_ISO();
+            		setMatVecValuesLagrangeCoarseFEM_ISO(iTimeStep);
             	};
             } else { //IGA fine mesh
             	if (elemTypeCoarse == 0){ //IGA coarse mesh
@@ -5877,9 +5891,9 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         //Compute and print drag and lift coefficients
         if (fineModel.computeDragAndLift){
             if (elemTypeFine == 0){
-                dragAndLiftCoefficientsFEM(dragLift);
+                dragAndLiftCoefficientsFEM(dragLift,iTimeStep);
             } else {
-                dragAndLiftCoefficientsISO(dragLift);
+                dragAndLiftCoefficientsISO(dragLift,iTimeStep);
             };
         };
 

@@ -1,0 +1,5 @@
+/home/patricia/Arlequin10/build/Release/CMakeFiles/runArlequin.dir
+/home/patricia/Arlequin10/build/Release/CMakeFiles/edit_cache.dir
+/home/patricia/Arlequin10/build/Release/CMakeFiles/rebuild_cache.dir
+/home/patricia/Arlequin10/build/Release/src/CMakeFiles/edit_cache.dir
+/home/patricia/Arlequin10/build/Release/src/CMakeFiles/rebuild_cache.dir

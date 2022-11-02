@@ -27,6 +27,7 @@
 #include <math.h>       /* atan */
 #include <vector>
 
+#include "DataTypes.h"
 
 // Defines the node object and stores all nodal variables information
 
@@ -194,7 +195,7 @@ public:
     void setAcceleration(double *u){for (int i=0; i < DIM; i++) acceleration_[i] = u[i];};
     void setAccelerationComponent(int dir, double val){acceleration_[dir] = val;};
 
-    // Gets the acceleration vector
+    // Gets the acceleration vectore
     double getAcceleration(int dir) {return acceleration_[dir];}
 
     // Increment the acceleration vector

@@ -88,15 +88,8 @@ private:
     std::vector<int>elementsGlueZoneCoarse_;// Vector with coarse elements in the gluing zone
     std::vector<int>nodesGlueZoneCoarse_;   // Vector with coarse nodes in the gluing zone
     
-    // Integration parameters
-    int numTimeSteps;           // Number of times steps
-    double dTime;               // Time step
-    int iTimeStep;              // Time counter   
+    // Integration parameters 
     double integScheme;            // Integration scheme (0 - max. dissipation; 1 - without dissipation)
-    
-    //Arlequin parameters
-    double glueZoneThickness;	// Thickness from gluing zone
-    double arlequinEpsilon;		// Constant > 0
          
     //MPI parameters
     int rank;                   				// Name of the process
@@ -151,17 +144,17 @@ public:
     void setMatVecValuesCoarseISO();
     void setMatVecValuesFineFEM();
     void setMatVecValuesFineISO();
-    void setMatVecValuesLagrangeFineFEM();
+    void setMatVecValuesLagrangeFineFEM(int &iTimeStep);
     void setMatVecValuesLagrangeFineISO();
     void setMatVecValuesLagrangeCoarseFEM_FEM();
-    void setMatVecValuesLagrangeCoarseFEM_ISO();
+    void setMatVecValuesLagrangeCoarseFEM_ISO(int &iTimeStep);
     void setMatVecValuesLagrangeCoarseISO_FEM();
     void setMatVecValuesLagrangeCoarseISO_ISO();
 
 
     // Compute and print drag and lift coefficients
-    void dragAndLiftCoefficientsFEM(std::ofstream& dragLift);
-    void dragAndLiftCoefficientsISO(std::ofstream& dragLift);
+    void dragAndLiftCoefficientsFEM(std::ofstream& dragLift, int &iTimeStep);
+    void dragAndLiftCoefficientsISO(std::ofstream& dragLift, int &iTimeStep);
 
 
     //Prints the results for Paraview post-processing

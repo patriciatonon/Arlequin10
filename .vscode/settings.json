@@ -92,7 +92,10 @@
         "ranges": "cpp",
         "compare": "cpp",
         "concepts": "cpp",
-        "3d": "c"
+        "3d": "c",
+        "numbers": "cpp",
+        "stop_token": "cpp",
+        "semaphore": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
     "cmake.buildDirectory": "${workspaceFolder}/build/${buildType}",

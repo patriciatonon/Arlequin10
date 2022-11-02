@@ -8,7 +8,7 @@
 //---------------------SUBDIVIDES THE FINITE ELEMENT DOMAIN---------------------
 //------------------------------------------------------------------------------
 template<>
-void FluidData<2>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_) {
+void FluidData<2>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_, int &numFemElem, int &numFemNodes) {
     
     std::string mirror2;
     mirror2 = "domain_decomposition.txt";
@@ -91,7 +91,7 @@ void FluidData<2>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_) 
 };
 
 template<>
-void FluidData<2>::domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_) {
+void FluidData<2>::domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_, int &numIsoElem, int &numCP) {
     
     std::string mirror2;
     mirror2 = "domain_decomposition.txt";
@@ -177,7 +177,7 @@ void FluidData<2>::domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_) 
 //----------------------------BEZIER CONNECTIVITY-------------------------------
 //------------------------------------------------------------------------------
 template<>
-void FluidData<2>::BezierConnectivity() {
+void FluidData<2>::BezierConnectivity(int &numPatches) {
 
     int numNodes = 0;
     int k = 0;
@@ -249,7 +249,7 @@ void FluidData<2>::BezierConnectivity() {
 };
 
 template<>
-void FluidData<3>::BezierConnectivity() {
+void FluidData<3>::BezierConnectivity(int &numPatches) {
 
   //   int numNodes = 0;
   //   int kne = 0;
@@ -529,15 +529,42 @@ void FluidData<3>::BezierConnectivity() {
 //------------------------------------------------------------------------------
 template<>
 void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::string& inputMeshFem, 
-                               const std::string& mirror,const bool& deleteFiles){
+                                   const std::string& mirror,const bool& deleteFiles){
+
+    //variables
+    //Fluid data
+    double pressInf;       			     //Undisturbed pressure 
+    double rhoInf;         			     //Density
+    double viscInf;        				 //Viscosity
+    double fieldForces[3]; 				 //Field forces (constant) 
+    double velocityInf[3];               //Infinity velocity
+    int numTimeSteps;                    //Number of Time Steps
+    double dTime;                        //Time Step
+    int printFreq;         				 //Printing frequence of output files
+    //Arlequin Problem
+    double arlequinK1;                   //L2
+    double arlequinK2;                   //H1
+    double glueZoneThickness;			 //Thickness from gluing zone
+    double arlequinEpsilon;				 //Constant > 0
+    //Time integration parameters
+    double integScheme;                  //Time Integration Scheme (0 - max. dissipation; 1 - no dissipation)
+    double alpha_f;						 //Alphageneralized parameter - matrix except mass
+    double alpha_m;						 //Alphageneralized parameter - mass
+    double gamma;						 //Alphageneralized parameter 
+    //Data meshes
+    int numFemNodes;                     //Number of nodes in FEM mesh
+    int numFemElem;                      //Number of FEM elements 
+    int numFemBoundaries;                //Number of fluid boundaries (FEM MESH)
+    int numFemBoundElem;                 //Number of elements in fluid boundaries (FEM MESH)
                            
-        MPI_Comm_rank(PETSC_COMM_WORLD, &rank);      
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);      
     MPI_Comm_size(PETSC_COMM_WORLD, &size);
     
     int dim = 2;
        
     if (rank == 0)std::cout << "Reading fluid data from \"" 
                             << inputFile << "\"" << std::endl;
+                    
 
     //Defines input and output files
     std::ifstream inputData(inputFile.c_str());
@@ -625,6 +652,11 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     fluidParameters.setFieldForce(fieldForces);
     fluidParameters.setArlequink1(arlequinK1);
     fluidParameters.setArlequink2(arlequinK2);
+    fluidParameters.setVelocityInf(velocityInf);
+    fluidParameters.setNumTimeSteps(numTimeSteps);
+    fluidParameters.setFreqPrint(printFreq);
+    fluidParameters.setArlequinEpsilon(arlequinEpsilon);
+    fluidParameters.setGlueZoneThickness(glueZoneThickness);
 
 
     //Read and print out Drag and lift coeficients
@@ -772,7 +804,7 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     mirrorData << "Number of Boundary groups (FEM MESH) = " << numFemBoundaries << std::endl;
     mirrorData << "Number of Boundary Elements (FEM MESH)= " << numFemBoundElem << std::endl;
 
-    boundary_.reserve(numBoundElemIso);
+    boundary_.reserve(numFemBoundElem);
    
     // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // +++++++++++++++++++++++++++++BONDARIES++++++++++++++++++++++++++++++++++
@@ -894,12 +926,12 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     };
 
 
-    domainDecompositionMETIS_FEM(elements_);
+    domainDecompositionMETIS_FEM(elements_,numFemElem,numFemNodes);
 
-     //Closing the file
-     file.close();
-     if (deleteFiles)
-        system((remove2 + inputFile).c_str());
+    //  //Closing the file
+    //  file.close();
+    //  if (deleteFiles)
+    //     system((remove2 + inputFile).c_str());
 
     return;
 };
@@ -907,6 +939,32 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
 template<>
 void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::string& inputMeshIso,
                                   const std::string& mirror,const bool& deleteFiles){
+
+    //Fluid data
+    double pressInf;       			     //Undisturbed pressure 
+    double rhoInf;         			     //Density
+    double viscInf;        				 //Viscosity
+    double fieldForces[3]; 				 //Field forces (constant) 
+    double velocityInf[3];               //Infinity velocity
+    int numTimeSteps;                    //Number of Time Steps
+    double dTime;                        //Time Step
+    int printFreq;         				 //Printing frequence of output files
+    //Arlequin Problem
+    double arlequinK1;                   //L2
+    double arlequinK2;                   //H1
+    double glueZoneThickness;			 //Thickness from gluing zone
+    double arlequinEpsilon;				 //Constant > 0
+    //Time integration parameters
+    double integScheme;                  //Time Integration Scheme (0 - max. dissipation; 1 - no dissipation)
+    double alpha_f;						 //Alphageneralized parameter - matrix except mass
+    double alpha_m;						 //Alphageneralized parameter - mass
+    double gamma;						 //Alphageneralized parameter 
+    //Mesh data
+    int numPatches;                      //Number of IGA patches
+    int numCP;                           //Number of control points
+    int numIsoElem;                      //Number of IGA elements 
+    int numBoundariesIso;                //Number of fluid boundaries (IGA MESH)
+    int numBoundElemIso;                 //Number of elements in fluid boundaries (IGA MESH)
 
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);      
     MPI_Comm_size(PETSC_COMM_WORLD, &size);
@@ -916,19 +974,20 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     if (rank == 0)std::cout << "Reading fluid data from \"" 
                             << inputFile << "\"" << std::endl;
 
+   
     //Defines input and output files
     std::ifstream inputData(inputFile.c_str());
     std::ifstream file2(inputMeshIso);
     std::ofstream mirrorData(mirror.c_str());
     std::string line;
     std::string remove2 = "rm ";
-      
+
     //Start to read the data problems  
     getline(inputData,line);getline(inputData,line);getline(inputData,line);
     
     //Read and print out time steps and printing frequence
     inputData >> numTimeSteps >> printFreq;
-    
+
     mirrorData << "Number of Time Steps   = " << numTimeSteps << std::endl;
     mirrorData << "Printing Frequence     = " << printFreq << std::endl;
     
@@ -1538,14 +1597,14 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         };
     };
 
-    BezierConnectivity();
+    BezierConnectivity(numPatches);
 
-    domainDecompositionMETIS_ISO(elements_);
+    domainDecompositionMETIS_ISO(elements_,numIsoElem,numCP);
 
-     //Closing the file
-     file2.close();
-     if (deleteFiles)
-        system((remove2 + inputFile).c_str());
+    //  //Closing the file
+    //  file2.close();
+    //  if (deleteFiles)
+    //     system((remove2 + inputFile).c_str());
 
     return;
 };
