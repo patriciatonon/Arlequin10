@@ -915,7 +915,7 @@ void QuadShapeFunction<3>::evaluateGradientIso(double *xsi, double **dphi, doubl
 };
 
 template<>
-void QuadShapeFunction<2>::evaluateHessianFem(double *xsi, double ***ddphi){
+void QuadShapeFunction<2>::evaluateHessianFem(double ***ddphi){
 
      ddphi[0][0][0] = 4.;
      ddphi[0][1][0] = 4.;

@@ -27,8 +27,6 @@
 #include <math.h>       /* atan */
 #include <vector>
 
-#include "DataTypes.h"
-
 // Defines the node object and stores all nodal variables information
 
 template<int DIM>

@@ -12,7 +12,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.22.1/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.22.1/CMakeSystem.cmake"
   "CMakeFiles/FindMPI/test_mpi.cpp"
-  "../../cmake-modules/EnableEigen.cmake"
   "../../cmake-modules/FindBoost.cmake"
   "../../cmake-modules/FindPETSc.cmake"
   "../../cmake-modules/FindPackageHandleStandardArgs.cmake"
@@ -54,9 +53,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.22/Modules/Platform/Linux-GNU.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/Linux.cmake"
   "/usr/share/cmake-3.22/Modules/Platform/UnixPaths.cmake"
-  "/usr/share/eigen3/cmake/Eigen3Config.cmake"
-  "/usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake"
-  "/usr/share/eigen3/cmake/Eigen3Targets.cmake"
   )
 
 # The corresponding makefile is:

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-9
 CXX_DEFINES = -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=""
 
-CXX_INCLUDES = -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-debug/include -isystem /usr/include/eigen3
+CXX_INCLUDES = -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-debug/include
 
 CXX_FLAGS = -g
 

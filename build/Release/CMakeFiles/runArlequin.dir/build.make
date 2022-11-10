@@ -167,24 +167,10 @@ CMakeFiles/runArlequin.dir/src/FluidData.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/FluidData.cpp.s"
 	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/FluidData.cpp -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.s
 
-CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o: CMakeFiles/runArlequin.dir/flags.make
-CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o: ../../src/FluidParameters.cpp
-CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o -MF CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o.d -o CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o -c /home/patricia/Arlequin10/src/FluidParameters.cpp
-
-CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/FluidParameters.cpp > CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.i
-
-CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/FluidParameters.cpp -o CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.s
-
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: ../../src/IntegrationQuadrature.cpp
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o"
 	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp
 
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.i: cmake_force
@@ -198,7 +184,7 @@ CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.s: cmake_force
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: ../../src/QuadraticShapeFunction.cpp
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o"
 	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -MF CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o.d -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp
 
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.i: cmake_force
@@ -212,7 +198,7 @@ CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.s: cmake_force
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: ../../src/SpecialIntegrationQuadrature.cpp
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o"
 	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp
 
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.i: cmake_force
@@ -232,7 +218,6 @@ runArlequin_OBJECTS = \
 "CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o" \
 "CMakeFiles/runArlequin.dir/src/Element.cpp.o" \
 "CMakeFiles/runArlequin.dir/src/FluidData.cpp.o" \
-"CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o" \
 "CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o" \
 "CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o" \
 "CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o"
@@ -247,7 +232,6 @@ runArlequin: CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp
 runArlequin: CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/Element.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/FluidData.cpp.o
-runArlequin: CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o
@@ -258,7 +242,7 @@ runArlequin: /home/patricia/mpich-3.4.2/install/lib/libmpicxx.so
 runArlequin: /home/patricia/mpich-3.4.2/install/lib/libmpi.so
 runArlequin: /home/patricia/petsc-3.18.0/arch-linux2-c-opt/lib/libpetsc.so
 runArlequin: CMakeFiles/runArlequin.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Linking CXX executable runArlequin"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable runArlequin"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/runArlequin.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

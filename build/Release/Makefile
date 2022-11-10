@@ -297,30 +297,6 @@ src/FluidData.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/src/FluidData.cpp.s
 .PHONY : src/FluidData.cpp.s
 
-src/FluidParameters.o: src/FluidParameters.cpp.o
-.PHONY : src/FluidParameters.o
-
-# target to build an object file
-src/FluidParameters.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o
-.PHONY : src/FluidParameters.cpp.o
-
-src/FluidParameters.i: src/FluidParameters.cpp.i
-.PHONY : src/FluidParameters.i
-
-# target to preprocess a source file
-src/FluidParameters.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.i
-.PHONY : src/FluidParameters.cpp.i
-
-src/FluidParameters.s: src/FluidParameters.cpp.s
-.PHONY : src/FluidParameters.s
-
-# target to generate assembly for a file
-src/FluidParameters.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.s
-.PHONY : src/FluidParameters.cpp.s
-
 src/IntegrationQuadrature.o: src/IntegrationQuadrature.cpp.o
 .PHONY : src/IntegrationQuadrature.o
 
@@ -423,9 +399,6 @@ help:
 	@echo "... src/FluidData.o"
 	@echo "... src/FluidData.i"
 	@echo "... src/FluidData.s"
-	@echo "... src/FluidParameters.o"
-	@echo "... src/FluidParameters.i"
-	@echo "... src/FluidParameters.s"
 	@echo "... src/IntegrationQuadrature.o"
 	@echo "... src/IntegrationQuadrature.i"
 	@echo "... src/IntegrationQuadrature.s"

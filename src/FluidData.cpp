@@ -538,14 +538,10 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     double viscInf;        				 //Viscosity
     double fieldForces[3]; 				 //Field forces (constant) 
     double velocityInf[3];               //Infinity velocity
-    int numTimeSteps;                    //Number of Time Steps
     double dTime;                        //Time Step
-    int printFreq;         				 //Printing frequence of output files
     //Arlequin Problem
     double arlequinK1;                   //L2
     double arlequinK2;                   //H1
-    double glueZoneThickness;			 //Thickness from gluing zone
-    double arlequinEpsilon;				 //Constant > 0
     //Time integration parameters
     double integScheme;                  //Time Integration Scheme (0 - max. dissipation; 1 - no dissipation)
     double alpha_f;						 //Alphageneralized parameter - matrix except mass
@@ -653,11 +649,6 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     fluidParameters.setArlequink1(arlequinK1);
     fluidParameters.setArlequink2(arlequinK2);
     fluidParameters.setVelocityInf(velocityInf);
-    fluidParameters.setNumTimeSteps(numTimeSteps);
-    fluidParameters.setFreqPrint(printFreq);
-    fluidParameters.setArlequinEpsilon(arlequinEpsilon);
-    fluidParameters.setGlueZoneThickness(glueZoneThickness);
-
 
     //Read and print out Drag and lift coeficients
     inputData >> computeDragAndLift >> numberOfLines; 
@@ -946,14 +937,10 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     double viscInf;        				 //Viscosity
     double fieldForces[3]; 				 //Field forces (constant) 
     double velocityInf[3];               //Infinity velocity
-    int numTimeSteps;                    //Number of Time Steps
     double dTime;                        //Time Step
-    int printFreq;         				 //Printing frequence of output files
     //Arlequin Problem
     double arlequinK1;                   //L2
     double arlequinK2;                   //H1
-    double glueZoneThickness;			 //Thickness from gluing zone
-    double arlequinEpsilon;				 //Constant > 0
     //Time integration parameters
     double integScheme;                  //Time Integration Scheme (0 - max. dissipation; 1 - no dissipation)
     double alpha_f;						 //Alphageneralized parameter - matrix except mass
@@ -1061,6 +1048,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     fluidParameters.setFieldForce(fieldForces);
     fluidParameters.setArlequink1(arlequinK1);
     fluidParameters.setArlequink2(arlequinK2);
+    fluidParameters.setVelocityInf(velocityInf);
 
     //Read and print out Drag and lift coeficients
     inputData >> computeDragAndLift >> numberOfLines; 

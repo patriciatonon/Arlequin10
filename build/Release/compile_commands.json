@@ -1,57 +1,52 @@
 [
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/main.cpp.o -c /home/patricia/Arlequin10/main.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/main.cpp.o -c /home/patricia/Arlequin10/main.cpp",
   "file": "/home/patricia/Arlequin10/main.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -c /home/patricia/Arlequin10/src/Arlequin.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -c /home/patricia/Arlequin10/src/Arlequin.cpp",
   "file": "/home/patricia/Arlequin10/src/Arlequin.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp",
   "file": "/home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp",
   "file": "/home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp",
   "file": "/home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/Element.cpp.o -c /home/patricia/Arlequin10/src/Element.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/Element.cpp.o -c /home/patricia/Arlequin10/src/Element.cpp",
   "file": "/home/patricia/Arlequin10/src/Element.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -c /home/patricia/Arlequin10/src/FluidData.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -c /home/patricia/Arlequin10/src/FluidData.cpp",
   "file": "/home/patricia/Arlequin10/src/FluidData.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/FluidParameters.cpp.o -c /home/patricia/Arlequin10/src/FluidParameters.cpp",
-  "file": "/home/patricia/Arlequin10/src/FluidParameters.cpp"
-},
-{
-  "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp",
   "file": "/home/patricia/Arlequin10/src/IntegrationQuadrature.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp",
   "file": "/home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp"
 },
 {
   "directory": "/home/patricia/Arlequin10/build/Release",
-  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -isystem /usr/include/eigen3 -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp",
+  "command": "/usr/bin/g++-9 -DBOOST_ALL_NO_LIB -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -D__INSDIR__=\"\" -I/home/patricia/Arlequin10/include -I/home/patricia/mpich-3.4.2/install/include -I/home/patricia/petsc-3.18.0/include -I/home/patricia/petsc-3.18.0/arch-linux2-c-opt/include -O3 -DNDEBUG -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp",
   "file": "/home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp"
 }
 ]

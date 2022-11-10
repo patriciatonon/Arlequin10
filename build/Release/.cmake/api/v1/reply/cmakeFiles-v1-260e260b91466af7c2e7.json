@@ -268,21 +268,6 @@
 			"path" : "cmake-modules/FindPackageMessage.cmake"
 		},
 		{
-			"path" : "cmake-modules/EnableEigen.cmake"
-		},
-		{
-			"isExternal" : true,
-			"path" : "/usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake"
-		},
-		{
-			"isExternal" : true,
-			"path" : "/usr/share/eigen3/cmake/Eigen3Config.cmake"
-		},
-		{
-			"isExternal" : true,
-			"path" : "/usr/share/eigen3/cmake/Eigen3Targets.cmake"
-		},
-		{
 			"path" : "src/CMakeLists.txt"
 		}
 	],

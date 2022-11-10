@@ -325,32 +325,33 @@ public:
     void getSpatialDerivatives_ISO(double *xsi, double **ainv_, double **dphi_dx);
     void getSpatialDerivatives_COARSE_ISO(double *xsi, double **ainv_, double **dphi_dx);
 
-    void getSecondSpatialDerivatives_FEM(double *xsi, double **ainv_, double ***ddphi_dx);
+    void getSecondSpatialDerivatives_FEM(double **ainv_, double ***ddphi_dx);
     void getSecondSpatialDerivatives_ISO(double *xsi, double **ainv_, double ***ddphi_dx);
     void getSecondSpatialDerivatives_COARSE_ISO(double *xsi, double **ainv_, double ***ddphi_dx);
 
 
     // Compute and stores the interpolated variables
-    void getInterpCoord(int &na, double *phi_, VecDouble &x_, VecDouble &xPrevious_);
-    void getInterpVel(int &na, double *phi_, VecDouble &u_, VecDouble &uPrev_);
-    void getInterpVelDer(int &na, double **dphi_dx, MatrixDouble &du_dx, MatrixDouble &duPrev_dx);
-    void getInterpVelCoarse(int &na, double *phi_, VecDouble &u_, VecDouble &uPrev_);
-    void getInterpVelDerCoarse(int &na, double **dphi_dx, MatrixDouble &du_dx, MatrixDouble &duPrev_dx); 
+    void getInterpCoord(int &na, double *phi_, double *x_, double *xPrevious_);
+    void getInterpCoord_ISO(int &na, double *phi_, double *x_, double *xPrev_);
+    void getInterpVel(int &na, double *phi_, double *u_, double *uPrev_);
+    void getInterpVelDer(int &na, double **dphi_dx, double **du_dx, double **duPrev_dx);
+    void getInterpVelCoarse(int &na, double *phi_, double *u_, double *uPrev_);
+    void getInterpVelDerCoarse(int &na, double **dphi_dx, double **du_dx, double **duPrev_dx); 
     void getInterpSecondVelDer(int &na, double ***dphi_dx, double ***ddu_dxdx, double ***dduPrev_dxdx);
     void getInterpSecondVelDerCoarse(int &na, double ***dphi_dx, double ***ddu_dxdx, double ***dduPrev_dxdx);
-    void getInterpMeshVel(int &na, double *phi_, VecDouble &uMesh_, VecDouble &uMeshPrev_);
-    void getInterpMeshVelDer(int &na, double **dphi_dx, MatrixDouble &duMesh_dx, MatrixDouble &duMeshPrev_dx);
-    void getInterpMeshVelCoarse(int &na, double *phi_, VecDouble &uMesh_, VecDouble &uMeshPrev_);
-    void getInterpMeshVelDerCoarse(int &na, double **dphi_dx, MatrixDouble &duMesh_dx, MatrixDouble &duMeshPrev_dx);
-    void getInterpAccel(int &na, double *phi_, VecDouble &accel_, VecDouble &accelPrev_); 
-    void getInterpAccelDer(int &na, double **dphi_dx, MatrixDouble &daccel_dx, MatrixDouble &daccelPrev_dx);
-    void getInterpAccelDerCoarse(int &na, double **dphi_dx, MatrixDouble &daccel_dx, MatrixDouble &daccelPrev_dx);
+    void getInterpMeshVel(int &na, double *phi_, double *uMesh_, double *uMeshPrev_);
+    void getInterpMeshVelDer(int &na, double **dphi_dx, double **duMesh_dx, double **duMeshPrev_dx);
+    void getInterpMeshVelCoarse(int &na, double *phi_, double *uMesh_, double *uMeshPrev_);
+    void getInterpMeshVelDerCoarse(int &na, double **dphi_dx, double **duMesh_dx, double **duMeshPrev_dx);
+    void getInterpAccel(int &na, double *phi_, double *accel_, double *accelPrev_); 
+    void getInterpAccelDer(int &na, double **dphi_dx, double **daccel_dx, double **daccelPrev_dx);
+    void getInterpAccelDerCoarse(int &na, double **dphi_dx, double **daccel_dx, double **daccelPrev_dx);
     void getInterpPress(int &na, double *phi_, double &press_);
-    void getInterpPressDer(int &na, double **dphi_dx, VecDouble &dpress_dx);
-    void getInterpSecondPressDer(int &na, double ***ddphi_dx, MatrixDouble &ddpress_dxdx);
-    void getInterpSecondPressDerCoarse(int &na, double ***ddphi_dx, MatrixDouble &ddpress_dxdx);
-    void getInterpLambda(int &na, double *phi_, VecDouble &lambda_);
-    void getInterpLambdaDer(int &na, double **dphi_dx, MatrixDouble &dlambda_dx);
+    void getInterpPressDer(int &na, double **dphi_dx, double *dpress_dx);
+    void getInterpSecondPressDer(int &na, double ***ddphi_dx, double **ddpress_dxdx);
+    void getInterpSecondPressDerCoarse(int &na, double ***ddphi_dx, double **ddpress_dxdx);
+    void getInterpLambda(int &na, double *phi_, double *lambda_);
+    void getInterpLambdaDer(int &na, double **dphi_dx, double **dlambda_dx);
 
     //......................Stabilization Parameters....................
     // Compute and store the SUPG, PSPG and LSIC stabilization parameters
@@ -384,7 +385,7 @@ public:
     
     //Arlequin Matrixes and Vectores
     void getMatrixAndVectorsSameMesh_FEM(double &djac_, double &weight_,double *phi_, double **dphi_dx, 
-                                        double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
+                                         double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
     void getMatrixAndVectorsSameMesh_tSUPG_tPSPG_FEM(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,double *phi_, 
                                                      double **dphi_dx,double **jacobianNRMatrix,double *rhsVector);
     void getMatrixAndVectorsSameMeshArlqStab_FEM(double &djac_, double &weight_,double &tARLQ_, int &index,
@@ -438,15 +439,14 @@ public:
     void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
 
     // Compute and store the Lagrange multiplier operator when integrating the same mesh portion
-    void getLagrangeMultipliersSameMesh_FEM(int &index, double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
-    // void getLagrangeMultipliersSameMesh_FEM(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
+    void getLagrangeMultipliersSameMesh_FEM(int &index, double **lagrMultMatrix, 
+                                            double *lagrMultVector, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                     std::vector<IParameters *> &iparamC, double **arlequinStabD, 
-                                                    double *arlequinStabVectorD,double **arlequinStab1, double *arlequinStabVector1);
-    // void getLagrangeMultipliersSameMeshArlqStab_FEM(double **arlequinStabD, double *arlequinStabVectorD,
-    //                                                 double **arlequinStab1, double *arlequinStabVector1);
+                                                    double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
-    //void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(double **jacobianNRMatrix, double *rhsVector);
+    
+    
     void getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_ISO(double **jacobianNRMatrix, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_ISO(double **arlequinStabD, double *arlequinStabVectorD,

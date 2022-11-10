@@ -98,12 +98,12 @@ src/clean:
 CMakeFiles/runArlequin.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/runArlequin.dir/build.make CMakeFiles/runArlequin.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12 "Built target runArlequin"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Built target runArlequin"
 .PHONY : CMakeFiles/runArlequin.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/runArlequin.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/patricia/Arlequin10/build/Release/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/patricia/Arlequin10/build/Release/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/runArlequin.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/patricia/Arlequin10/build/Release/CMakeFiles 0
 .PHONY : CMakeFiles/runArlequin.dir/rule

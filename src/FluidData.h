@@ -53,7 +53,6 @@ private:
     int size;			   				 //Parameter to the division of mesh between the threads
     double pi = M_PI;					 //Paralelization parameter 
 
-
 public:
 
 	// Defines the classes objetcs:
@@ -66,6 +65,14 @@ public:
     //mesh data
     int NumBezierNodes;                   //Number of Bezier Nodes 
     int NCNumberNodes;                    //Number of non coincidents control points in the mesh (for solve the matrixes)
+
+    //Numeric analysis
+    int numTimeSteps;                     //Number of Time Steps
+    int printFreq;
+    
+    //Arlequin Problem
+    double glueZoneThickness;			  //Thickness from gluing zone
+    double arlequinEpsilon;				  //Constant > 0
     
     //Print data
     bool printVelocity;

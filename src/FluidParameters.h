@@ -43,8 +43,6 @@ public:
     // Sets arlequin parameters 
     void setArlequink1(double &arlk1) {arlequinK1 = arlk1;};
     void setArlequink2(double &arlk2) {arlequinK2 = arlk2;};
-    void setArlequinEpsilon(double &arlqEps) {arlequinEpsilon = arlqEps;};
-    void setGlueZoneThickness(double &thick) {glueZoneThickness = thick;};
 
     void setVelocityInf(double *velInf){
         for (int i = 0; i < DIM; i++){
@@ -52,9 +50,6 @@ public:
         };
     };
     
-    void setNumTimeSteps(int &numTS) {numTimeSteps = numTS;};
-    void setFreqPrint(int &pf) {printFreq = pf;};
-
     double& getTimeStep() {return timeStepSize;}
     double& getDensity() {return density;}
     double& getViscosity() {return viscosity;}
@@ -64,12 +59,8 @@ public:
     double& getFieldForce(int dir) {return fieldForce[dir];}
     double& getArlequinK1() {return arlequinK1;};
     double& getArlequinK2() {return arlequinK2;};
-    double& getArlequinEpsilon() {return arlequinEpsilon;};
-    double& getGlueZoneThickness () {return glueZoneThickness;};
     double& getVelocityInf(int dir) {return velocityInf[dir];}
     double& getSpectralRadius() {return spectralRadius;};
-    int& getNumTimeSteps() {return numTimeSteps;};
-    int& getFreqPrint() {return printFreq;};
 
 
 private:
@@ -83,11 +74,7 @@ private:
     double fieldForce [DIM];
     double arlequinK1;
     double arlequinK2;
-    double glueZoneThickness;
-    double arlequinEpsilon;
     double velocityInf[DIM];
-    int    numTimeSteps;
-    int    printFreq;
 
     
 };

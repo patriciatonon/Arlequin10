@@ -1681,7 +1681,7 @@ void Arlequin<2>::setSignaledDistance(){
 template<>
 void Arlequin<2>::setGluingZone(){
 
-    double& glueZoneThickness = parametersFine -> getGlueZoneThickness();
+    double glueZoneThickness = fineModel.glueZoneThickness;
 
 	int dim = 2;
     int flag;
@@ -1981,8 +1981,8 @@ void Arlequin<2>::setWeightFunction(){
 
 	double wFuncValue;
 
-    double& glueZoneThickness = parametersFine -> getGlueZoneThickness();
-    double& arlequinEpsilon = parametersFine -> getArlequinEpsilon();
+    double glueZoneThickness = fineModel.glueZoneThickness;
+    double arlequinEpsilon = fineModel.arlequinEpsilon;
 
 	glueZoneThickness *= 1.01;	// Thickness from gluing zone
 	
@@ -4010,7 +4010,7 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 
 	double &alpha_f = parametersFine ->getAlphaF();
 	double &gamma = parametersFine ->getGamma();
-    double& dTime = parametersFine -> getTimeStep();
+    double &dTime = parametersFine -> getTimeStep();
     double integ = alpha_f * gamma * dTime;
 
     for (int l = 0; l < numElemGlueZoneFine; l++){
@@ -4062,43 +4062,39 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
             	int *connecC = elementsCoarse_[iElemCoarse] -> getConnectivity();
             	int patch = elementsCoarse_[iElemCoarse] -> getPatch();
 
-	            	//LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
-	    		double **elemMatrixLag1;
-	    		elemMatrixLag1 = new double*[12]();
-	    		for (int i = 0; i < 12; ++i)  elemMatrixLag1[i] = new double[18]();
-	    		double elemVectorLag1_1[18] = {};
-	    		double elemVectorLag1_2[12] = {};
-	            
+	            //LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+                double **elemMatrixLag1;
+    		    elemMatrixLag1 = new double*[12]();
+    		    for (int i = 0; i < 12; ++i)  elemMatrixLag1[i] = new double[18]();
+    		    
+                double elemVectorLag1_1[18] = {};
+                double elemVectorLag1_2[12] = {};
+
+
 	            //tSUPG and tPSPG STABILIZATION
-	            double **jacobianNRMatrix;
-	            jacobianNRMatrix = new double*[18]();
-	            for (int i = 0; i < 18; ++i)  jacobianNRMatrix[i] = new double[12]();
-	            double rhsVector[18] = {};
+                double **jacobianNRMatrix;
+    		    jacobianNRMatrix = new double*[18]();
+    		    for (int i = 0; i < 18; ++i)  jacobianNRMatrix[i] = new double[12]();
+                double rhsVector[18] = {};
 
 	    		//ARLEQUIN STABILIZATION MATRIXES
-	            double **elemStabMatrixD;
-	            elemStabMatrixD = new double*[12]();
-	            for (int i = 0; i < 12; ++i)  elemStabMatrixD[i] = new double[12]();
+                 double **elemStabMatrixD;
+    		    elemStabMatrixD = new double*[12]();
+    		    for (int i = 0; i < 12; ++i)  elemStabMatrixD[i] = new double[12]();
+
+                 double **elemStabMatrix1;
+    		    elemStabMatrix1 = new double*[12]();
+    		    for (int i = 0; i < 12; ++i)  elemStabMatrix1[i] = new double[18]();
+
 	            double elemStabVectorD[12] = {};
-
-	        	double **elemStabMatrix1;
-	            elemStabMatrix1 = new double*[12]();
-	            for (int i = 0; i < 12; ++i)  elemStabMatrix1[i] = new double[18]();
-	            double elemStabVector1[12] = {};
-
+                double elemStabVector1[12] = {};
 	            
 	    		elementsFine_[jel] -> setTimeStep(iTimeStep);
 	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(ip,elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
-	    		// elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 	            //elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(ip,jacobianNRMatrix,rhsVector);
-                //elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(jacobianNRMatrix,rhsVector);
-
 	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
                                                                                  elemStabMatrixD,elemStabVectorD,
 	    																	     elemStabMatrix1,elemStabVector1);
-
-	             // elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(elemStabMatrixD,elemStabVectorD,
-	    									// 								     elemStabMatrix1,elemStabVector1);
 
 			
 	    		for (int i = 0; i < 6; i++){
@@ -4237,19 +4233,6 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i+1 ],ADD_VALUES);
 	    		};//i
 
-	    		for (int i = 0; i < 12; ++i) {
-	            	delete [] elemMatrixLag1[i];
-	            	delete [] elemStabMatrixD[i];
-	            	delete [] elemStabMatrix1[i];
-	            }
-	            delete [] elemMatrixLag1;
-	            delete [] elemStabMatrixD;
-	            delete [] elemStabMatrix1;
-
-	            for (int i = 0; i < 18; ++i) {
-	                delete [] jacobianNRMatrix[i];
-	            }
-	    		delete [] jacobianNRMatrix; 
             }//integration points		
 
     	};//decomposition
@@ -5421,12 +5404,14 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
 
     double sumtime = 0;
 
-    int& numTimeSteps = parametersFine -> getNumTimeSteps();
+    int numTimeSteps = fineModel.numTimeSteps;
     double& dTime = parametersFine -> getTimeStep();
     int iTimeStep;
+
+    
  
     for (iTimeStep = 0; iTimeStep < numTimeSteps; iTimeStep++){
-
+ 
         
         if (rank == 0) {std::cout << "------------------------- TIME STEP = "
                                   << iTimeStep << " -------------------------"
@@ -5485,6 +5470,8 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
         };
 
         double duNorm=100.;
+
+   
         
         for (int inewton = 0; inewton < iterNumber; inewton++){
             
@@ -5523,7 +5510,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             	setMatVecValuesFineISO();
             }
             
-           //  //Matrix and vectors - Lagrange multiplieres - FINE MESH
+            //Matrix and vectors - Lagrange multiplieres - FINE MESH
             if (elemTypeFine == 0){ //FEM fine mesh
             	setMatVecValuesLagrangeFineFEM(iTimeStep);
             } else { //IGA fine mesh
@@ -5543,9 +5530,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             	} else { //IGA coarse mesh
             		setMatVecValuesLagrangeCoarseISO_ISO();
             	};
-            };
-            
-            
+            };          
 	        
 
             //Assemble matrices and vectors
