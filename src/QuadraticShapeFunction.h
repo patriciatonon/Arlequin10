@@ -38,6 +38,9 @@ public:
 public:
     
     // Evaluates the shape function value
+    void basisFunctionsBS(double &xsi, int &deg, double *knot, int &inc, double *phiL);
+    void derBasisFunctionsBS(int &degree, double &xsi, int &deg, double *knot, int &inc, double *dphiL);
+
     void evaluateFem(double *xsi, double *phi) const;
     void evaluateIso(double *xsi, double *phi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch);
 

@@ -100,6 +100,7 @@ private:
     // double intPointWeightFunctionSpecialPrev_FEM[12];
 
     int iTimeStep;
+    double integScheme;
 
     
 public:
@@ -359,8 +360,12 @@ public:
     void getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **quadJacMat, double *phi_, double **dphi_dx);
     void getParameterArlequin_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
     void getParameterArlequin_FEM(double &tARLQ_, double *phi_, double **dphi_dx);
+    void getParameterArlequin_COARSE_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
     void getParameterArlequin2_FEM(double &djac_, double &weight_, double &tARLQ_, 
                                    double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
+    void getParameterArlequin2_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, 
+                                          double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, 
+                                          double ***ddphi_dx, double ***ddphiC_dx);
 
 
  	//......................Drag and Lift Parameters....................
@@ -373,65 +378,39 @@ public:
    
     //.......................Element vectors and matrices.......................
     // Compute and store the element matrix for the incompressible flow problem
-    void getElemMatrix_FEM(double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
-                           int &index, double *phi_, double **dphi_dx, double **jacobianNRMatrix);
-    void getElemMatrix_ISO(double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
-                           int &index, double *phi_, double **dphi_dx, double **jacobianNRMatrix);   
+    void getElemMatrix(int &na, double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
+                       int &index, double *phi_, double **dphi_dx, double **jacobianNRMatrix);  
+    
     //Compute and store the residual vector for the incompressible flow problem
-    void getResidualVector_FEM(double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
-                               int &index, double *phi_, double **dphi_dx, double *rhsVector);
-    void getResidualVector_ISO(double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
-                               int &index, double *phi_, double **dphi_dx, double *rhsVector);
+    void getResidualVector(int &na, double &djac_, double &weight_, double &tSUPG_, double &tPSPG_, double &tLSIC_,
+                          int &index, double *phi_, double **dphi_dx, double *rhsVector);
+
     
     //Arlequin Matrixes and Vectores
-    void getMatrixAndVectorsSameMesh_FEM(double &djac_, double &weight_,double *phi_, double **dphi_dx, 
-                                         double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
-    void getMatrixAndVectorsSameMesh_tSUPG_tPSPG_FEM(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,double *phi_, 
-                                                     double **dphi_dx,double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsSameMeshArlqStab_FEM(double &djac_, double &weight_,double &tARLQ_, int &index,
-                                                 double *phi_, double **dphi_dx, double ***ddphi_dx,
-                                                 double **arlequinStabD, double *arlequinStabVectorD,
-                                                 double **arlequinStab1, double *arlequinStabVector1);
+    void getMatrixAndVectorsSameMesh(int &na, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
+                                     double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
+    void getMatrixAndVectorsSameMesh_tSUPG_tPSPG(int &na, double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,double *phi_, 
+                                                 double **dphi_dx,double **jacobianNRMatrix,double *rhsVector);
+    void getMatrixAndVectorsSameMeshArlqStab(int &na, double &djac_, double &weight_,double &tARLQ_, int &index,
+                                             double *phi_, double **dphi_dx, double ***ddphi_dx,
+                                             double **arlequinStabD, double *arlequinStabVectorD,
+                                             double **arlequinStab1, double *arlequinStabVector1);
    
-    void getMatrixAndVectorsSameMesh_ISO(double &djac_, double &weight_,double *phi_, double **dphi_dx,  
-        	                             double **lagrMultMatrix, double *rhsVector1, double *rhsVector2); 
-    void getMatrixAndVectorsSameMesh_tSUPG_tPSPG_ISO(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
-                                                    double *phi_, double **dphi_dx,double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsSameMeshArlqStab_ISO(double &djac_, double &weight_,double &tARLQ_, int &index,
-                                                 double *phi_, double **dphi_dx, double ***ddphi_dx,
-                                                 double **arlequinStabD, double *arlequinStabVectorD,
-                                                 double **arlequinStab1, double *arlequinStabVector1);
-    
-    void getMatrixAndVectorsDifferentMesh_FEM_FEM(double &djac_, double &weight_,double &tARLQ_, double *phi_, 
-                                                  double **dphi_dx, double *phiC_, double **dphiC_dx,
-                                                  double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
-                                                  double **arlequinStab, double *arlequinStabVector);   
-    void getMatrixAndVectorsDifferentMesh_ISO_ISO(double &djac_, double &weight_,double &tARLQ_,double *phi_, 
-                                                  double **dphi_dx, double *phiC_, double **dphiC_dx,
-        									      double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
-                                                  double **arlequinStab, double *arlequinStabVector);
+    void getMatrixAndVectorsDifferentMesh(double &djac_, double &weight_,int &na, double *phi_, 
+                                          double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,
+                                          double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);   
+    void getMatrixAndVectorsDifferentMeshTemp(double &djac_, double &weight_,double &tARLQ_, int &na, double *phi_, 
+                                              double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,
+                                              double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
+                                              double **arlequinStab, double *arlequinStabVector);  
+    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
+                                                      int &na, double *phi_, int &naC, double *phiC_, double **dphiC_dx,
+                                                      double **jacobianNRMatrix,double *rhsVector);
+    void getMatrixAndVectorsDifferentMeshArlqStab(double &djac_, double &weight_,double &tARLQ_,int &index, 
+                                                  int &na, double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,double ***ddphiC_dx,
+                                                  double **arlequinStabD, double *arlequinStabVectorD,
+                                                  double **arlequinStab0, double *arlequinStabVector0);
 
-    void getMatrixAndVectorsDifferentMesh_FEM_ISO(double &djac_, double &weight_,double *phi_, double **dphi_dx, 
-                                                  double *phiC_, double **dphiC_dx,double **lagrMultMatrix, 
-                                                  double *rhsVector1, double *rhsVector2);
-    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_FEM_ISO(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
-                                                             double *phi_, double *phiC_, double **dphiC_dx,
-                                                             double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsDifferentMeshArlqStab_FEM_ISO(double &djac_, double &weight_,double &tARLQ_,int &index, 
-                                                          double **dphi_dx, double *phiC_, double **dphiC_dx,double ***ddphiC_dx,
-                                                          double **arlequinStabD, double *arlequinStabVectorD,
-                                                          double **arlequinStab0, double *arlequinStabVector0);
-
-    void getMatrixAndVectorsDifferentMesh_ISO_FEM(double &djac_, double &weight_,double *phi_,double **dphi_dx, 
-                                                  double *phiC_, double **dphiC_dx,double **lagrMultMatrix, 
-                                                  double *rhsVector1, double *rhsVector2);
-    void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG_ISO_FEM(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
-                                                              double *phi_,double *phiC_, double **dphiC_dx,
-                                                              double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsDifferentMeshArlqStab_ISO_FEM(double &djac_, double &weight_,double &tARLQ_,int &index, 
-                                                          double **dphi_dx, double *phiC_, double **dphiC_dx,double ***ddphiC_dx,
-                                                          double **arlequinStabD, double *arlequinStabVectorD,
-                                                          double **arlequinStab0, double *arlequinStabVector0);
 
     //...............................Problem type...............................
     // Compute the Transient Navier-Stokes problem matrices and vectors
