@@ -1,4 +1,4 @@
-Number of Time Steps   = 100000
+Number of Time Steps   = 2
 Printing Frequence     = 1
 Thickness of glue zone   = 0.1
 Epsilon from Arlequin formulation   = 0.01
@@ -9,8 +9,8 @@ Undisturbed Velocity y = 0
 Undisturbed Velocity z = 0
 Undisturbed Pressure   = 0
 Undisturbed Density    = 1
-Undisturbed Viscosity  = 0.1
-Time Step              = 0.1
+Undisturbed Viscosity  = 0.001
+Time Step              = 0.001
 Time Integration Scheme= 0
 Field Forces x         = 0
 Field Forces y         = 0

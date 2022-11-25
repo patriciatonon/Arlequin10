@@ -2513,7 +2513,7 @@ void Element<2>::getParameterArlequin_FEM(double &tARLQ_, double *phi_, double *
 }
 
 template <>
-void Element<2>::getParameterArlequin2_FEM(double &djac_, double &weight_, double &tARLQ_, double *phi_,
+void Element<2>::getParameterArlequin2_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, double *phi_,
                                            double *phiC_, double **dphi_dx, double ***ddphi_dx)
 {
 
@@ -2642,7 +2642,9 @@ void Element<2>::getParameterArlequin2_FEM(double &djac_, double &weight_, doubl
     double press[12] = {};
     double gradlambda[12] = {};
 
-    double WJ = weight_ * djac_;
+    double wna_ = 1.;//alpha_f * intPointWeightFunction_FEM[index] + (1. - alpha_f) * intPointWeightFunctionPrev_FEM[index];
+    
+    double WJ = weight_ * djac_ * wna_;
 
     for (int i = 0; i < 6; i++)
     {
@@ -2672,14 +2674,14 @@ void Element<2>::getParameterArlequin2_FEM(double &djac_, double &weight_, doubl
         press[2*i] += (dphi_dx[0][i] * ddpress_dxdx[0][0] + dphi_dx[1][i] * ddpress_dxdx[1][0]) * WJ;
         press[2*i+1] += (dphi_dx[0][i] * ddpress_dxdx[0][1] + dphi_dx[1][i] * ddpress_dxdx[1][1]) * WJ;
 
-        gradlambda[2*i] += (dphi_dx[0][i] * dlambda_dx[0][0] + dphi_dx[1][i] * dlambda_dx[0][1]) * k1 * WJ;
-        gradlambda[2*i+1] += (dphi_dx[0][i] * dlambda_dx[1][0] + dphi_dx[1][i] * dlambda_dx[1][1]) * k1 * WJ;
+        gradlambda[2*i] += (dphi_dx[0][i] * dlambda_dx[0][0] + dphi_dx[1][i] * dlambda_dx[0][1]) * k1;// * WJ / wna_;
+        gradlambda[2*i+1] += (dphi_dx[0][i] * dlambda_dx[1][0] + dphi_dx[1][i] * dlambda_dx[1][1]) * k1;// * WJ / wna_;
 
         for (int j = 0; j < 6; j++)
         {
             // lagrange multipliers
-            lambda1[2*i][2*j] += phi_[i] * phi_[j] * WJ * k1;
-            lambda1[2*i+1][2*j+1] += phi_[i] * phi_[j] * WJ * k1;
+            lambda1[2*i][2*j] += phi_[i] * phi_[j] * k1 * WJ/wna_;
+            lambda1[2*i+1][2*j+1] += phi_[i] * phi_[j] * k1 * WJ/wna_;
         };
     };
 
@@ -2688,8 +2690,8 @@ void Element<2>::getParameterArlequin2_FEM(double &djac_, double &weight_, doubl
         for (int j = 0; j < 9; j++)
         {
             // lagrange multipliers
-            lambda0[2*i][2*j] += phi_[i] * phiC_[j] * WJ * k1;
-            lambda0[2*i+1][2*j+1] += phi_[i] * phiC_[j] * WJ * k1;
+            lambda0[2*i][2*j] += phi_[i] * phiC_[j] * k1 * WJ/wna_;
+            lambda0[2*i+1][2*j+1] += phi_[i] * phiC_[j] * k1 * WJ/wna_;
         };
     };
 
@@ -2776,20 +2778,15 @@ void Element<2>::getParameterArlequin2_FEM(double &djac_, double &weight_, doubl
     if(tE1>1.)tE1=0.0000000001;
     if(tE2>1.)tE2=0.0000000001;
 
-    double tA = 1. / sqrt(1. / (tA1 * tA1) +
-                          1. / (tA2 * tA2));
+    double tA = 1. / sqrt(1. / (tA1 * tA1) + 1. / (tA2 * tA2));
 
-    double tB = 1. / sqrt(1. / (tB1 * tB1) +
-                          1. / (tB2 * tB2));
+    double tB = 1. / sqrt(1. / (tB1 * tB1) + 1. / (tB2 * tB2));
 
-    double tC = 1. / sqrt(1. / (tC1 * tC1) +
-                          1. / (tC2 * tC2));
+    double tC = 1. / sqrt(1. / (tC1 * tC1) + 1. / (tC2 * tC2));
 
-    double tD = 1. / sqrt(1. / (tD1 * tD1) +
-                          1. / (tD2 * tD2));
+    double tD = 1. / sqrt(1. / (tD1 * tD1) + 1. / (tD2 * tD2));
 
-    double tE = 1. / sqrt(1. / (tE1 * tE1) +
-                          1. / (tE2 * tE2));
+    double tE = 1. / sqrt(1. / (tE1 * tE1) + 1. / (tE2 * tE2));
 
     tARLQ_ = 1. / sqrt(1. / (tA * tA) +
                         1. / (tB * tB) +
@@ -4977,7 +4974,7 @@ void Element<2>::getLagrangeMultipliersSameMeshArlqStab_FEM(int &index, int &ipa
     // Computes the coqrse shape functions
     shapeQuad.evaluateIso(xsiC, phiC_, wpcC, incC_, (*iparametersC), NpatchC_);
 
-    getParameterArlequin2_FEM(djac_, weight_, tARLQ_, phi_, phiC_, dphi_dx, ddphi_dx);
+    getParameterArlequin2_FEM(index, djac_, weight_, tARLQ_, phi_, phiC_, dphi_dx, ddphi_dx);
     // getParameterArlequin_FEM(tARLQ_,phi_,dphi_dx);
 
     // Computes matrixes and vectors

@@ -361,7 +361,7 @@ public:
     void getParameterArlequin_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
     void getParameterArlequin_FEM(double &tARLQ_, double *phi_, double **dphi_dx);
     void getParameterArlequin_COARSE_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
-    void getParameterArlequin2_FEM(double &djac_, double &weight_, double &tARLQ_, 
+    void getParameterArlequin2_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, 
                                    double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
     void getParameterArlequin2_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, 
                                           double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, 

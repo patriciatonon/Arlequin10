@@ -4096,15 +4096,6 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
                                                                                  elemStabMatrixD,elemStabVectorD,
 	    																	     elemStabMatrix1,elemStabVector1);
-        //    if (jel == 1955){
-
-        //         if (iTimeStep == 1){
-        //             std::cout << jel << " " << ip << std::endl;
-        //             for (int i = 0; i < 12; i++){
-        //                 std::cout << elemStabVector1[i] << std::endl;
-        //             }
-        //         }
-        //            }
 
 			
 	    		for (int i = 0; i < 6; i++){
@@ -4242,6 +4233,20 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 	    			dof_i = 3*NCNumberNodesC + 3*NCNumberNodesF + 2*connecL[i] + 1;
 	    			ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[2*i+1 ],ADD_VALUES);
 	    		};//i
+
+                for (int i = 0; i < 12; ++i) {
+                    delete [] elemMatrixLag1[i];
+                    delete [] elemStabMatrixD[i];
+                    delete [] elemStabMatrix1[i];
+                }
+                delete [] elemMatrixLag1; 
+                delete [] elemStabMatrixD;
+                delete [] elemStabMatrix1;
+
+                for (int i = 0; i < 18; ++i) {
+                    delete [] jacobianNRMatrix[i];
+                }
+                delete [] jacobianNRMatrix; 
 
             }//integration points		
 
@@ -5707,8 +5712,7 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
                                   << std::endl;}
 
 
-        if (iTimeStep == 2){
-
+        if (iTimeStep == 10){
         	parametersCoarse -> setSpectralRadius(integScheme);
         	parametersFine -> setSpectralRadius(integScheme);
         }; 
