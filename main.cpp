@@ -119,16 +119,16 @@ int main(int argc, char **args) {
 
     //EXEMPLOS FEM/ISO (FINE/COARSE) 
     //Exemplo tipo Jeferson - Lembrar de colocar os valores de normais no Set Signaled Distance
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineT_fem.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineT_fem.msh","mirror_fine.txt",0);
 
     //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fine_fem.msh","mirror_fine.txt",0);
 
     //EXEMPLO CILINDRO
-    // coarseModel.dataReading_ISO("../../mesh/meshfinecyl_data.txt","../../mesh/coarse_iso_cylinder.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
+    coarseModel.dataReading_ISO("../../mesh/meshfinecyl_data.txt","../../mesh/coarse_iso_cylinder.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
 
 
     //EXEMPLOS ISO/FEM

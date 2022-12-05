@@ -2256,37 +2256,35 @@ void Element<2>::getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double 
 
     getInvMatrixC(MatrixCuInv, MatrixCvInv);
 
-    ublas::vector<double> Dxsi(3), Deta(3);
+    std::vector<double> Dxsi(2), Deta(2);
 
     Dxsi.clear();
     Deta.clear();
 
     for (int i = 0; i <= degm; i++)
     {
-        Dxsi(1) += i * (MatrixCuInv[i][1] - MatrixCuInv[i][0]);
-        Dxsi(2) += i * (MatrixCuInv[i][2] - MatrixCuInv[i][1]);
+        Dxsi[0] += i * (MatrixCuInv[i][1] - MatrixCuInv[i][0]);
+        Dxsi[1] += i * (MatrixCuInv[i][2] - MatrixCuInv[i][1]);
     }
 
-    Dxsi(1) *= (dimxsi / degm);
-    Dxsi(2) *= (dimxsi / degm);
+    Dxsi[0] *= (dimxsi / degm);
+    Dxsi[1] *= (dimxsi / degm);
 
     for (int i = 0; i <= degn; i++)
     {
-        Deta(1) += i * (MatrixCvInv[i][1] - MatrixCvInv[i][0]);
-        Deta(2) += i * (MatrixCvInv[i][2] - MatrixCvInv[i][1]);
+        Deta[0] += i * (MatrixCvInv[i][1] - MatrixCvInv[i][0]);
+        Deta[1] += i * (MatrixCvInv[i][2] - MatrixCvInv[i][1]);
     }
 
-    Deta(1) *= (dimeta / degn);
-    Deta(2) *= (dimeta / degn);
+    Deta[0] *= (dimeta / degn);
+    Deta[1] *= (dimeta / degn);
 
-    typedef ublas::vector<double>::iterator itt;
-
-    std::pair<itt, itt> results = minmax_element(Dxsi.begin(), Dxsi.end());
-    std::pair<itt, itt> results2 = minmax_element(Deta.begin(), Deta.end());
+    auto it = std::minmax_element(Dxsi.begin(), Dxsi.end());
+    auto it2 = std::minmax_element(Deta.begin(), Deta.end());
 
     // RQD - MAX
-    MatrixD[0][0] = *(results.second);
-    MatrixD[1][1] = *(results2.second);
+    MatrixD[0][0] = *it.second;
+    MatrixD[1][1] = *it2.second;
 
     // Inverse Matrix D
     double detMatrixD = MatrixD[0][0] * MatrixD[1][1] - MatrixD[0][1] * MatrixD[1][0];
@@ -2674,8 +2672,8 @@ void Element<2>::getParameterArlequin2_FEM(int &index, double &djac_, double &we
         press[2*i] += (dphi_dx[0][i] * ddpress_dxdx[0][0] + dphi_dx[1][i] * ddpress_dxdx[1][0]) * WJ;
         press[2*i+1] += (dphi_dx[0][i] * ddpress_dxdx[0][1] + dphi_dx[1][i] * ddpress_dxdx[1][1]) * WJ;
 
-        gradlambda[2*i] += (dphi_dx[0][i] * dlambda_dx[0][0] + dphi_dx[1][i] * dlambda_dx[0][1]) * k1;// * WJ / wna_;
-        gradlambda[2*i+1] += (dphi_dx[0][i] * dlambda_dx[1][0] + dphi_dx[1][i] * dlambda_dx[1][1]) * k1;// * WJ / wna_;
+        gradlambda[2*i] += (dphi_dx[0][i] * dlambda_dx[0][0] + dphi_dx[1][i] * dlambda_dx[0][1]) * k1 * WJ / wna_;
+        gradlambda[2*i+1] += (dphi_dx[0][i] * dlambda_dx[1][0] + dphi_dx[1][i] * dlambda_dx[1][1]) * k1 * WJ / wna_;
 
         for (int j = 0; j < 6; j++)
         {
@@ -2842,6 +2840,206 @@ void Element<2>::getParameterArlequin2_FEM(int &index, double &djac_, double &we
         delete[] dduPrev_dxdx[i];
     };
     delete[] dduPrev_dxdx;
+
+};
+
+
+template <>
+void Element<2>::getParameterArlequinMN_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, double *phi_,
+                                           double *phiC_, double **dphi_dx, double ***ddphi_dx)
+{
+
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters-> getGamma();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &dTime_ = parameters->getTimeStep();    
+    double &k1 = parameters->getArlequinK1();
+
+    // Interpolated variables
+    int na = 6;
+
+    //Velocity
+    double u_[2], uPrev_[2], una_[2];
+    getInterpVel(na, phi_, u_, uPrev_);
+    for (int i = 0; i < 2; i++) una_[i] = alpha_f * u_[i] + (1. - alpha_f) * uPrev_[i];
+
+    //Mesh Velocity
+    double uMesh_[2], uMeshPrev_[2], umeshna_[2];
+    getInterpMeshVel(na, phi_, uMesh_, uMeshPrev_);
+    for (int i = 0; i < 2; i++) umeshna_[i] = alpha_f * uMesh_[i] + (1. - alpha_f) * uMeshPrev_[i];
+
+    //Velocity Derivatives
+    double **du_dx;
+    du_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) du_dx[i] = new double[2];
+
+    double **duPrev_dx;
+    duPrev_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duPrev_dx[i] = new double[2];
+
+    double duna_dx[2][2];
+    getInterpVelDer(na, dphi_dx, du_dx, duPrev_dx);
+    for (int i = 0; i <2; i++){
+        for (int j = 0; j < 2; j++){
+            duna_dx[i][j] = alpha_f * du_dx[i][j] + (1. - alpha_f) * duPrev_dx[i][j];
+        };
+    };
+
+    //Mesh velocity derivatives
+    double **duMesh_dx;
+    duMesh_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duMesh_dx[i] = new double[2];
+
+    double **duMeshPrev_dx;
+    duMeshPrev_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duMeshPrev_dx[i] = new double[2];
+
+    double dumeshna_dx[2][2];
+    getInterpMeshVelDer(na, dphi_dx, duMesh_dx, duMeshPrev_dx);
+    for (int i = 0; i <2; i++){
+        for (int j = 0; j < 2; j++){
+            dumeshna_dx[i][j] = alpha_f * duMesh_dx[i][j] + (1. - alpha_f) * duMeshPrev_dx[i][j];
+        };
+    };
+
+    double lambda1[12][12] = {};
+    double lambda0[12][18] = {};
+    double convec[12][12] = {};
+    double iner[12][12] = {};
+    double visc[12][12] = {};
+    double press[12][12] = {};
+    double gradlambda[12][12] = {};
+
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+
+           //inercia matrix
+            iner[2*i][2*j] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * alpha_m;
+            iner[2*i+1][2*j+1] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * alpha_m;
+
+            //convecction matrix
+            double convec1 = (dphi_dx[0][i] * ((una_[0] - umeshna_[0]) * ddphi_dx[0][0][j] + (duna_dx[0][0] - dumeshna_dx[0][0]) * dphi_dx[0][j] + 
+                                               (una_[1] - umeshna_[1]) * ddphi_dx[1][0][j] + (duna_dx[1][0] - dumeshna_dx[1][0]) * dphi_dx[1][j]) +  
+                              dphi_dx[1][i] * ((una_[0] - umeshna_[0]) * ddphi_dx[0][1][j] + (duna_dx[0][1] - dumeshna_dx[0][1]) * dphi_dx[0][j] + 
+                                               (una_[1] - umeshna_[1]) * ddphi_dx[1][1][j] + (duna_dx[1][1] - dumeshna_dx[1][1]) * dphi_dx[1][j]));
+
+            convec[2*i][2*j] += convec1 * alpha_f * gamma * dTime_;
+            convec[2*i+1][2*j+1] += convec1 * alpha_f * gamma * dTime_;
+
+            //pressure term
+            press[2*i][j] += (dphi_dx[0][i] * ddphi_dx[0][0][j] + dphi_dx[1][i] * ddphi_dx[1][0][j])/dens_;
+            press[2*i+1][j] += (dphi_dx[0][i] * ddphi_dx[0][1][j] + dphi_dx[1][i] * ddphi_dx[1][1][j])/dens_;
+
+            gradlambda[2*i][2*j] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j])/dens_*k1;
+            gradlambda[2*i+1][2*j+1] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j])/dens_*k1;
+        
+            // viscosity
+            visc[2*i][2*j]     += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * (2. * ddphi_dx[0][0][j] + ddphi_dx[1][1][j]) * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i][2*j+1]   += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * ddphi_dx[0][1][j] * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i+1][2*j]   += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * ddphi_dx[1][0][j] * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i+1][2*j+1] += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * (2. * ddphi_dx[1][1][j] + ddphi_dx[0][0][j]) * visc_ * alpha_f * gamma * dTime_;
+
+            // lagrange multipliers
+            lambda1[2*i][2*j] += phi_[i] * phi_[j] * k1;
+            lambda1[2*i+1][2*j+1] += phi_[i] * phi_[j] * k1;
+        };
+
+        for (int j = 0; j < 9; j++)
+        {
+            // lagrange multipliers
+            lambda0[2*i][2*j] += phi_[i] * phiC_[j] * k1;
+            lambda0[2*i+1][2*j+1] += phi_[i] * phiC_[j] * k1;
+        };
+
+    };
+
+    double normLambda0 = 0.;
+    double normLambda1 = 0.;
+    double normConvec = 0.;
+    double normIner = 0.;
+    double normVisc = 0.;
+    double normPress = 0.;
+    double normGradLambda = 0.;
+
+    for (int i = 0; i < 12; i++)
+    {
+        for (int j = 0; j < 12; j++){
+            normLambda1 += lambda1[i][j] * lambda1[i][j];
+            normConvec += convec[i][j] * convec[i][j];
+            normIner += iner[i][j] * iner[i][j];
+            normVisc += visc[i][j] * visc[i][j];
+            normPress += press[i][j] * press[i][j];
+            normGradLambda += gradlambda[i][j] * gradlambda[i][j];
+        }
+        for (int j = 0; j < 18; j++){
+            normLambda0 += lambda0[i][j] * lambda0[i][j];
+        };
+    };
+
+    normLambda0 = sqrt(normLambda0);
+    normLambda1 = sqrt(normLambda1);
+    normConvec = sqrt(normConvec);
+    normIner = sqrt(normIner);
+    normVisc = sqrt(normVisc);
+    normPress = sqrt(normPress);
+    normGradLambda = sqrt(normGradLambda);
+
+    if (fabs(normIner) <= 1.e-10)
+        normIner = 1.e-10;
+    if (fabs(normVisc) <= 1.e-10)
+        normVisc = 1.e-10;
+    if (fabs(normPress) <= 1.e-10)
+        normPress = 1.e-10;
+    if (fabs(normConvec) <= 1.e-10)
+        normConvec = 1.e-10;
+    if (fabs(normGradLambda) <= 1.e-10)
+        normGradLambda = 1.e-10;
+
+    double tA1 = std::fabs(normLambda1) / std::fabs(normConvec);
+    double tA2 = std::fabs(normLambda0) / std::fabs(normConvec);
+    double tB1 = std::fabs(normLambda1) / std::fabs(normIner);
+    double tB2 = std::fabs(normLambda0) / std::fabs(normIner);
+    double tC1 = std::fabs(normLambda1) / std::fabs(normVisc);
+    double tC2 = std::fabs(normLambda0) / std::fabs(normVisc);
+    double tD1 = std::fabs(normLambda1) / std::fabs(normPress);
+    double tD2 = std::fabs(normLambda0) / std::fabs(normPress);
+    double tE1 = std::fabs(normLambda1) / std::fabs(normGradLambda);
+    double tE2 = std::fabs(normLambda0) / std::fabs(normGradLambda);
+    if(tE1>1.)tE1=0.0000000001;
+    if(tE2>1.)tE2=0.0000000001;
+
+    double tA = 1. / sqrt(1. / (tA1 * tA1) + 1. / (tA2 * tA2));
+
+    double tB = 1. / sqrt(1. / (tB1 * tB1) + 1. / (tB2 * tB2));
+
+    double tC = 1. / sqrt(1. / (tC1 * tC1) + 1. / (tC2 * tC2));
+
+    double tD = 1. / sqrt(1. / (tD1 * tD1) + 1. / (tD2 * tD2));
+
+    double tE = 1. / sqrt(1. / (tE1 * tE1) + 1. / (tE2 * tE2));
+
+    tARLQ_ = 1. / sqrt(1. / (tA * tA) +
+                        1. / (tB * tB) +
+                        1. / (tC * tC) +
+                        1. / (tE * tE) +
+                        1. / (tD * tD));  
+
+    //deallocating memory
+    for (int i = 0; i < 2; ++i) delete[] du_dx[i];
+    delete[] du_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duPrev_dx[i];
+    delete[] duPrev_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duMesh_dx[i];
+    delete[] duMesh_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duMeshPrev_dx[i];
+    delete[] duMeshPrev_dx;
 
 };
 
@@ -4974,8 +5172,19 @@ void Element<2>::getLagrangeMultipliersSameMeshArlqStab_FEM(int &index, int &ipa
     // Computes the coqrse shape functions
     shapeQuad.evaluateIso(xsiC, phiC_, wpcC, incC_, (*iparametersC), NpatchC_);
 
-    getParameterArlequin2_FEM(index, djac_, weight_, tARLQ_, phi_, phiC_, dphi_dx, ddphi_dx);
-    // getParameterArlequin_FEM(tARLQ_,phi_,dphi_dx);
+    
+    // Computes tARLQ_
+    //old way
+     // getParameterArlequin_FEM(tARLQ_,phi_,dphi_dx);
+   
+    //Vector norm
+    // getParameterArlequin2_FEM(index, djac_, weight_, tARLQ_, phi_, phiC_, dphi_dx, ddphi_dx);
+   
+    //matriz norm
+    getParameterArlequinMN_FEM(index, djac_, weight_, tARLQ_, phi_, phiC_, dphi_dx, ddphi_dx);
+
+    //by Elemnt matriz norm
+    // tARLQ_ = tARLQEL_;
 
     // Computes matrixes and vectors
     int na = 6;
@@ -5087,6 +5296,289 @@ void Element<2>::getLagrangeMultipliersSameMeshArlqStab_FEM(int &index, int &ipa
 // return;
 
 // };
+
+
+template<>
+void Element<2>::getParameterArlequinElem(double &tarlq, int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                          std::vector<IParameters *> &iparamC){
+
+    // quadrature and functions local classes
+    NormalQuad nQuad = NormalQuad();
+    QuadShapeFunction<2> shapeQuad;
+
+    // Data for IGA coarse mesh computation
+    nodesC_ = &nodesCoarse_;
+    connectC_ = connecC;
+    NpatchC_ = ipatchC;
+    iparametersC = &iparamC;
+    double wpcC[9], xsiC[2], phiC_[9];
+    for (int i = 0; i < 9; i++) wpcC[i] = (*nodesC_)[connectC_[i]]->getWeightPC();
+    int *incC_ = (*nodesC_)[connectC_[8]]->getINC();
+
+    // data for computation of FEM fine mesh computations
+    double xsi[2], phi_[6], djac_;
+
+    double **dphi_dx;
+    dphi_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) dphi_dx[i] = new double[6];
+
+    double ***ddphi_dx;
+    ddphi_dx = new double **[2];
+    for (int i = 0; i < 2; ++i)
+    {
+        ddphi_dx[i] = new double *[2];
+        for (int j = 0; j < 2; j++)
+            ddphi_dx[i][j] = new double[6];
+    };
+
+    double **ainv_;
+    ainv_ = new double *[2];
+    for (int i = 0; i < 2; ++i) ainv_[i] = new double[2];
+
+    double **Jac;
+    Jac = new double *[2];
+    for (int i = 0; i < 2; ++i) Jac[i] = new double[2];
+
+    // Defines the integration points adimentional coordinates
+    xsi[0] = nQuad.PointListFem(index, 0);
+    xsi[1] = nQuad.PointListFem(index, 1);
+
+    // Computes the shape functions
+    shapeQuad.evaluateFem(xsi, phi_);
+
+    // Computes the jacobian matrix
+    getJacobianMatrix_FEM(djac_, xsi, Jac, ainv_);
+
+    // Computes spatial derivatives
+    getSpatialDerivatives_FEM(xsi, ainv_, dphi_dx);
+
+    // Computes spatial second derivatives
+    getSecondSpatialDerivatives_FEM(ainv_, ddphi_dx);
+
+    // Integration point in the coarse mesh element
+    for (int k = 0; k < 2; k++)
+        xsiC[k] = intPointCorrespXsi_FEM[index][k];
+
+    // Computes the coqrse shape functions
+    shapeQuad.evaluateIso(xsiC, phiC_, wpcC, incC_, (*iparametersC), NpatchC_);
+
+
+    //computing tARLQ
+
+    double &alpha_f = parameters->getAlphaF();
+    double &alpha_m = parameters->getAlphaM();
+    double &gamma = parameters-> getGamma();
+    double &visc_ = parameters->getViscosity();
+    double &dens_ = parameters->getDensity();
+    double &dTime_ = parameters->getTimeStep();    
+    double &k1 = parameters->getArlequinK1();
+
+    // Interpolated variables
+    int na = 6;
+
+    //Velocity
+    double u_[2], uPrev_[2], una_[2];
+    getInterpVel(na, phi_, u_, uPrev_);
+    for (int i = 0; i < 2; i++) una_[i] = alpha_f * u_[i] + (1. - alpha_f) * uPrev_[i];
+
+    //Mesh Velocity
+    double uMesh_[2], uMeshPrev_[2], umeshna_[2];
+    getInterpMeshVel(na, phi_, uMesh_, uMeshPrev_);
+    for (int i = 0; i < 2; i++) umeshna_[i] = alpha_f * uMesh_[i] + (1. - alpha_f) * uMeshPrev_[i];
+
+    //Velocity Derivatives
+    double **du_dx;
+    du_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) du_dx[i] = new double[2];
+
+    double **duPrev_dx;
+    duPrev_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duPrev_dx[i] = new double[2];
+
+    double duna_dx[2][2];
+    getInterpVelDer(na, dphi_dx, du_dx, duPrev_dx);
+    for (int i = 0; i <2; i++){
+        for (int j = 0; j < 2; j++){
+            duna_dx[i][j] = alpha_f * du_dx[i][j] + (1. - alpha_f) * duPrev_dx[i][j];
+        };
+    };
+
+    //Mesh velocity derivatives
+    double **duMesh_dx;
+    duMesh_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duMesh_dx[i] = new double[2];
+
+    double **duMeshPrev_dx;
+    duMeshPrev_dx = new double *[2];
+    for (int i = 0; i < 2; ++i) duMeshPrev_dx[i] = new double[2];
+
+    double dumeshna_dx[2][2];
+    getInterpMeshVelDer(na, dphi_dx, duMesh_dx, duMeshPrev_dx);
+    for (int i = 0; i <2; i++){
+        for (int j = 0; j < 2; j++){
+            dumeshna_dx[i][j] = alpha_f * duMesh_dx[i][j] + (1. - alpha_f) * duMeshPrev_dx[i][j];
+        };
+    };
+
+    double lambda1[12][12] = {};
+    double lambda0[12][18] = {};
+    double convec[12][12] = {};
+    double iner[12][12] = {};
+    double visc[12][12] = {};
+    double press[12][12] = {};
+    double gradlambda[12][12] = {};
+
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+
+           //inercia matrix
+            iner[2*i][2*j] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * alpha_m;
+            iner[2*i+1][2*j+1] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j]) * alpha_m;
+
+            //convecction matrix
+            double convec1 = (dphi_dx[0][i] * ((una_[0] - umeshna_[0]) * ddphi_dx[0][0][j] + (duna_dx[0][0] - dumeshna_dx[0][0]) * dphi_dx[0][j] + 
+                                               (una_[1] - umeshna_[1]) * ddphi_dx[1][0][j] + (duna_dx[1][0] - dumeshna_dx[1][0]) * dphi_dx[1][j]) +  
+                              dphi_dx[1][i] * ((una_[0] - umeshna_[0]) * ddphi_dx[0][1][j] + (duna_dx[0][1] - dumeshna_dx[0][1]) * dphi_dx[0][j] + 
+                                               (una_[1] - umeshna_[1]) * ddphi_dx[1][1][j] + (duna_dx[1][1] - dumeshna_dx[1][1]) * dphi_dx[1][j]));
+
+            convec[2*i][2*j] += convec1 * alpha_f * gamma * dTime_;
+            convec[2*i+1][2*j+1] += convec1 * alpha_f * gamma * dTime_;
+
+            //pressure term
+            press[2*i][j] += (dphi_dx[0][i] * ddphi_dx[0][0][j] + dphi_dx[1][i] * ddphi_dx[1][0][j])/dens_;
+            press[2*i+1][j] += (dphi_dx[0][i] * ddphi_dx[0][1][j] + dphi_dx[1][i] * ddphi_dx[1][1][j])/dens_;
+
+            gradlambda[2*i][2*j] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j])/dens_*k1;
+            gradlambda[2*i+1][2*j+1] += (dphi_dx[0][i] * dphi_dx[0][j] + dphi_dx[1][i] * dphi_dx[1][j])/dens_*k1;
+        
+            // viscosity
+            visc[2*i][2*j]     += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * (2. * ddphi_dx[0][0][j] + ddphi_dx[1][1][j]) * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i][2*j+1]   += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * ddphi_dx[0][1][j] * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i+1][2*j]   += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * ddphi_dx[1][0][j] * visc_ * alpha_f * gamma * dTime_;
+            visc[2*i+1][2*j+1] += (ddphi_dx[0][0][i] + ddphi_dx[1][1][i]) * (2. * ddphi_dx[1][1][j] + ddphi_dx[0][0][j]) * visc_ * alpha_f * gamma * dTime_;
+
+            // lagrange multipliers
+            lambda1[2*i][2*j] += phi_[i] * phi_[j] * k1;
+            lambda1[2*i+1][2*j+1] += phi_[i] * phi_[j] * k1;
+        };
+
+        for (int j = 0; j < 9; j++)
+        {
+            // lagrange multipliers
+            lambda0[2*i][2*j] += phi_[i] * phiC_[j] * k1;
+            lambda0[2*i+1][2*j+1] += phi_[i] * phiC_[j] * k1;
+        };
+
+    };
+
+    double normLambda0 = 0.;
+    double normLambda1 = 0.;
+    double normConvec = 0.;
+    double normIner = 0.;
+    double normVisc = 0.;
+    double normPress = 0.;
+    double normGradLambda = 0.;
+
+    for (int i = 0; i < 12; i++)
+    {
+        for (int j = 0; j < 12; j++){
+            normLambda1 += lambda1[i][j] * lambda1[i][j];
+            normConvec += convec[i][j] * convec[i][j];
+            normIner += iner[i][j] * iner[i][j];
+            normVisc += visc[i][j] * visc[i][j];
+            normPress += press[i][j] * press[i][j];
+            normGradLambda += gradlambda[i][j] * gradlambda[i][j];
+        }
+        for (int j = 0; j < 18; j++){
+            normLambda0 += lambda0[i][j] * lambda0[i][j];
+        };
+    };
+
+    normLambda0 = sqrt(normLambda0);
+    normLambda1 = sqrt(normLambda1);
+    normConvec = sqrt(normConvec);
+    normIner = sqrt(normIner);
+    normVisc = sqrt(normVisc);
+    normPress = sqrt(normPress);
+    normGradLambda = sqrt(normGradLambda);
+
+    if (fabs(normIner) <= 1.e-10)
+        normIner = 1.e-10;
+    if (fabs(normVisc) <= 1.e-10)
+        normVisc = 1.e-10;
+    if (fabs(normPress) <= 1.e-10)
+        normPress = 1.e-10;
+    if (fabs(normConvec) <= 1.e-10)
+        normConvec = 1.e-10;
+    if (fabs(normGradLambda) <= 1.e-10)
+        normGradLambda = 1.e-10;
+
+    double tA1 = std::fabs(normLambda1) / std::fabs(normConvec);
+    double tA2 = std::fabs(normLambda0) / std::fabs(normConvec);
+    double tB1 = std::fabs(normLambda1) / std::fabs(normIner);
+    double tB2 = std::fabs(normLambda0) / std::fabs(normIner);
+    double tC1 = std::fabs(normLambda1) / std::fabs(normVisc);
+    double tC2 = std::fabs(normLambda0) / std::fabs(normVisc);
+    double tD1 = std::fabs(normLambda1) / std::fabs(normPress);
+    double tD2 = std::fabs(normLambda0) / std::fabs(normPress);
+    double tE1 = std::fabs(normLambda1) / std::fabs(normGradLambda);
+    double tE2 = std::fabs(normLambda0) / std::fabs(normGradLambda);
+    if(tE1>1.)tE1=0.0000000001;
+    if(tE2>1.)tE2=0.0000000001;
+
+    double tA = 1. / sqrt(1. / (tA1 * tA1) + 1. / (tA2 * tA2));
+
+    double tB = 1. / sqrt(1. / (tB1 * tB1) + 1. / (tB2 * tB2));
+
+    double tC = 1. / sqrt(1. / (tC1 * tC1) + 1. / (tC2 * tC2));
+
+    double tD = 1. / sqrt(1. / (tD1 * tD1) + 1. / (tD2 * tD2));
+
+    double tE = 1. / sqrt(1. / (tE1 * tE1) + 1. / (tE2 * tE2));
+
+    tarlq = 1. / sqrt(1. / (tA * tA) +
+                        1. / (tB * tB) +
+                        1. / (tC * tC) +
+                        1. / (tE * tE) +
+                        1. / (tD * tD));
+
+   
+
+    //deallocating memory
+    for (int i = 0; i < 2; ++i) delete[] du_dx[i];
+    delete[] du_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duPrev_dx[i];
+    delete[] duPrev_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duMesh_dx[i];
+    delete[] duMesh_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] duMeshPrev_dx[i];
+    delete[] duMeshPrev_dx;
+
+
+
+    for (int i = 0; i < 2; ++i) delete[] dphi_dx[i];
+    delete[] dphi_dx;
+
+    for (int i = 0; i < 2; ++i)
+    {
+        for (int j = 0; j < 2; ++j)
+            delete[] ddphi_dx[i][j];
+        delete[] ddphi_dx[i];
+    };
+    delete[] ddphi_dx;
+
+    for (int i = 0; i < 2; ++i) delete[] ainv_[i];
+    delete[] ainv_;
+
+    for (int i = 0; i < 2; ++i) delete[] Jac[i];
+    delete[] Jac;                                        
+
+};
 
 template <>
 void Element<2>::getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *rhsVector1, double *rhsVector2)

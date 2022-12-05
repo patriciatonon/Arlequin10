@@ -20,14 +20,12 @@
 #include<cstdlib>
 #include<fstream>
 #include<iostream>
-#include <math.h>       /* atan */
+#include <math.h>       /* atan */ 
+#include <iomanip> 
 
 // PETSc libraries
 #include <metis.h>
 #include <petscksp.h> 
-
-#include <boost/timer.hpp> 
-#include <boost/thread.hpp>
 
 // Mounts the incompressible flow problems
 template<int DIM>

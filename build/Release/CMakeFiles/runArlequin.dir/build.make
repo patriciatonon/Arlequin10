@@ -236,8 +236,6 @@ runArlequin: CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o
 runArlequin: CMakeFiles/runArlequin.dir/build.make
-runArlequin: /usr/lib/x86_64-linux-gnu/libboost_system.so.1.74.0
-runArlequin: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so.1.74.0
 runArlequin: /home/patricia/mpich-3.4.2/install/lib/libmpicxx.so
 runArlequin: /home/patricia/mpich-3.4.2/install/lib/libmpi.so
 runArlequin: /home/patricia/petsc-3.18.0/arch-linux2-c-opt/lib/libpetsc.so

@@ -14,8 +14,6 @@
 #ifndef ELEMENT_H
 #define ELEMENT_H
 
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/algorithm/minmax_element.hpp>
 #include "Node.h"
 #include "BoundaryIntegrationQuadrature.h"
 #include "BoundaryIntegrationQuadratureIso.h"
@@ -24,7 +22,7 @@
 #include "FluidParameters.h"
 #include "IsogeometricParameters.h"
 
-using namespace boost::numeric;
+#include <algorithm>
 
 // Defines the fluid element object and all the element information
 template<int DIM>
@@ -67,7 +65,7 @@ private:
     //Information for analysis in the gluing zone
     bool                       model;               // Model: true - fine mesh/ false - coarse mesh
     bool                       glueZone;            // Defines if the element is in the gluing zone (true = gluing zone)  
-    
+    double                     tARLQEL_;
 
     // Integration points and element in the coarse mesh correspondent to the fine mesh in gluing zone 
     // double intPointCorrespXsi_ISO[25][DIM];		       
@@ -363,6 +361,8 @@ public:
     void getParameterArlequin_COARSE_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
     void getParameterArlequin2_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, 
                                    double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
+    void getParameterArlequinMN_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, 
+                                   double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
     void getParameterArlequin2_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, 
                                           double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, 
                                           double ***ddphi_dx, double ***ddphiC_dx);
@@ -422,7 +422,11 @@ public:
                                             double *lagrMultVector, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                     std::vector<IParameters *> &iparamC, double **arlequinStabD, 
-                                                    double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);
+                                                    double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);                                              
+    
+    void getParameterArlequinElem(double &tarlq, int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                  std::vector<IParameters *> &iparamC);
+
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
     
     
@@ -476,6 +480,8 @@ public:
     void setTimeStep(int timeStep) {
     	iTimeStep = timeStep;
     }
+
+    void setTarlq(double &tarlq){ tARLQEL_ = tarlq;}
 
 };
 
