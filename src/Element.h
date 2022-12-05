@@ -363,6 +363,9 @@ public:
                                    double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
     void getParameterArlequinMN_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, 
                                    double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
+    void getParameterArlequinMN_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, double *phi_, 
+                                           double *phiC_, double **dphi_dx, double **dphiC_dx, double ***ddphi_dx,
+                                           double ***ddphiC_dx);
     void getParameterArlequin2_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, 
                                           double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, 
                                           double ***ddphi_dx, double ***ddphiC_dx);
