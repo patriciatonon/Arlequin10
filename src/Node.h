@@ -14,13 +14,7 @@
 #ifndef NODE_H
 #define NODE_H
 
-// #include <boost/numeric/ublas/vector.hpp>
-// #include <boost/numeric/ublas/matrix.hpp>
-// #include <boost/numeric/ublas/io.hpp>
-
-
-// using namespace boost::numeric;
-
+#include "DataTypes.h"
 #include<cstdlib>
 #include<fstream>
 #include<iostream>

@@ -72,20 +72,12 @@ private:
     std::vector<IParameters *> *iparameters;
 
     //List of integration points coordinates
-    // double pointCoordSpecial[64][DIM];
-    // double pointCoordSpecial[25][DIM]; //Reduced
     double pointCoordSpecialIso[18*DIM-27][DIM];
-
-    //List of integration points weights
-    // double pointWeightSpecial[64];
-    // double pointWeightSpecial[25]; //Reduced
     double pointWeightSpecialIso[18*DIM-27]; 
 
     double pointCoordSpecialFem[8*DIM-9][DIM];
-    double pointWeightSpecialFem[8*DIM-9]; //Reduced
+    double pointWeightSpecialFem[8*DIM-9]; 
 
-    // double pointCoordSpecialFem[12][DIM];
-    // double pointWeightSpecialFem[12]; 
 };
 
 #endif

@@ -10,7 +10,6 @@
 template<int DIM>
 void QuadShapeFunction<DIM>::basisFunctionsBS(double &xsi, int &deg, double *knot, int &inc, double *phiL){
 
-
     double  uLeft [deg+1];
     double  uRight[deg+1];
     double  uBF[deg+1][deg+1] = {}; // stores de base functions in each direction
@@ -157,53 +156,7 @@ void QuadShapeFunction<2>::evaluateFem(double *xsi, double *phi) const {
      phi[5] = 4.0 * xsi2 * xsi3;
 
      return;
-}
-
-
-template<>
-void QuadShapeFunction<2>::evaluateIso(double *xsi, double *phi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
-    
-
-    std::vector<IParameters_ *> *ipar_ = &iparameters;
-       
-    int degm = (*ipar_)[Npatch] -> getDegree(0);
-    int degn = (*ipar_)[Npatch] -> getDegree(1);
-    int npcm = (*ipar_)[Npatch] -> getNcp(0);
-    int npcn = (*ipar_)[Npatch] -> getNcp(1);   
-    int numLocalBF = (degm+1)*(degn+1);
-
-    double *uknot = (*ipar_)[Npatch]->getuKnot();
-    double *vknot = (*ipar_)[Npatch]->getvKnot(); 
-
-    double  phiL1 [degm+1];
-    double  phiL2 [degn+1];
-    double  phit  [numLocalBF];
-
-
-    basisFunctionsBS(xsi[0],degm,uknot,inc[0],phiL1);
-    basisFunctionsBS(xsi[1],degn,vknot,inc[1],phiL2);
-    
-
-    int index = 0;
-    for (int j = 0; j < degn + 1 ; j ++) {
-        for (int k = 0; k < degm + 1; k ++) {
-            phit[index] = phiL1[k] * phiL2 [j];
-            index ++;
-        }
-    }
-
-    double sum = 0.0;
-    for (int i = 0; i < numLocalBF; i++) {
-        sum += phit[i] * wpcs[i];
-    }
-
-    for (int i = 0; i < numLocalBF; i++) {
-        phi[i] = phit[i] * wpcs[i]/sum;
-    }
-
-    return;
 };
-
 
 template<>
 void QuadShapeFunction<3>::evaluateFem(double *xsi, double *phi) const {
@@ -215,63 +168,77 @@ void QuadShapeFunction<3>::evaluateFem(double *xsi, double *phi) const {
      phi[0] = 2.0 * (xsi1 - 0.50) * xsi1; 
      phi[1] = 2.0 * (xsi2 - 0.50) * xsi2; 
      phi[2] = 2.0 * (xsi3 - 0.50) * xsi3; 
-     phi[3] = (2.0 - 2.0 * xsi3 - 2.0 * xsi2 - 2.0 * xsi1 - 1.0)  \
-              * (1.0 - xsi1 - xsi2 - xsi3); 
+     phi[3] = (2.0 - 2.0 * xsi3 - 2.0 * xsi2 - 2.0 * xsi1 - 1.0) * (1.0 - xsi1 - xsi2 - xsi3); 
      phi[4] = 4.0 * xsi1 * xsi2; 
      phi[5] = 4.0 * xsi2 * xsi3;
      phi[6] = 4.0 * xsi1 * xsi3;
      phi[7] = 4.0 * xsi1 * (1.0 - xsi1 - xsi2 - xsi3);
      phi[8] = 4.0 * xsi3 * (1.0 - xsi1 - xsi2 - xsi3);
      phi[9] = 4.0 * xsi2 * (1.0 - xsi1 - xsi2 - xsi3);
-     
-     return;
-}
 
-template<>
-void QuadShapeFunction<3>::evaluateIso(double *xsi, double *phi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
+     return;
+};
+
+
+template<int DIM>
+void QuadShapeFunction<DIM>::evaluateIso(double *xsi, double *phi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
     
     std::vector<IParameters_ *> *ipar_ = &iparameters;
-       
-    int degm = (*ipar_)[Npatch] -> getDegree(0);
-    int degn = (*ipar_)[Npatch] -> getDegree(1);
-    int degq = (*ipar_)[Npatch] -> getDegree(2);
-    int npcm = (*ipar_)[Npatch] -> getNcp(0);
-    int npcn = (*ipar_)[Npatch] -> getNcp(1);   
-    int npcq = (*ipar_)[Npatch] -> getNcp(2); 
 
-    int numLocalBF = (degm+1)*(degn+1)*(degq+1);
+    int deg[DIM],npc[DIM];
 
-    double phiL1 [degm+1];
-    double phiL2 [degn+1];
-    double phiL3 [degq+1];
+    for (int i = 0; i < DIM; i++){
+        deg[i] = (*ipar_)[Npatch] -> getDegree(i);
+        npc[i] = (*ipar_)[Npatch] -> getNcp(i);
+    };
+
+    int numLocalBF = 1.;
+
+    for (int i = 0; i < DIM; i++){
+        numLocalBF *= (deg[i]+1);
+    }
+
+    //assuming same functions degree in all directions
+    double phiL [DIM][deg[0]+1];
     double phit  [numLocalBF];
 
-    double *uknot = (*ipar_)[Npatch]->getuKnot();
-    double *vknot = (*ipar_)[Npatch]->getvKnot(); 
-    double *tknot = (*ipar_)[Npatch]->gettKnot(); 
-
-    basisFunctionsBS(xsi[0],degm,uknot,inc[0],phiL1);
-    basisFunctionsBS(xsi[1],degn,vknot,inc[1],phiL2);
-    basisFunctionsBS(xsi[2],degq,tknot,inc[2],phiL3);
-
-
-    int index = 0;
-    for (int i = 0; i < degq + 1; i++){
-        for (int j = 0; j < degn + 1 ; j ++) {
-            for (int k = 0; k < degm + 1; k ++) {
-                phit[index] = phiL1[k] * phiL2 [j] * phiL3[i];
-                index ++;
-            };
+    for (int i = 0; i < DIM; i++){
+        int size = deg[i]+npc[i]+1;
+        double knot[size];
+        (*ipar_)[Npatch] -> getKnot(i,size,knot);
+        double phil[deg[i]+1];
+        basisFunctionsBS(xsi[i],deg[i],knot,inc[i],phil);
+        for (int j = 0; j < deg[i]+1; j++){
+            phiL[i][j] = phil[j];
         };
     };
-        
-    double sum = 0.0;
+    
+    int index = 0;
+    if(DIM == 2){
+        for (int j = 0; j< deg[1]+1; j ++) {
+            for (int k = 0; k < deg[0]+1; k ++) {
+                phit[index] = phiL[0][k] * phiL[1][j];           
+                index ++;
+            };
+        };  
+    } else { //DIM = 3
+        for (int i = 0; i < deg[2]+1 ; i++){
+            for (int j = 0; j< deg[1]+1; j ++) {
+                for (int k = 0; k < deg[0]+1; k ++) {
+                    phit[index] = phiL[0][k] * phiL[1][j] * phiL[2][i];                
+                    index ++;
+                };
+            }; 
+        };
+    };
+
+    double sumF = 0.0;
     for (int i = 0; i < numLocalBF; i++) {
-        sum += phit[i] * wpcs[i];
+        sumF += phit[i] * wpcs[i];
     };
 
     for (int i = 0; i < numLocalBF; i++) {
-        phi[i] = phit[i] * wpcs[i]/sum;
+        for (int j = 0; j < DIM; j++) phi[i] = phit[i] * wpcs[i]/ (sumF * sumF); 
     };
 
     return;
@@ -308,80 +275,14 @@ void QuadShapeFunction<2>::evaluateGradientFem(double *xsi, double **dphi) const
 
      
     return;
-}
-
-template<>
-void QuadShapeFunction<2>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
-
-    std::vector<IParameters_ *> *ipar_ = &iparameters;
-      
-    int degm = (*ipar_)[Npatch] -> getDegree(0);
-    int degn = (*ipar_)[Npatch] -> getDegree(1);
-    int npcm = (*ipar_)[Npatch] -> getNcp(0);
-    int npcn = (*ipar_)[Npatch] -> getNcp(1);  
- 
-    int numLocalBF = (degm+1)*(degn+1);
-
-    double phiL1 [degm+1];
-    double phiL2 [degn+1];
-    double phit  [numLocalBF];
-    double dphiL1[degm+1];
-    double dphiL2[degn+1];
-    double dphit [2][numLocalBF];
-
-    double *uknot = (*ipar_)[Npatch] -> getuKnot();
-    double *vknot = (*ipar_)[Npatch] -> getvKnot();  
-
-    basisFunctionsBS(xsi[0],degm,uknot,inc[0],phiL1);
-    basisFunctionsBS(xsi[1],degn,vknot,inc[1],phiL2);
-
-    int index = 0;
-    for (int j = 0; j< (degn + 1) ; j ++) {
-        for (int k = 0; k < (degm + 1); k ++) {
-            phit[index] = phiL1[k] * phiL2 [j];
-            index ++;
-        };
-    };
-
-    int degree = 1; //firs derivative
-
-    derBasisFunctionsBS(degree,xsi[0],degm,uknot,inc[0],dphiL1);
-    derBasisFunctionsBS(degree,xsi[1],degn,vknot,inc[1],dphiL2);
-
-    index = 0;
-    for (int j = 0; j< (degn + 1) ; j ++) {
-        for (int k = 0; k < (degm + 1); k ++) {
-            dphit[0][index] = dphiL1[k] * phiL2 [j];
-            dphit[1][index] = phiL1[k] * dphiL2 [j];
-            index ++;
-        };
-    };
-
-    double sum = 0.0;
-    double sum1 = 0.0;
-    double sum2 = 0.0;
-    
-    for (int i = 0; i < numLocalBF; i++) {
-        sum += phit[i] * wpcs[i];
-        sum1 += dphit[0][i] * wpcs[i];
-        sum2 += dphit[1][i] * wpcs[i];
-    };
-
-    for (int i = 0; i < numLocalBF; i++) {
-        dphi[0][i] = ((dphit[0][i] * wpcs[i] * sum - phit[i] * wpcs[i] * sum1) / (sum * sum)); 
-        dphi[1][i] = ((dphit[1][i] * wpcs[i] * sum - phit[i] * wpcs[i] * sum2) / (sum * sum)); 
-    };
-
-    return;
 };
- 
 
 template<>
 void QuadShapeFunction<3>::evaluateGradientFem(double *xsi, double **dphi) const {
 
-     const double xsi1 = xsi[0];
-     const double xsi2 = xsi[1];
-     const double xsi3 = xsi[2];
+    const double xsi1 = xsi[0];
+    const double xsi2 = xsi[1];
+    const double xsi3 = xsi[2];
 
      dphi[0][0] = 4. * xsi1 - 1.;
      dphi[1][0] = 0.;
@@ -423,91 +324,95 @@ void QuadShapeFunction<3>::evaluateGradientFem(double *xsi, double **dphi) const
      dphi[1][9] = 4. * (1. - 2. * xsi2 - xsi1 - xsi3);
      dphi[2][9] = -4. * xsi2;
 
-     
-    return;
-}
-
-template<>
-void QuadShapeFunction<3>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
+};
 
 
-    std::vector<IParameters_ *> *ipar_;  // isogeometric parameters
-    ipar_ = &iparameters;
-       
-    int degm = (*ipar_)[Npatch] -> getDegree(0);
-    int degn = (*ipar_)[Npatch] -> getDegree(1);
-    int degq = (*ipar_)[Npatch] -> getDegree(2);
-    int npcm = (*ipar_)[Npatch] -> getNcp(0);
-    int npcn = (*ipar_)[Npatch] -> getNcp(1);  
-    int npcq = (*ipar_)[Npatch] -> getNcp(2);
- 
-    int numLocalBF = (degm+1)*(degn+1)*(degq+1);
+template<int DIM>
+void QuadShapeFunction<DIM>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
 
-    double phiL1 [degm+1];
-    double phiL2 [degn+1];
-    double phiL3 [degq+1];
+    std::vector<IParameters_ *> *ipar_ = &iparameters;
+
+    int deg[DIM],npc[DIM];
+
+    for (int i = 0; i < DIM; i++){
+        deg[i] = (*ipar_)[Npatch] -> getDegree(i);
+        npc[i] = (*ipar_)[Npatch] -> getNcp(i);
+    };
+
+    int numLocalBF = 1.;
+
+    for (int i = 0; i < DIM; i++){
+        numLocalBF *= (deg[i]+1);
+    }
+
+    //assuming same functions degree in all directions
+    double phiL [DIM][deg[0]+1];
+    double dphiL[DIM][deg[0]+1];
     double phit  [numLocalBF];
-    double dphiL1[degm+1];
-    double dphiL2[degn+1];
-    double dphiL3[degq+1];
-    double dphit [3][numLocalBF];
+    double dphit [DIM][numLocalBF];
 
-    double *uknot = (*ipar_)[Npatch] ->  getuKnot();
-    double *vknot = (*ipar_)[Npatch] ->  getvKnot();  
-    double *tknot = (*ipar_)[Npatch] ->  gettKnot();
 
-    basisFunctionsBS(xsi[0],degm,uknot,inc[0],phiL1);
-    basisFunctionsBS(xsi[1],degn,vknot,inc[1],phiL2);
-    basisFunctionsBS(xsi[2],degq,tknot,inc[2],phiL3);
+    for (int i = 0; i < DIM; i++){
+        int size = deg[i]+npc[i]+1;
+        double knot[size];
+        (*ipar_)[Npatch] -> getKnot(i,size,knot);
+        double phil[deg[i]+1], dphil[deg[i]+1];
+        basisFunctionsBS(xsi[i],deg[i],knot,inc[i],phil);
+        int degree = 1;
+        derBasisFunctionsBS(degree,xsi[i],deg[i],knot,inc[i],dphil);
+        for (int j = 0; j < deg[i]+1; j++){
+            phiL[i][j] = phil[j];
+            dphiL[i][j] = dphil[j];
+        };
+    };
 
     int index = 0;
-    for (int i = 0; i< (degq + 1) ; i ++) {
-        for (int j = 0; j< (degn + 1) ; j ++) {
-            for (int k = 0; k < (degm + 1); k ++) {
-                phit[index] = phiL1[k] * phiL2 [j] * phiL3 [i];
+    if (DIM == 2) {
+        for (int j = 0; j< deg[1]+1; j ++) {
+            for (int k = 0; k < deg[0]+1; k ++) {
+            
+                phit[index] = phiL[0][k] * phiL[1][j];
+
+                dphit[0][index] = dphiL[0][k] * phiL[1][j];
+                dphit[1][index] = phiL[0][k] * dphiL[1][j];
+                
                 index ++;
             };
+        }; 
+    } else { //DIM = 3
+        for (int i = 0; i < deg[2]+1 ; i++){
+            for (int j = 0; j< deg[1]+1; j ++) {
+                for (int k = 0; k < deg[0]+1; k ++) {
+                
+                    phit[index] = phiL[0][k] * phiL[1][j] * phiL[2][i];
+
+                    dphit[0][index] = dphiL[0][k] * phiL[1][j] * phiL[2][i];
+                    dphit[1][index] = phiL[0][k] * dphiL[1][j] * phiL[2][i];
+                    dphit[1][index] = phiL[0][k] * phiL[1][j] * dphiL[2][i];
+                    
+                    index ++;
+                };
+            }; 
         };
     };
-        
-    int degree = 1; //first derivative
-    derBasisFunctionsBS(degree,xsi[0],degm,uknot,inc[0],dphiL1);
-    derBasisFunctionsBS(degree,xsi[1],degn,vknot,inc[1],dphiL2);
-    derBasisFunctionsBS(degree,xsi[2],degq,tknot,inc[2],dphiL3);
+     
+    double sumF = 0.0;
+    double sumDer[DIM] = {};
 
-    index = 0;
-    for (int i = 0; i< (degq + 1) ; i ++) {
-        for (int j = 0; j< (degn + 1) ; j ++) {
-            for (int k = 0; k < (degm + 1); k ++) {
-                dphit[0][index] = dphiL1[k] * phiL2 [j] * phiL3 [i];
-                dphit[1][index] = phiL1[k] * dphiL2 [j] * phiL3 [i];
-                dphit[2][index] = phiL1[k] * phiL2 [j] * dphiL3 [i];
-                index ++;
-            };
-        };
-    };
-    
-
-    double sum = 0.0;
-    double sum1 = 0.0;
-    double sum2 = 0.0;
-    double sum3 = 0.0;
-    
     for (int i = 0; i < numLocalBF; i++) {
-        sum += phit[i] * wpcs[i];
-        sum1 += dphit[0][i] * wpcs[i];
-        sum2 += dphit[1][i] * wpcs[i];
-        sum3 += dphit[2][i] * wpcs[i];
+        sumF += phit[i] * wpcs[i];
+        for (int j = 0; j < DIM; j++){
+            sumDer[j] += dphit[j][i] * wpcs[i];
+        };
     };
 
     for (int i = 0; i < numLocalBF; i++) {
-        dphi[0][i] = ((dphit[0][i] * wpcs[i] * sum - phit[i] * wpcs[i] * sum1) / (sum * sum)); 
-        dphi[1][i] = ((dphit[1][i] * wpcs[i] * sum - phit[i] * wpcs[i] * sum2) / (sum * sum)); 
-        dphi[2][i] = ((dphit[2][i] * wpcs[i] * sum - phit[i] * wpcs[i] * sum3) / (sum * sum)); 
+        for (int j = 0; j < DIM; j++) dphi[j][i] = ((dphit[j][i] * wpcs[i] * sumF - phit[i] * wpcs[i] * sumDer[j]) / (sumF * sumF)); 
     };
 
     return;
 };
+
 
 template<>
 void QuadShapeFunction<2>::evaluateHessianFem(double ***ddphi){
@@ -544,114 +449,265 @@ void QuadShapeFunction<2>::evaluateHessianFem(double ***ddphi){
 
 };
 
+
 template<>
-void QuadShapeFunction<2>::evaluateHessianIso(double *xsi, double*** ddphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch){
+void QuadShapeFunction<3>::evaluateHessianFem(double ***ddphi){
 
+    ddphi[0][0][0] = 4.;
+    ddphi[0][1][0] = 0.;
+    ddphi[0][2][0] = 0.;
+
+    ddphi[1][0][0] = 0.;
+    ddphi[1][1][0] = 0.;
+    ddphi[1][2][0] = 0.;
+
+    ddphi[2][0][0] = 0.;
+    ddphi[2][1][0] = 0.;
+    ddphi[2][2][0] = 0.;
+
+
+    ddphi[0][0][1] = 0.;
+    ddphi[0][1][1] = 0.;
+    ddphi[0][2][1] = 0.;
+
+    ddphi[1][0][1] = 0.;
+    ddphi[1][1][1] = 4.;
+    ddphi[1][2][1] = 0.;
+
+    ddphi[2][0][1] = 0.;
+    ddphi[2][1][1] = 0.;
+    ddphi[2][2][1] = 0.;
+
+    
+    ddphi[0][0][2] = 0.;
+    ddphi[0][1][2] = 0.;
+    ddphi[0][2][2] = 0.;
+
+    ddphi[1][0][2] = 0.;
+    ddphi[1][1][2] = 0.;
+    ddphi[1][2][2] = 0.;
+
+    ddphi[2][0][2] = 0.;
+    ddphi[2][1][2] = 0.;
+    ddphi[2][2][2] = 4.;
+
+
+    ddphi[0][0][3] = 4.;
+    ddphi[0][1][3] = 4.;
+    ddphi[0][2][3] = 4.;
+
+    ddphi[1][0][3] = 4.;
+    ddphi[1][1][3] = 4.;
+    ddphi[1][2][3] = 4.;
+
+    ddphi[2][0][3] = 4.;
+    ddphi[2][1][3] = 4.;
+    ddphi[2][2][3] = 4.;
+
+
+    ddphi[0][0][4] = 0.;
+    ddphi[0][1][4] = 4.;
+    ddphi[0][2][4] = 0.;
+
+    ddphi[1][0][4] = 4.;
+    ddphi[1][1][4] = 0.;
+    ddphi[1][2][4] = 0.;
+
+    ddphi[2][0][4] = 0.;
+    ddphi[2][1][4] = 0.;
+    ddphi[2][2][4] = 0.;
+
+    
+    ddphi[0][0][5] = 0.;
+    ddphi[0][1][5] = 0.;
+    ddphi[0][2][5] = 0.;
+
+    ddphi[1][0][5] = 0.;
+    ddphi[1][1][5] = 0.;
+    ddphi[1][2][5] = 4.;
+
+    ddphi[2][0][5] = 0.;
+    ddphi[2][1][5] = 4.;
+    ddphi[2][2][5] = 0.;
+
+
+    ddphi[0][0][6] = 0.;
+    ddphi[0][1][6] = 0.;
+    ddphi[0][2][6] = 4.;
+
+    ddphi[1][0][6] = 0.;
+    ddphi[1][1][6] = 0.;
+    ddphi[1][2][6] = 0.;
+
+    ddphi[2][0][6] = 4.;
+    ddphi[2][1][6] = 0.;
+    ddphi[2][2][6] = 0.;
+
+
+    ddphi[0][0][7] = -8.;
+    ddphi[0][1][7] = -4.;
+    ddphi[0][2][7] = -4.;
+
+    ddphi[1][0][7] = -4.;
+    ddphi[1][1][7] = 0.;
+    ddphi[1][2][7] = 0.;
+
+    ddphi[2][0][7] = -4.;
+    ddphi[2][1][7] = 0.;
+    ddphi[2][2][7] = 0.;
+
+
+    ddphi[0][0][8] =  0.;
+    ddphi[0][1][8] =  0.;
+    ddphi[0][2][8] = -4.;
+
+    ddphi[1][0][8] =  0.;
+    ddphi[1][1][8] =  0.;
+    ddphi[1][2][8] = -4.;
+
+    ddphi[2][0][8] = -4.;
+    ddphi[2][1][8] = -4.;
+    ddphi[2][2][8] = -8.;
+
+
+    ddphi[0][0][9] = 0.;
+    ddphi[0][1][9] = -4.;
+    ddphi[0][2][9] = 0.;
+    
+    ddphi[1][0][9] =-4.;
+    ddphi[1][0][9] = -8.;
+    ddphi[1][0][9] = -4.;
+    
+    ddphi[2][0][9] = -0.;
+    ddphi[2][0][9] = -4.;
+    ddphi[2][0][9] = 0.;
+
+};
+
+
+template<int DIM>
+void QuadShapeFunction<DIM>::evaluateHessianIso(double *xsi, double*** ddphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch){
+   
     std::vector<IParameters_ *> *ipar_ = &iparameters;
-       
-    int degm = (*ipar_)[Npatch] -> getDegree(0);
-    int degn = (*ipar_)[Npatch] -> getDegree(1);
-    int npcm = (*ipar_)[Npatch] -> getNcp(0);
-    int npcn = (*ipar_)[Npatch] -> getNcp(1); 
 
-    int numLocalBF = (degm+1)*(degn+1);
+    int deg[DIM],npc[DIM];
 
-    double phiL1 [degm+1];
-    double phiL2 [degn+1];
-    double dphiL1 [degm+1];
-    double dphiL2 [degn+1];
-    double ddphiL1 [degm+1];
-    double ddphiL2 [degn+1];
+    for (int i = 0; i < DIM; i++){
+        deg[i] = (*ipar_)[Npatch] -> getDegree(i);
+        npc[i] = (*ipar_)[Npatch] -> getNcp(i);
+    };
+
+    int numLocalBF = 1.;
+
+    for (int i = 0; i < DIM; i++){
+        numLocalBF *= (deg[i]+1);
+    }
+
+    //assuming same functions degree in all directions
+    double phiL [DIM][deg[0]+1];
+    double dphiL[DIM][deg[0]+1];
+    double ddphiL [DIM][deg[0]+1];
     double phit  [numLocalBF];
-    double dphit [2][numLocalBF];
-    double ddphit [2][2][numLocalBF];
+    double dphit [DIM][numLocalBF];
+    double ddphit [DIM][DIM][numLocalBF];
 
-    double *uknot = (*ipar_)[Npatch] ->  getuKnot();
-    double *vknot = (*ipar_)[Npatch] ->  getvKnot();  
 
-    basisFunctionsBS(xsi[0],degm,uknot,inc[0],phiL1);
-    basisFunctionsBS(xsi[1],degn,vknot,inc[1],phiL2);
-
-    int degree = 1; //first derivative
-    derBasisFunctionsBS(degree,xsi[0],degm,uknot,inc[0],dphiL1);
-    derBasisFunctionsBS(degree,xsi[1],degn,vknot,inc[1],dphiL2);
-
-    degree = 2; //second derivatives
-    derBasisFunctionsBS(degree,xsi[0],degm,uknot,inc[0],ddphiL1);
-    derBasisFunctionsBS(degree,xsi[1],degn,vknot,inc[1],ddphiL2);
-
-    int index = 0;
-    for (int j = 0; j<= degn; j ++) {
-        for (int k = 0; k <= degm; k ++) {
-           
-            phit[index] = phiL1[k] * phiL2 [j];
-
-            dphit[0][index] = dphiL1[k] * phiL2 [j];
-            dphit[1][index] = phiL1[k] * dphiL2[j];
-            
-            ddphit[0][0][index] = ddphiL1[k] * phiL2 [j]; 
-            ddphit[0][1][index] = dphiL1[k] * dphiL2[j];
-            ddphit[1][0][index] = dphiL1[k] * dphiL2[j];
-            ddphit[1][1][index] = phiL1[k] * ddphiL2[j];
-
-            index ++;
+    for (int i = 0; i < DIM; i++){
+        int size = deg[i]+npc[i]+1;
+        double knot[size];
+        (*ipar_)[Npatch] -> getKnot(i,size,knot);
+        double phil[deg[i]+1], dphil[deg[i]+1], ddphil[deg[i]+1];
+        basisFunctionsBS(xsi[i],deg[i],knot,inc[i],phil);
+        int degree = 1;
+        derBasisFunctionsBS(degree,xsi[i],deg[i],knot,inc[i],dphil);
+        degree = 2;
+        derBasisFunctionsBS(degree,xsi[i],deg[i],knot,inc[i],ddphil);
+        for (int j = 0; j < deg[i]+1; j++){
+            phiL[i][j] = phil[j];
+            dphiL[i][j] = dphil[j];
+            ddphiL[i][j] = ddphil[j];
         };
     };
 
-    double sumf = 0.0;
-    double sumdqsi = 0.0;
-    double sumdeta = 0.0;
-    double sumdqsi_dqsi = 0.0;
-    double sumdqsi_deta = 0.0;
-    double sumdeta_dqsi = 0.0;
-    double sumdeta_deta = 0.0; 
+    int index = 0;
+    if (DIM == 2){
+        for (int j = 0; j< deg[1]+1; j ++) {
+            for (int k = 0; k < deg[0]+1; k ++) {
+            
+                phit[index] = phiL[0][k] * phiL[1][j];
+
+                dphit[0][index] = dphiL[0][k] * phiL[1][j];
+                dphit[1][index] = phiL[0][k] * dphiL[1][j];
+                
+                ddphit[0][0][index] = ddphiL[0][k] * phiL[1][j]; 
+                ddphit[0][1][index] = dphiL[0][k] * dphiL[1][j];
+                
+                ddphit[1][0][index] = dphiL[0][k] * dphiL[1][j];
+                ddphit[1][1][index] = phiL[0][k] * ddphiL[1][j];
+
+                index ++;
+            };
+        };
+    } else { //DIM = 3
+        for (int i = 0; i < deg[2]+1; i++){
+            for (int j = 0; j< deg[1]+1; j ++) {
+                for (int k = 0; k < deg[0]+1; k ++) {
+                
+                    phit[index] = phiL[0][k] * phiL[1][j] * phiL[2][i];
+
+                    dphit[0][index] = dphiL[0][k] * phiL[1][j] * phiL[2][i];
+                    dphit[1][index] = phiL[0][k] * dphiL[1][j] * phiL[2][i];
+                    dphit[2][index] = phiL[0][k] * phiL[1][j] * dphiL[2][i];
+                    
+                    ddphit[0][0][index] = ddphiL[0][k] * phiL[1][j] * phiL[2][i]; 
+                    ddphit[0][1][index] = dphiL[0][k] * dphiL[1][j] * phiL[2][i];
+                    ddphit[0][2][index] = dphiL[0][k] * phiL[1][j] * dphiL[2][i];
+                
+                    ddphit[1][0][index] = dphiL[0][k] * dphiL[1][j] * phiL[2][i];
+                    ddphit[1][1][index] = phiL[0][k] * ddphiL[1][j] * phiL[2][i];
+                    ddphit[1][1][index] = phiL[0][k] * dphiL[1][j] * dphiL[2][i];
+
+                    ddphit[2][0][index] = dphiL[0][k] * phiL[1][j] * dphiL[2][i];
+                    ddphit[2][1][index] = phiL[0][k] * dphiL[1][j] * dphiL[2][i];
+                    ddphit[2][1][index] = phiL[0][k] * phiL[1][j] * ddphiL[2][i];
+
+                    index ++;
+                };
+            };
+        };
+    };
+  
+    double sumF = 0.0;
+    double sumDer[DIM] = {};
+    double sumSecDer[DIM][DIM] = {};
 
     for (int i = 0; i < numLocalBF; i++) {
-        sumf += phit[i] * wpcs[i];
-        sumdqsi += dphit[0][i] * wpcs[i];
-        sumdeta += dphit[1][i] * wpcs[i];
-        sumdqsi_dqsi += ddphit[0][0][i] * wpcs[i];
-        sumdqsi_deta += ddphit[0][1][i] * wpcs[i];
-        sumdeta_dqsi += ddphit[1][0][i] * wpcs[i];
-        sumdeta_deta += ddphit[1][1][i] * wpcs[i]; 
+        sumF += phit[i] * wpcs[i];
+        for (int j = 0; j < DIM; j++){
+            sumDer[j] += dphit[j][i] * wpcs[i];
+            for (int k = 0; k < DIM; k++){
+                sumSecDer[j][k] += ddphit[j][k][i] * wpcs[i];
+            };
+        };
     };
 
-
-
+    double v_ = sumF * sumF;
     for (int i = 0; i < numLocalBF; i++) {
-
-        double u_ = dphit[0][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdqsi;
-        double ul_ = ddphit[0][0][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdqsi_dqsi;
-        double v_ = sumf * sumf;
-        double vl_ = 2 * sumf * sumdqsi;
-        ddphi[0][0][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
-
-        
-        u_ = dphit[0][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdqsi;;
-        ul_ = ddphit[0][1][i] * wpcs[i] * sumf + dphit[0][i] * wpcs[i] * sumdeta - 
-              dphit[1][i] * wpcs[i] * sumdqsi - phit[i] * wpcs[i] * sumdqsi_deta;
-        v_ = sumf * sumf;
-        vl_ = 2 * sumf * sumdeta;
-        ddphi[0][1][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
-
-
-        u_ = dphit[1][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdeta;;
-        ul_ = ddphit[1][0][i] * wpcs[i] * sumf + dphit[1][i] * wpcs[i] * sumdqsi - 
-              dphit[0][i] * wpcs[i] * sumdeta - phit[i] * wpcs[i] * sumdeta_dqsi;
-        v_ = sumf * sumf;
-        vl_ = 2 * sumf * sumdqsi;
-        ddphi[1][0][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
-
-
-        u_ = dphit[1][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdeta;
-        ul_ = ddphit[1][1][i] * wpcs[i] * sumf - phit[i] * wpcs[i] * sumdeta_deta;
-        v_ = sumf * sumf;
-        vl_ = 2 * sumf * sumdeta;
-        ddphi[1][1][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
+        for (int j = 0; j < DIM; j++){
+            double u_ = dphit[j][i] * wpcs[i] * sumF - phit[i] * wpcs[i] * sumDer[j];
+            for (int k = 0; k < DIM; k++){
+                double ul_ = ddphit[j][k][i] * wpcs[i] * sumF + dphit[j][i] * wpcs[i] * sumDer[k] - 
+                             dphit[k][i] * wpcs[i] * sumDer[j] - phit[i] * wpcs[i] * sumSecDer[j][k];;
+                double vl_ = 2 * sumF * sumDer[k];
+                ddphi[j][k][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
+            };
+        };
     };
 
     return;
 
 };
 
+template class QuadShapeFunction<2>;
+template class QuadShapeFunction<3>;
 

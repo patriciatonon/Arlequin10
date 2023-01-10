@@ -849,25 +849,25 @@ void Arlequin<2>::setSignaledDistance(){
     
 
     //Gambiarra para malha FEM fine
-    // n[0] = 1.;
-    // n[1] = 1.;
+    n[0] = 1.;
+    n[1] = 1.;
 
-    // nodesFine_[6] -> setInnerNormal(n);
+    nodesFine_[6] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = 1.;
+    n[0] = -1.;
+    n[1] = 1.;
 
-    // nodesFine_[8] -> setInnerNormal(n);
+    nodesFine_[8] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = -1.;
+    n[0] = -1.;
+    n[1] = -1.;
 
-    // nodesFine_[17] -> setInnerNormal(n);
+    nodesFine_[17] -> setInnerNormal(n);
     
-    // n[0] = 1.;
-    // n[1] = -1.;
+    n[0] = 1.;
+    n[1] = -1.;
 
-    // nodesFine_[15] -> setInnerNormal(n);
+    nodesFine_[15] -> setInnerNormal(n);
 
 
 
@@ -4012,7 +4012,7 @@ void Arlequin<2>::setMatVecValuesFineISO(){
 };
 
 template<>
-void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
+void Arlequin<2>::setMatVecValuesLagrangeFineFEM_ISO(int &iTimeStep){
 
 	double &alpha_f = parametersFine ->getAlphaF();
 	double &gamma = parametersFine ->getGamma();
@@ -4122,8 +4122,8 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 	    		elementsFine_[jel] -> setTimeStep(iTimeStep);
 	    		elementsFine_[jel] -> getLagrangeMultipliersSameMesh_FEM(ip,elemMatrixLag1,elemVectorLag1_1,elemVectorLag1_2);
 	            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(ip,jacobianNRMatrix,rhsVector);
-	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
-                                                                                 elemStabMatrixD,elemStabVectorD,
+	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
+                                                                                    elemStabMatrixD,elemStabVectorD,
 	    																	        elemStabMatrix1,elemStabVector1);
 
 			
@@ -5836,8 +5836,11 @@ int Arlequin<2>::solveArlequinProblem(int iterNumber, double tolerance) {
             }
             
             //Matrix and vectors - Lagrange multiplieres - FINE MESH
-            if (elemTypeFine == 0){ //FEM fine mesh
-            	setMatVecValuesLagrangeFineFEM(iTimeStep);
+            if (elemTypeFine == 0){ //FEM fine mesh 
+
+
+                //ADICIONAR NOVAS OPÇÕES
+            	setMatVecValuesLagrangeFineFEM_ISO(iTimeStep);
             } else { //IGA fine mesh
             	setMatVecValuesLagrangeFineISO();
             }

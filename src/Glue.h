@@ -24,7 +24,6 @@ private:
     int index_;             //Element Number in the gluing zone
     int elemCorrespondent_; //Correspondent number in the fluid mesh
  
-
 public:
     // Gluing Zone Element constructor
     Glue(int index, int elemCorrespondent){
@@ -48,11 +47,6 @@ public:
     int *getNewConnectivity(){return newconnect_;};
     
 };
-
-
-//------------------------------------------------------------------------------
-//--------------------------------IMPLEMENTATION--------------------------------
-//------------------------------------------------------------------------------
 
 
 #endif

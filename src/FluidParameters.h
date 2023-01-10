@@ -31,25 +31,25 @@ public:
         alpha_f = 1. / (1. + spectralRadius);
         alpha_m = 0.5 * (3. - spectralRadius) / (1. + spectralRadius);
         gamma = 0.5 + alpha_m - alpha_f;
-    }
+    };
 
     // Sets body forces
     void setFieldForce(double *ff){
         for (int i = 0; i < DIM; i++){
             fieldForce[i] = ff[i];
-        }
+        };
     };
-
-    // Sets arlequin parameters 
-    void setArlequink1(double &arlk1) {arlequinK1 = arlk1;};
-    void setArlequink2(double &arlk2) {arlequinK2 = arlk2;};
 
     void setVelocityInf(double *velInf){
         for (int i = 0; i < DIM; i++){
             velocityInf[i] = velInf[i];
         };
     };
-    
+
+    // Sets arlequin parameters 
+    void setArlequink1(double &arlk1) {arlequinK1 = arlk1;};
+    void setArlequink2(double &arlk2) {arlequinK2 = arlk2;};
+
     double& getTimeStep() {return timeStepSize;}
     double& getDensity() {return density;}
     double& getViscosity() {return viscosity;}
@@ -72,11 +72,10 @@ private:
     double alpha_f;
     double gamma;
     double fieldForce [DIM];
+    double velocityInf[DIM];
     double arlequinK1;
     double arlequinK2;
-    double velocityInf[DIM];
 
-    
 };
 
 #endif

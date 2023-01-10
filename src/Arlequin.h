@@ -144,7 +144,7 @@ public:
     void setMatVecValuesCoarseISO();
     void setMatVecValuesFineFEM();
     void setMatVecValuesFineISO();
-    void setMatVecValuesLagrangeFineFEM(int &iTimeStep);
+    void setMatVecValuesLagrangeFineFEM_ISO(int &iTimeStep);
     void setMatVecValuesLagrangeFineISO();
     void setMatVecValuesLagrangeCoarseFEM_FEM();
     void setMatVecValuesLagrangeCoarseFEM_ISO(int &iTimeStep);

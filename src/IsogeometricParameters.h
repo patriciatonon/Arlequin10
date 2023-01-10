@@ -46,17 +46,17 @@ public:
     // Sets the number of elements in each patch - x direction
     void setNumElemPatchx(int numElem) {numElemPatchx = numElem;};
 
-    // Gets the number of elements in each patch - x direction
-    int getNumElemPatchx(){return numElemPatchx;};
-
     // Sets the number of elements in each patch - y direction
     void setNumElemPatchy(int numElem) {numElemPatchy = numElem;};
 
-    // Gets the number of elements in each patch - y direction
-    int getNumElemPatchy(){return numElemPatchy;};
-
     // Sets the number of elements in each patch - z direction
     void setNumElemPatchz(int numElem) {numElemPatchz = numElem;};
+
+        // Gets the number of elements in each patch - x direction
+    int getNumElemPatchx(){return numElemPatchx;};
+
+        // Gets the number of elements in each patch - y direction
+    int getNumElemPatchy(){return numElemPatchy;};
 
     // Gets the number of elements in each patch - z direction
     int getNumElemPatchz(){return numElemPatchz;};
@@ -78,6 +78,17 @@ public:
 
     // Gets the knot vector - t direction
     double* gettKnot(){return tknot_;};
+
+    void getKnot(int dir, int size, double *knot) {
+        
+        for (int i = 0; i < size; i++){
+
+            if (dir == 0) knot[i] = uknot_[i];
+            if (dir == 1) knot[i] = vknot_[i];
+            if (dir == 2) knot[i] = tknot_[i];
+        };
+
+    };
 
     // Gets the degree of the functions in each direction per patch
     int getDegree(int dir) {return deg_[dir];}

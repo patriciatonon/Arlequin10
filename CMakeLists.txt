@@ -10,10 +10,14 @@ find_package(PETSc REQUIRED)
 include_directories(include ${MPI_INCLUDE_PATH} ${PETSC_INCLUDES})
 add_definitions(${PETSC_DEFINITIONS})
 
+# Eigen
+include(cmake-modules/EnableEigen.cmake)
+enable_eigen()
+
 add_subdirectory(src)
 
 link_directories(${PETSC_DIR}/${PETSC_ARCH}/lib)
 
 add_executable(${PROJECT_NAME} main.cpp ${CXX_SOURCE_FILES})
 
-target_link_libraries(runArlequin metis ${MPI_LIBRARIES} ${PETSC_LIBRARIES})
+target_link_libraries(runArlequin metis Eigen3::Eigen ${MPI_LIBRARIES} ${PETSC_LIBRARIES})

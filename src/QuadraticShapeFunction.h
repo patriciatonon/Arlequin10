@@ -49,7 +49,7 @@ public:
     void evaluateGradientIso(double *xsi, double **dphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch);
 
     void evaluateHessianFem(double ***ddphi);
-    void evaluateHessianIso(double *xsi, double ***ddphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch);
+    void evaluateHessianIso(double *xsi, double ***ddphi, double* wpcs, int *inc,  std::vector<IParameters_ *> &iparameters , int Npatch);
 
 };
 
