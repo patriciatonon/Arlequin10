@@ -73,141 +73,141 @@ CMakeFiles/runArlequin.dir/main.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/main.cpp.o: ../../main.cpp
 CMakeFiles/runArlequin.dir/main.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/runArlequin.dir/main.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/main.cpp.o -MF CMakeFiles/runArlequin.dir/main.cpp.o.d -o CMakeFiles/runArlequin.dir/main.cpp.o -c /home/patricia/Arlequin10/main.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/main.cpp.o -MF CMakeFiles/runArlequin.dir/main.cpp.o.d -o CMakeFiles/runArlequin.dir/main.cpp.o -c /home/patricia/Arlequin10/main.cpp
 
 CMakeFiles/runArlequin.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/main.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/main.cpp > CMakeFiles/runArlequin.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/main.cpp > CMakeFiles/runArlequin.dir/main.cpp.i
 
 CMakeFiles/runArlequin.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/main.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/main.cpp -o CMakeFiles/runArlequin.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/main.cpp -o CMakeFiles/runArlequin.dir/main.cpp.s
 
 CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o: ../../src/Arlequin.cpp
 CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -MF CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o.d -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -c /home/patricia/Arlequin10/src/Arlequin.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -MF CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o.d -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.o -c /home/patricia/Arlequin10/src/Arlequin.cpp
 
 CMakeFiles/runArlequin.dir/src/Arlequin.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/Arlequin.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/Arlequin.cpp > CMakeFiles/runArlequin.dir/src/Arlequin.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/Arlequin.cpp > CMakeFiles/runArlequin.dir/src/Arlequin.cpp.i
 
 CMakeFiles/runArlequin.dir/src/Arlequin.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/Arlequin.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/Arlequin.cpp -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/Arlequin.cpp -o CMakeFiles/runArlequin.dir/src/Arlequin.cpp.s
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o: ../../src/BoundaryIntegrationQuadrature.cpp
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.i
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryIntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadrature.cpp.s
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o: ../../src/BoundaryIntegrationQuadratureIso.cpp
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.o -c /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp > CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp > CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.i
 
 CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryIntegrationQuadratureIso.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryIntegrationQuadratureIso.cpp.s
 
 CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o: ../../src/BoundaryShapeFunction.cpp
 CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -MF CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o.d -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp
 
 CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp > CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp > CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.i
 
 CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/BoundaryShapeFunction.cpp -o CMakeFiles/runArlequin.dir/src/BoundaryShapeFunction.cpp.s
 
 CMakeFiles/runArlequin.dir/src/Element.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/Element.cpp.o: ../../src/Element.cpp
 CMakeFiles/runArlequin.dir/src/Element.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/runArlequin.dir/src/Element.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/Element.cpp.o -MF CMakeFiles/runArlequin.dir/src/Element.cpp.o.d -o CMakeFiles/runArlequin.dir/src/Element.cpp.o -c /home/patricia/Arlequin10/src/Element.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/Element.cpp.o -MF CMakeFiles/runArlequin.dir/src/Element.cpp.o.d -o CMakeFiles/runArlequin.dir/src/Element.cpp.o -c /home/patricia/Arlequin10/src/Element.cpp
 
 CMakeFiles/runArlequin.dir/src/Element.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/Element.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/Element.cpp > CMakeFiles/runArlequin.dir/src/Element.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/Element.cpp > CMakeFiles/runArlequin.dir/src/Element.cpp.i
 
 CMakeFiles/runArlequin.dir/src/Element.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/Element.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/Element.cpp -o CMakeFiles/runArlequin.dir/src/Element.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/Element.cpp -o CMakeFiles/runArlequin.dir/src/Element.cpp.s
 
 CMakeFiles/runArlequin.dir/src/FluidData.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/FluidData.cpp.o: ../../src/FluidData.cpp
 CMakeFiles/runArlequin.dir/src/FluidData.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/runArlequin.dir/src/FluidData.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -MF CMakeFiles/runArlequin.dir/src/FluidData.cpp.o.d -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -c /home/patricia/Arlequin10/src/FluidData.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -MF CMakeFiles/runArlequin.dir/src/FluidData.cpp.o.d -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.o -c /home/patricia/Arlequin10/src/FluidData.cpp
 
 CMakeFiles/runArlequin.dir/src/FluidData.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/FluidData.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/FluidData.cpp > CMakeFiles/runArlequin.dir/src/FluidData.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/FluidData.cpp > CMakeFiles/runArlequin.dir/src/FluidData.cpp.i
 
 CMakeFiles/runArlequin.dir/src/FluidData.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/FluidData.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/FluidData.cpp -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/FluidData.cpp -o CMakeFiles/runArlequin.dir/src/FluidData.cpp.s
 
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: ../../src/IntegrationQuadrature.cpp
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp
 
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.i
 
 CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/IntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/IntegrationQuadrature.cpp.s
 
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: ../../src/QuadraticShapeFunction.cpp
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -MF CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o.d -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -MF CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o.d -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.o -c /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp
 
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp > CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp > CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.i
 
 CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/QuadraticShapeFunction.cpp -o CMakeFiles/runArlequin.dir/src/QuadraticShapeFunction.cpp.s
 
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/flags.make
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: ../../src/SpecialIntegrationQuadrature.cpp
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o: CMakeFiles/runArlequin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/patricia/Arlequin10/build/Release/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -MF CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o.d -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.o -c /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp
 
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.i"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp > CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.i
 
 CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.s"
-	/usr/bin/g++-9 $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/patricia/Arlequin10/src/SpecialIntegrationQuadrature.cpp -o CMakeFiles/runArlequin.dir/src/SpecialIntegrationQuadrature.cpp.s
 
 # Object files for target runArlequin
 runArlequin_OBJECTS = \

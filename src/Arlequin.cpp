@@ -849,25 +849,25 @@ void Arlequin<2>::setSignaledDistance(){
     
 
     //Gambiarra para malha FEM fine
-    // n[0] = 1.;
-    // n[1] = 1.;
+    n[0] = 1.;
+    n[1] = 1.;
 
-    // nodesFine_[6] -> setInnerNormal(n);
+    nodesFine_[6] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = 1.;
+    n[0] = -1.;
+    n[1] = 1.;
 
-    // nodesFine_[8] -> setInnerNormal(n);
+    nodesFine_[8] -> setInnerNormal(n);
 
-    // n[0] = -1.;
-    // n[1] = -1.;
+    n[0] = -1.;
+    n[1] = -1.;
 
-    // nodesFine_[17] -> setInnerNormal(n);
+    nodesFine_[17] -> setInnerNormal(n);
     
-    // n[0] = 1.;
-    // n[1] = -1.;
+    n[0] = 1.;
+    n[1] = -1.;
 
-    // nodesFine_[15] -> setInnerNormal(n);
+    nodesFine_[15] -> setInnerNormal(n);
 
 
 
@@ -4124,7 +4124,7 @@ void Arlequin<2>::setMatVecValuesLagrangeFineFEM(int &iTimeStep){
 	            // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(ip,jacobianNRMatrix,rhsVector);
 	            elementsFine_[jel] -> getLagrangeMultipliersSameMeshArlqStab_FEM(ip,patch,nodesCoarse_,connecC,IsoParCoarse,
                                                                                  elemStabMatrixD,elemStabVectorD,
-	    																	        elemStabMatrix1,elemStabVector1);
+	    																	     elemStabMatrix1,elemStabVector1);
 
 			
 	    		for (int i = 0; i < 6; i++){
@@ -5049,9 +5049,9 @@ void Arlequin<2>::setMatVecValuesLagrangeCoarseFEM_ISO(int &iTimeStep){
                                                                                   elemMatrixLag0,elemVectorLag0_1,elemVectorLag0_2);
                 // elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,
                 //  																			  iElemCoarse, jacobianNRMatrix,rhsVector);
-                // elementsFine_[jel] -> getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
-                //                                                                           elemStabMatrixD,elemStabVectorD,elemStabMatrix0,
-                //                                                                           elemStabVector0);
+                elementsFine_[jel] -> getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,iElemCoarse, 
+                                                                                          elemStabMatrixD,elemStabVectorD,elemStabMatrix0,
+                                                                                          elemStabVector0);
       
                 for (int i = 0; i < 6; i++){
                     for (int j = 0; j < 9; j++){
