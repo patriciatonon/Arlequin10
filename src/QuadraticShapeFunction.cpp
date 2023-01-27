@@ -327,8 +327,82 @@ void QuadShapeFunction<3>::evaluateGradientFem(double *xsi, double **dphi) const
 };
 
 
-template<int DIM>
-void QuadShapeFunction<DIM>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
+template<>
+void QuadShapeFunction<2>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
+
+    const int DIM = 2;
+    std::vector<IParameters_ *> *ipar_ = &iparameters;
+
+    int deg[DIM],npc[DIM];
+
+    for (int i = 0; i < DIM; i++){
+        deg[i] = (*ipar_)[Npatch] -> getDegree(i);
+        npc[i] = (*ipar_)[Npatch] -> getNcp(i);
+    };
+
+    int numLocalBF = 1.;
+
+    for (int i = 0; i < DIM; i++){
+        numLocalBF *= (deg[i]+1);
+    }
+
+    //assuming same functions degree in all directions
+    double phiL [DIM][deg[0]+1];
+    double dphiL[DIM][deg[0]+1];
+    double phit  [numLocalBF];
+    double dphit [DIM][numLocalBF];
+
+
+    for (int i = 0; i < DIM; i++){
+        int size = deg[i]+npc[i]+1;
+        double knot[size];
+        (*ipar_)[Npatch] -> getKnot(i,size,knot);
+        double phil[deg[i]+1], dphil[deg[i]+1];
+        basisFunctionsBS(xsi[i],deg[i],knot,inc[i],phil);
+        int degree = 1;
+        derBasisFunctionsBS(degree,xsi[i],deg[i],knot,inc[i],dphil);
+        for (int j = 0; j < deg[i]+1; j++){
+            phiL[i][j] = phil[j];
+            dphiL[i][j] = dphil[j];
+        };
+    };
+
+    int index = 0;
+    for (int j = 0; j< deg[1]+1; j ++) {
+        for (int k = 0; k < deg[0]+1; k ++) {
+        
+            phit[index] = phiL[0][k] * phiL[1][j];
+
+            dphit[0][index] = dphiL[0][k] * phiL[1][j];
+            dphit[1][index] = phiL[0][k] * dphiL[1][j];
+            
+            index ++;
+        };
+    }; 
+     
+    double sumF = 0.0;
+    double sumDer[DIM] = {};
+
+    for (int i = 0; i < numLocalBF; i++) {
+        sumF += phit[i] * wpcs[i];
+        for (int j = 0; j < DIM; j++){
+            sumDer[j] += dphit[j][i] * wpcs[i];
+        };
+    };
+
+    for (int i = 0; i < numLocalBF; i++) {
+        for (int j = 0; j < DIM; j++) dphi[j][i] = ((dphit[j][i] * wpcs[i] * sumF - phit[i] * wpcs[i] * sumDer[j]) / (sumF * sumF)); 
+    };
+
+    return;
+};
+
+
+template<>
+void QuadShapeFunction<3>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
+
+
+    const int DIM = 3;
 
     std::vector<IParameters_ *> *ipar_ = &iparameters;
 
@@ -367,33 +441,20 @@ void QuadShapeFunction<DIM>::evaluateGradientIso(double *xsi, double **dphi, dou
     };
 
     int index = 0;
-    if (DIM == 2) {
+
+    for (int i = 0; i < deg[2]+1 ; i++){
         for (int j = 0; j< deg[1]+1; j ++) {
             for (int k = 0; k < deg[0]+1; k ++) {
             
-                phit[index] = phiL[0][k] * phiL[1][j];
+                phit[index] = phiL[0][k] * phiL[1][j] * phiL[2][i];
 
-                dphit[0][index] = dphiL[0][k] * phiL[1][j];
-                dphit[1][index] = phiL[0][k] * dphiL[1][j];
+                dphit[0][index] = dphiL[0][k] * phiL[1][j] * phiL[2][i];
+                dphit[1][index] = phiL[0][k] * dphiL[1][j] * phiL[2][i];
+                dphit[2][index] = phiL[0][k] * phiL[1][j] * dphiL[2][i];
                 
                 index ++;
             };
         }; 
-    } else { //DIM = 3
-        for (int i = 0; i < deg[2]+1 ; i++){
-            for (int j = 0; j< deg[1]+1; j ++) {
-                for (int k = 0; k < deg[0]+1; k ++) {
-                
-                    phit[index] = phiL[0][k] * phiL[1][j] * phiL[2][i];
-
-                    dphit[0][index] = dphiL[0][k] * phiL[1][j] * phiL[2][i];
-                    dphit[1][index] = phiL[0][k] * dphiL[1][j] * phiL[2][i];
-                    dphit[1][index] = phiL[0][k] * phiL[1][j] * dphiL[2][i];
-                    
-                    index ++;
-                };
-            }; 
-        };
     };
      
     double sumF = 0.0;
@@ -409,6 +470,8 @@ void QuadShapeFunction<DIM>::evaluateGradientIso(double *xsi, double **dphi, dou
     for (int i = 0; i < numLocalBF; i++) {
         for (int j = 0; j < DIM; j++) dphi[j][i] = ((dphit[j][i] * wpcs[i] * sumF - phit[i] * wpcs[i] * sumDer[j]) / (sumF * sumF)); 
     };
+
+    
 
     return;
 };
@@ -553,7 +616,6 @@ void QuadShapeFunction<3>::evaluateHessianFem(double ***ddphi){
     ddphi[1][2][7] = 0.;
 
     ddphi[2][0][7] = -4.;
-    ddphi[2][1][7] = 0.;
     ddphi[2][2][7] = 0.;
 
 
@@ -665,11 +727,11 @@ void QuadShapeFunction<DIM>::evaluateHessianIso(double *xsi, double*** ddphi, do
                 
                     ddphit[1][0][index] = dphiL[0][k] * dphiL[1][j] * phiL[2][i];
                     ddphit[1][1][index] = phiL[0][k] * ddphiL[1][j] * phiL[2][i];
-                    ddphit[1][1][index] = phiL[0][k] * dphiL[1][j] * dphiL[2][i];
+                    ddphit[1][2][index] = phiL[0][k] * dphiL[1][j] * dphiL[2][i];
 
                     ddphit[2][0][index] = dphiL[0][k] * phiL[1][j] * dphiL[2][i];
                     ddphit[2][1][index] = phiL[0][k] * dphiL[1][j] * dphiL[2][i];
-                    ddphit[2][1][index] = phiL[0][k] * phiL[1][j] * ddphiL[2][i];
+                    ddphit[2][2][index] = phiL[0][k] * phiL[1][j] * ddphiL[2][i];
 
                     index ++;
                 };
@@ -707,6 +769,59 @@ void QuadShapeFunction<DIM>::evaluateHessianIso(double *xsi, double*** ddphi, do
     return;
 
 };
+
+
+template<>
+double QuadShapeFunction<2>::ParametricCoordBezier(int i, int j){
+
+    paramCoord[0][0] = -1.; paramCoord[0][1] = -1.;
+    paramCoord[1][0] = 0.; paramCoord[1][1] = -1.;
+    paramCoord[2][0] = 1.; paramCoord[2][1] = -1.;
+    paramCoord[3][0] = -1.; paramCoord[3][1] = 0.;
+    paramCoord[4][0] = 0.; paramCoord[4][1] = 0.;
+    paramCoord[5][0] = 1.; paramCoord[5][1] = 0.;
+    paramCoord[6][0] = -1.; paramCoord[6][1] = 1.;
+    paramCoord[7][0] = 0.; paramCoord[7][1] = 1.;
+    paramCoord[8][0] = 1.; paramCoord[8][1] = 1.;  
+
+    return paramCoord[i][j];
+};
+
+template<>
+double QuadShapeFunction<3>::ParametricCoordBezier(int i, int j){
+
+    paramCoord[0][0] = -1.; paramCoord[0][1] = -1.; paramCoord[0][2] = -1.;
+    paramCoord[1][0] = 0.; paramCoord[1][1] = -1.; paramCoord[1][2] = -1.;
+    paramCoord[2][0] = 1.; paramCoord[2][1] = -1.; paramCoord[2][2] = -1.;
+    paramCoord[3][0] = -1.; paramCoord[3][1] = 0.; paramCoord[3][2] = -1.;
+    paramCoord[4][0] = 0.; paramCoord[4][1] = 0.; paramCoord[4][2] = -1.;
+    paramCoord[5][0] = 1.; paramCoord[5][1] = 0.; paramCoord[5][2] = -1.;
+    paramCoord[6][0] = -1.; paramCoord[6][1] = 1.; paramCoord[6][2] = -1.;
+    paramCoord[7][0] = 0.; paramCoord[7][1] = 1.; paramCoord[7][2] = -1.;
+    paramCoord[8][0] = 1.; paramCoord[8][1] = 1.; paramCoord[8][2] = -1.;  
+
+    paramCoord[9][0] = -1.; paramCoord[9][1] = -1.; paramCoord[9][2] = 0.;
+    paramCoord[10][0] = 0.; paramCoord[10][1] = -1.; paramCoord[10][2] = 0.;
+    paramCoord[11][0] = 1.; paramCoord[11][1] = -1.; paramCoord[11][2] = 0.;
+    paramCoord[12][0] = -1.; paramCoord[12][1] = 0.; paramCoord[12][2] = 0.;
+    paramCoord[13][0] = 0.; paramCoord[13][1] = 0.; paramCoord[13][2] = 0.;
+    paramCoord[14][0] = 1.; paramCoord[14][1] = 0.; paramCoord[14][2] = 0.;
+    paramCoord[15][0] = -1.; paramCoord[15][1] = 1.; paramCoord[15][2] = 0.;
+    paramCoord[16][0] = 0.; paramCoord[16][1] = 1.; paramCoord[16][2] = 0.;
+    paramCoord[17][0] = 1.; paramCoord[17][1] = 1.; paramCoord[17][2] = 0.;  
+
+    paramCoord[18][0] = -1.; paramCoord[18][1] = -1.; paramCoord[18][2] = 1.;
+    paramCoord[19][0] = 0.; paramCoord[19][1] = -1.; paramCoord[19][2] = 1.;
+    paramCoord[20][0] = 1.; paramCoord[20][1] = -1.; paramCoord[20][2] = 1.;
+    paramCoord[21][0] = -1.; paramCoord[21][1] = 0.; paramCoord[21][2] = 1.;
+    paramCoord[22][0] = 0.; paramCoord[22][1] = 0.; paramCoord[22][2] = 1.;
+    paramCoord[23][0] = 1.; paramCoord[23][1] = 0.; paramCoord[23][2] = 1.;
+    paramCoord[24][0] = -1.; paramCoord[24][1] = 1.; paramCoord[24][2] = 1.;
+    paramCoord[25][0] = 0.; paramCoord[25][1] = 1.; paramCoord[25][2] = 1.;
+    paramCoord[26][0] = 1.; paramCoord[26][1] = 1.; paramCoord[26][2] = 1.;  
+
+    return paramCoord[i][j];
+}
 
 template class QuadShapeFunction<2>;
 template class QuadShapeFunction<3>;

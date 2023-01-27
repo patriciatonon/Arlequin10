@@ -39,7 +39,7 @@ public:
         for (int i=0; i< DIM; i++){
             deg_[i] = deg[i];
             ncp_[i] = ncp[i];
-        }
+        };
 
     };
 

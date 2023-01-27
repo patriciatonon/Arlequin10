@@ -51,6 +51,10 @@ public:
     void evaluateHessianFem(double ***ddphi);
     void evaluateHessianIso(double *xsi, double ***ddphi, double* wpcs, int *inc,  std::vector<IParameters_ *> &iparameters , int Npatch);
 
+    double ParametricCoordBezier(int i, int j); 
+
+private:
+    double paramCoord[18*DIM-27][DIM];
 };
 
 

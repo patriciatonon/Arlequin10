@@ -1459,3 +1459,39 @@ void BoundShapeFunction<3>::evaluateGradientBoundaryIso(double *Xsi, double **dp
 };
 
 
+template<>
+void BoundShapeFunction<3>::evaluateHessianBoundaryFem(double ***ddphiB_) {
+
+     ddphiB_[0][0][0] = 4.;
+     ddphiB_[0][1][0] = 4.;
+     ddphiB_[1][0][0] = 4.;
+     ddphiB_[1][1][0] = 4.;
+
+     ddphiB_[0][0][1] = 4.;
+     ddphiB_[0][1][1] = 0.;
+     ddphiB_[1][0][1] = 0.;
+     ddphiB_[1][1][1] = 0.;
+
+     ddphiB_[0][0][2] = 0.;
+     ddphiB_[0][1][2] = 0.;
+     ddphiB_[1][0][2] = 0.;
+     ddphiB_[1][1][2] = 4.;
+
+     ddphiB_[0][0][3] = -8.;
+     ddphiB_[0][1][3] = -4.;
+     ddphiB_[1][0][3] = -4.;
+     ddphiB_[1][1][3] = 0.;
+
+     ddphiB_[0][0][4] = 0.;
+     ddphiB_[0][1][4] = 4.;
+     ddphiB_[1][0][4] = 4.;
+     ddphiB_[1][1][4] = 0.;
+
+     ddphiB_[0][0][5] = 0.;
+     ddphiB_[0][1][5] = -4.;
+     ddphiB_[1][0][5] = -4.;
+     ddphiB_[1][1][5] = -8.;
+
+
+    return;
+};

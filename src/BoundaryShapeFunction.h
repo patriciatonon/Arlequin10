@@ -45,6 +45,7 @@ void evaluateGradientBoundaryFem(double *Xsi, double **dphiB_);
 
 void evaluateGradientBoundaryIso(double *Xsi, double **dphiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
 
+void evaluateHessianBoundaryFem(double ***ddphiB_);
 };
 
 

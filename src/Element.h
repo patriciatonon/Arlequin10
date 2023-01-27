@@ -195,8 +195,7 @@ public:
     // Set the integration point and element correspondence in the coarse mesh
     void setIntegrationPointCorrespondence_FEM(int ipoint, double *x, int elem){
         intPointCorrespElem_FEM[ipoint] = elem;
-        intPointCorrespXsi_FEM[ipoint][0] = x[0];
-        intPointCorrespXsi_FEM[ipoint][1] = x[1]; 
+        for (int i = 0; i < DIM; i++) intPointCorrespXsi_FEM[ipoint][i] = x[i];
     };
     
     // Returns correspondent element in the coarse mesh
@@ -236,7 +235,6 @@ public:
     //......................Jacobian Matrixes and Derivatives....................
     // Compute and store the spatial jacobian matrix
     void getJacobianMatrix_FEM(double &djac_, double *xsi, double **Jac, double **ainv_);
-    void getJacobianMatrix_COARSE_FEM(double *xsi, double **Jac, double **ainv_);
     void getJacobianMatrix_ISO(double &djac_, double *xsi, double **quadJacMat, double **ainv_);
     void getJacobianMatrix_COARSE_ISO(double *xsi, double **ainv_);
     
@@ -329,26 +327,15 @@ public:
     // Compute and store the SUPG, PSPG and LSIC stabilization parameters
     void getNewParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **Jac , double *phi, double **dphi_dx);
     void getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **quadJacMat, double *phi_, double **dphi_dx);
-    void getParameterArlequin_COARSE_ISO(double &tARLQ_, double *phi_, double **dphi_dx);
-    void getParameterArlequinVN_FEM(int &index, double &djac_, double &weight_, double &tARLQ_, 
-                                   double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
-    void getParameterArlequinVN_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, 
-                                          double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, 
-                                          double ***ddphi_dx, double ***ddphiC_dx);
-    void getParameterArlequinMN(int &LNN, int &LNNC, double &djac_, double &weight_, double &tARLQ_, 
-                                double *phi_, double *phiC_,double **dphi_dx, double ***ddphi_dx);
-    void getParameterArlequinMN_COARSE_ISO(double &djac_, double &weight_, double &tARLQ_, double *phi_, 
-                                           double *phiC_, double **dphi_dx, double **dphiC_dx, double ***ddphi_dx,
-                                           double ***ddphiC_dx);
-    void getParameterArlequinElem(double &tarlq, int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                  std::vector<IParameters *> &iparamC);
-
+    void getParameterArlequinMN(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ_, 
+                                double *phi_, double *phiC_, double **dphi_dx, double ***ddphi_dx);
+    void getParameterArlequinMN_COARSE(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ_, 
+                                       double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, double ***ddphi_dx,
+                                       double ***ddphiC_dx);
 
  	//......................Drag and Lift Parameters....................
     // Compute and store the drag and lift forces at the element boundary
     void computeDragAndLiftForces_FEM(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
-                                      double &dForce, double &lForce, double &aux_Mom, double &aux_Per);
-    void computeDragAndLiftForces_ISO(int &side, double &pDForce, double &pLForce, double &fDForce, double &fLForce, 
                                       double &dForce, double &lForce, double &aux_Mom, double &aux_Per);
 
    
@@ -376,15 +363,11 @@ public:
     void getMatrixAndVectorsDifferentMesh(double &djac_, double &weight_,int &na, double *phi_, 
                                           double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,
                                           double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);   
-    void getMatrixAndVectorsDifferentMeshTemp(double &djac_, double &weight_,double &tARLQ_, int &na, double *phi_, 
-                                              double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,
-                                              double **lagrMultMatrix, double *rhsVector1, double *rhsVector2,
-                                              double **arlequinStab, double *arlequinStabVector);  
     void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
                                                       int &LNN, double *phi_, int &LNNC, double *phiC_, double **dphiC_dx,
                                                       double **jacobianNRMatrix,double *rhsVector);
-    void getMatrixAndVectorsDifferentMeshArlqStab(double &djac_, double &weight_,double &tARLQ_,int &index, 
-                                                  int &na, double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,double ***ddphiC_dx,
+    void getMatrixAndVectorsDifferentMeshArlqStab(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_,double &tARLQ_,
+                                                  double **dphi_dx, double *phiC_, double **dphiC_dx, double ***ddphiC_dx,
                                                   double **arlequinStabD, double *arlequinStabVectorD,
                                                   double **arlequinStab0, double *arlequinStabVector0);
 
@@ -396,17 +379,11 @@ public:
 
     // Compute and store the Lagrange multiplier operator when integrating the same mesh portion
     void getLagrangeMultipliersSameMesh_FEM(int &index, double **lagrMultMatrix, 
-                                               double *lagrMultVector, double *rhsVector);
+                                               double *lagrMultVector, double *rhsVector);                                           
+    void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                        std::vector<IParameters *> &iparamC, double **arlequinStabD, 
-                                                       double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);                                              
-    void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
-    
-    
-    void getLagrangeMultipliersSameMesh_ISO(double **lagrMultMatrix, double *lagrMultVector, double *rhsVector);
-    void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_ISO(double **jacobianNRMatrix, double *rhsVector);
-    void getLagrangeMultipliersSameMeshArlqStab_ISO(double **arlequinStabD, double *arlequinStabVectorD,
-                                                    double **arlequinStab1, double *arlequinStabVector1);
+                                                       double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);   
 
 
     //Compute and store the Lagrange multiplier operator when integrationg the different mesh portion
@@ -421,22 +398,6 @@ public:
                                                              double **arlequinStabD, double *arlequinStabVectorD,
                                                              double **arlequinStab0, double *arlequinStabVector0);
     
-    void getLagrangeMultipliersDifferentMesh_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
-                                                    double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
-    void getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
-                                                                double **jacobianNRMatrix, double *rhsVector);
-    void getLagrangeMultipliersDifferentMeshArlqStab_ISO_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
-                                                             double **arlequinStabD, double *arlequinStabVectorD,
-                                                             double **arlequinStab0, double *arlequinStabVector0);
-
-    void getLagrangeMultipliersDifferentMesh_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
-                                                     double **lagrMultMatrix,double *rhsVector1, double *rhsVector2,
-                                                     double **arlequinStab, double *arlequinStabVector);
-    void getLagrangeMultipliersDifferentMesh_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                                    std::vector<IParameters *> &iparamC, int &ielem, 
-                                                    double **lagrMultMatrix,double *rhsVector1, double *rhsVector2,
-                                                    double **arlequinStab, double *arlequinStabVector);
-
     //.......................Bezier Element transformation.......................
     // Computes Bézier extract operator 
     void getDirMatrixC(int &deg, int &dim_, int &ind, double *knot_, double **matrixC_);
@@ -449,11 +410,7 @@ public:
         return parameters;
     }
 
-    void setTimeStep(int timeStep) {
-    	iTimeStep = timeStep;
-    }
 
-    void setTarlq(double &tarlq){ tARLQEL_ = tarlq;}
 
 };
 

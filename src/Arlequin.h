@@ -67,8 +67,6 @@ public:
 private:
     
     // Meshes data
-    int elemTypeCoarse;                     // 0 - FEM coarse mesh; 1 - IGA coarse mesh 
-    int elemTypeFine; 						// 0 - FEM fine mesh; 1 - IGA fine mesh
     int numElemCoarse;                      // Number of elements in the coarse mesh
     int numElemFine;                        // Number of elements in the fine mesh
     int numBoundElemCoarse;                 // Number of bondary elements in the coarse mesh
@@ -110,58 +108,51 @@ private:
 
 public:
     // Sets the coarse and fine mesh models
-    void setFluidModels(FluidMesh& coarse, FluidMesh& fine);
+    void setFluidModels_FEM_ISO(FluidMesh& coarse, FluidMesh& fine);
     
-    // Computes and stores the element boxes for improving the correspondence searching process
-    void setElementBoxes();
+    // Computes and stores the element boxes for coarse mesh for improving the correspondence searching process
+    void setElementBoxes_ISO();
     
-    // Computes and store the signaled distance function from Nodes or CP to a defined boundary
-    void setSignaledDistance();
+    // Computes and store the signaled distance function from Nodes to a defined FEM boundary
+    void setSignaledDistance_FEM_ISO();
+    void searchMinDist_FEM(double *pointCoord, int &ibound, double &mindist);
 
     // Defines the Gluing zone
-    void setGluingZone();
+    void setGluingZone_FEM_ISO();
 
     // Computes the energy weight function
-    void setWeightFunction();
+    void setWeightFunction_FEM_ISO();
 
     //Sets the nodal and integration points correspondence in the coarse mesh
-    void setCorrespondenceFine();
+    void setCorrespondenceFine_FEM_ISO();
 
    	//Sets the Dirichelet Constrains in the domain
-   	void setDirichletConstrain(std::vector<int> &dofTemp);
+   	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
    
     // Searchs point correspondence in the coarse mesh
-    void searchPointCorrespondence(double *x,std::vector<Nodes *> nodes,
-                                  std::vector<Element *> elements, 
-                                  std::vector<IsoParameters* > isopar, int &elemType, int numElem,
-                                  double *xsiC, int &elemC, int elSearch);
+    void searchPointCorrespondence_ISO(double *x,std::vector<Nodes *> nodes,
+                                      std::vector<Element *> elements, 
+                                      std::vector<IsoParameters* > isopar, int numElem,
+                                      double *xsiC, int &elemC, int elSearch);
     
     //Solves the Arlequin Problem
-    int solveArlequinProblem(int iterNumber,double tolerance);
+    int solveArlequinProblem_FEM_ISO(int iterNumber,double tolerance);
 
     //Assemble system
-    void setMatVecValuesCoarseFEM();
-    void setMatVecValuesCoarseISO();
-    void setMatVecValuesFineFEM();
-    void setMatVecValuesFineISO();
-    void setMatVecValuesLagrangeFineFEM_ISO(int &iTimeStep);
-    void setMatVecValuesLagrangeFineISO();
-    void setMatVecValuesLagrangeCoarseFEM_FEM();
-    void setMatVecValuesLagrangeCoarseFEM_ISO(int &iTimeStep);
-    void setMatVecValuesLagrangeCoarseISO_FEM();
-    void setMatVecValuesLagrangeCoarseISO_ISO();
-
+    void setMatVecValuesCoarse_ISO();
+    void setMatVecValuesFine_FEM();
+    void setMatVecValuesLagrangeFine_FEM_ISO();
+    void setMatVecValuesLagrangeCoarse_FEM_ISO();
 
     // Compute and print drag and lift coefficients
-    void dragAndLiftCoefficientsFEM(std::ofstream& dragLift, int &iTimeStep);
-    void dragAndLiftCoefficientsISO(std::ofstream& dragLift, int &iTimeStep);
+    void dragAndLiftCoefficients_FEM(std::ofstream& dragLift, int &iTimeStep);
 
 
     //Prints the results for Paraview post-processing
-    void printResults(int step);
+    void printResults_FEM_ISO(int step);
 
     //Print the results of the gluing in the integration points for Paraview post-processing
-    void printResultsIP(int step);
+    void printResultsIP_FEM_ISO(int step);
 
 };
 
