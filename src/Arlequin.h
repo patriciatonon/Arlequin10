@@ -128,6 +128,9 @@ public:
 
    	//Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
+
+    //Sets the Dirichelet Constrains in the domain
+   	void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp);
    
     // Searchs point correspondence in the coarse mesh
     void searchPointCorrespondence_ISO(double *x,std::vector<Nodes *> nodes,
@@ -138,11 +141,18 @@ public:
     //Solves the Arlequin Problem
     int solveArlequinProblem_FEM_ISO(int iterNumber,double tolerance);
 
+    int solveArlequinProblemLaplace_FEM_ISO(int iterNumber,double tolerance);
+
     //Assemble system
     void setMatVecValuesCoarse_ISO();
     void setMatVecValuesFine_FEM();
     void setMatVecValuesLagrangeFine_FEM_ISO();
     void setMatVecValuesLagrangeCoarse_FEM_ISO();
+
+    void setMatVecValuesCoarseLaplace_ISO();
+    void setMatVecValuesFineLaplace_FEM();
+    void setMatVecValuesLagrangeFineLaplace_FEM_ISO();
+    void setMatVecValuesLagrangeCoarseLaplace_FEM_ISO();
 
     // Compute and print drag and lift coefficients
     void dragAndLiftCoefficients_FEM(std::ofstream& dragLift, int &iTimeStep);
@@ -150,6 +160,8 @@ public:
 
     //Prints the results for Paraview post-processing
     void printResults_FEM_ISO(int step);
+
+    void printResultsLaplace_FEM_ISO(int step);
 
     //Print the results of the gluing in the integration points for Paraview post-processing
     void printResultsIP_FEM_ISO(int step);

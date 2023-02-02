@@ -212,8 +212,7 @@ public:
     // Set the integration point and element correspondence in the coarse mesh
     void setIntegrationPointCorrespondence_ISO(int ipoint, double *x, int elem){
         intPointCorrespElem_ISO[ipoint] = elem;
-        intPointCorrespXsi_ISO[ipoint][0] = x[0];
-        intPointCorrespXsi_ISO[ipoint][1] = x[1]; 
+        for (int i = 0; i < DIM; i++) intPointCorrespXsi_ISO[ipoint][i] = x[i];
     };
     
     // Returns correspondent element in the coarse mesh
@@ -341,7 +340,7 @@ public:
    
     //.......................Element vectors and matrices.......................
     // Compute and store the element matrix for the incompressible flow problem
-    void getElemMatrix(int &na, double &wna_, double &djac_, double &weight_, 
+    void getElemMatrix(int &LNN, double &wna_, double &djac_, double &weight_, 
                        double &tSUPG_, double &tPSPG_, double &tLSIC_,
                        double *phi_, double **dphi_dx, double **jacobianNRMatrix);  
     //Compute and store the residual vector for the incompressible flow problem
@@ -349,7 +348,11 @@ public:
                           double &tSUPG_, double &tPSPG_, double &tLSIC_,
                           double *phi_, double **dphi_dx, double *rhsVector);
 
-    
+    void getElemMatrixLaplace(int &LNN, double &wna_, double &djac_, double &weight_, 
+                              double **dphi_dx, double **jacobianNRMatrix);
+
+    void getResidualVectorLaplace(int &LNN, double *rhsVector);
+
     //Arlequin Matrixes and Vectores
     void getMatrixAndVectorsSameMesh(int &LNN, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
                                      double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
@@ -371,15 +374,33 @@ public:
                                                   double **arlequinStabD, double *arlequinStabVectorD,
                                                   double **arlequinStab0, double *arlequinStabVector0);
 
+    
+    void getMatrixAndVectorsSameMeshLaplace(int &LNN, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
+                                            double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
+
+    void getMatrixAndVectorsDifferentMeshLaplace(double &djac_, double &weight_,int &LNN, double *phi_, 
+                                                double **dphi_dx, int &LNNC, double *phiC_, double **dphiC_dx,
+                                                double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);  
+
 
     //...............................Problem type...............................
     // Compute the Transient Navier-Stokes problem matrices and vectors
     void getTransientNavierStokes_FEM(double **jacobianNRMatrix, double *rhsVector);
     void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
 
+    void getLaplace_FEM(double **jacobianNRMatrix, double *rhsVector);
+    void getLaplace_ISO(double **jacobianNRMatrix, double *rhsVector);
+
     // Compute and store the Lagrange multiplier operator when integrating the same mesh portion
     void getLagrangeMultipliersSameMesh_FEM(int &index, double **lagrMultMatrix, 
-                                               double *lagrMultVector, double *rhsVector);                                           
+                                               double *lagrMultVector, double *rhsVector);   
+
+    void getLagrangeMultipliersSameMesh_FEM_TESTE(double **lagrMultMatrix, 
+                                                 double *lagrMultVector, double *rhsVector); 
+
+    void getLagrangeMultipliersSameMeshLaplace_FEM(double **lagrMultMatrix, 
+                                                   double *lagrMultVector, double *rhsVector);
+
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                        std::vector<IParameters *> &iparamC, double **arlequinStabD, 
@@ -390,6 +411,15 @@ public:
     void getLagrangeMultipliersDifferentMesh_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                     std::vector<IParameters *> &iparamC, int &ielem, 
                                                     double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
+    void getLagrangeMultipliersDifferentMeshLaplace_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            std::vector<IParameters *> &iparamC, int &ielem, 
+                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
+    void getLagrangeMultipliersDifferentMesh_FEM_ISO_TESTE(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                          std::vector<IParameters *> &iparamC, int &ielem, 
+                                                          double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+                                                    
     void getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                     			std::vector<IParameters *> &iparamC, int &ielem, 
                                                     		    double **jacobianNRMatrix, double *rhsVector);
@@ -409,6 +439,8 @@ public:
     FParameters* getFluidParameters(){
         return parameters;
     }
+
+    void setDirichletConstrain(int &LNN, double **jacobianNRMatrix);
 
 
 

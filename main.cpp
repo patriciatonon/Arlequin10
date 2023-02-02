@@ -82,9 +82,13 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
 
 
-    //3D problem cavity
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_iso3d.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_fem3d.msh","mirror_fine.txt",0);
+    //3D problem cavity 
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_iso3d.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_fem3dEST.msh","mirror_fine.txt",0);
+
+    //3D LAPLACE
+    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
 
 
     //ArlequinProblem needs two objects from fluid:
@@ -95,7 +99,9 @@ int main(int argc, char **args) {
     //solveArlequinProblem function needs two parameters:  
     //1- The maximum number of iterations in the Newton-Raphson process
     //2- The maximum relative error in the Newton-Raphson process (DU) 
-    ArlequinProblem.solveArlequinProblem_FEM_ISO(10, 1.e-6);
+    //ArlequinProblem.solveArlequinProblem_FEM_ISO(10, 1.e-6);
+
+    ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
     
     //Finalize main program   
     PetscFinalize();
