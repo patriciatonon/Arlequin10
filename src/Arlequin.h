@@ -115,7 +115,7 @@ public:
     
     // Computes and store the signaled distance function from Nodes to a defined FEM boundary
     void setSignaledDistance_FEM_ISO();
-    void searchMinDist_FEM(double *pointCoord, int &ibound, double &mindist);
+    void searchMinDist_FEM(int &inode, double *pointCoord, int &ibound, double &mindist);
 
     // Defines the Gluing zone
     void setGluingZone_FEM_ISO();

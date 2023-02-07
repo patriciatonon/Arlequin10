@@ -2463,6 +2463,7 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
         
         int ncp[DIM],deg[DIM];
         for (int i = 0; i < DIM; i++){
+
             deg[i] = IsoPar_[ipatch] -> getDegree(i);
             ncp[i] = IsoPar_[ipatch] -> getNcp(i);
         }; 
@@ -2555,8 +2556,8 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
         //any of the control points belong to the same patch
         int ncp[DIM],deg[DIM]; 
         for (int i = 0; i < DIM; i++){
-            deg[i] = IsoPar_[Icpbc[0][4]] -> getDegree(0);
-            ncp[i] = IsoPar_[Icpbc[0][4]] -> getNcp(0);  
+            deg[i] = IsoPar_[Icpbc[0][4]] -> getDegree(i);
+            ncp[i] = IsoPar_[Icpbc[0][4]] -> getNcp(i);  
         };
         
         double *uknot = IsoPar_[Icpbc[0][4]] -> getuKnot();
@@ -2572,9 +2573,10 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
             contcp += ncp0 * ncp1 * ncp2;
         };
 
+
         //Finding the boundary connectivity
         for (int k = 0; k < numGroup; k++){
-            
+
             int *connectB;
             connectB = new int[9];
 
@@ -2594,6 +2596,7 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
                                 connectB[contcon--] = contcp + ncp[0]*ncp[1]*w + ncp[0]*j + i - z -l*ncp[0];
                             };
                         };
+                                                
                         Boundaries *bound = new Boundaries(connectB, index++,constrain, value, ibound);
                         boundary_.push_back(bound);
                     };
@@ -2628,11 +2631,13 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
                         boundary_.push_back(bound);
                     };
                 };
-            };                    
+            };  
+             
         };
     };  
 
     numBoundElemIso = index;
+   
 
     //Sets nodal boundary constrains
     

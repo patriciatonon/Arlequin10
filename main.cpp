@@ -82,14 +82,21 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
 
 
-    //3D problem cavity 
+    // //3D problem cavity 
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_fem3dEST.msh","mirror_fine.txt",0);
 
-    //3D LAPLACE
+    //3D LAPLACE - FEM/ISO
     coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
 
+    //3D LAPLACE - malha contorno com distancia assinalada errada
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceCONT_fem3d.msh","mirror_fine.txt",0);
+
+    //ISO/ISO
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
 
     //ArlequinProblem needs two objects from fluid:
     //1 - coarseModel;
