@@ -20,6 +20,7 @@
 #include<fstream>
 #include<iostream>
 #include <math.h>       /* atan */
+#include <iomanip> 
 
 // Defines the domain integration Hammer quadrature
 
@@ -66,10 +67,12 @@ private:
     //List of integration points coordinates
     double pointCoordFem[8*DIM-9][DIM];
     double pointCoordIso[18*DIM-27][DIM];
+    // double pointCoordIso[64][DIM];
 
     //List of integration points weights
     double pointWeightFem[8*DIM-9];
     double pointWeightIso[18*DIM-27];
+    // double pointWeightIso[64];
 
 };
 

@@ -203,6 +203,262 @@ double SpecialIntegQuadrature<2>::PointListIso(int i, int j){
 template<>
 double SpecialIntegQuadrature<3>::PointListIso(int i, int j){
 
+    // pointCoordSpecialIso[0][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[0][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[0][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[1][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[1][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[1][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[2][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[2][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[2][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[3][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[3][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[3][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[4][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[4][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[4][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[5][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[5][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[5][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[6][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[6][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[6][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[7][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[7][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[7][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[8][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[8][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[8][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[9][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[9][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[9][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[10][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[10][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[10][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[11][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[11][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[11][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[12][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[12][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[12][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[13][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[13][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[13][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[14][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[14][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[14][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[15][0] = -0.33998104358485597976;
+    // pointCoordSpecialIso[15][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[15][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[16][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[16][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[16][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[17][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[17][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[17][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[18][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[18][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[18][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[19][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[19][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[19][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[20][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[20][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[20][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[21][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[21][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[21][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[22][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[22][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[22][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[23][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[23][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[23][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[24][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[24][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[24][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[25][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[25][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[25][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[26][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[26][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[26][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[27][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[27][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[27][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[28][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[28][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[28][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[29][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[29][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[29][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[30][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[30][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[30][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[31][0] = 0.33998104358485597976;
+    // pointCoordSpecialIso[31][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[31][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[32][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[32][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[32][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[33][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[33][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[33][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[34][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[34][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[34][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[35][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[35][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[35][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[36][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[36][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[36][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[37][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[37][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[37][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[38][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[38][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[38][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[39][0] = -0.86113631159405301663;   
+    // pointCoordSpecialIso[39][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[39][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[40][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[40][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[40][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[41][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[41][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[41][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[42][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[42][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[42][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[43][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[43][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[43][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[44][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[44][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[44][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[45][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[45][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[45][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[46][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[46][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[46][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[47][0] = -0.86113631159405301663;
+    // pointCoordSpecialIso[47][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[47][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[48][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[48][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[48][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[49][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[49][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[49][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[50][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[50][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[50][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[51][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[51][1] = -0.33998104358485597976;
+    // pointCoordSpecialIso[51][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[52][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[52][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[52][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[53][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[53][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[53][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[54][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[54][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[54][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[55][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[55][1] = 0.33998104358485597976;
+    // pointCoordSpecialIso[55][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[56][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[56][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[56][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[57][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[57][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[57][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[58][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[58][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[58][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[59][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[59][1] = -0.86113631159405301663;
+    // pointCoordSpecialIso[59][2] = 0.86113631159405301663;
+
+    // pointCoordSpecialIso[60][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[60][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[60][2] = -0.33998104358485597976;
+
+    // pointCoordSpecialIso[61][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[61][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[61][2] = 0.33998104358485597976;
+
+    // pointCoordSpecialIso[62][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[62][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[62][2] = -0.86113631159405301663;
+
+    // pointCoordSpecialIso[63][0] = 0.86113631159405301663;
+    // pointCoordSpecialIso[63][1] = 0.86113631159405301663;
+    // pointCoordSpecialIso[63][2] = 0.86113631159405301663;
+
     pointCoordSpecialIso[0][0] =   0.;
     pointCoordSpecialIso[0][1] =   0.;
     pointCoordSpecialIso[0][2] =   0.;   
@@ -412,6 +668,72 @@ double SpecialIntegQuadrature<2>::WeightListIso(int i){
 
 template<>
 double SpecialIntegQuadrature<3>::WeightListIso(int i){
+
+
+// pointWeightSpecialIso[0] = 0.27735296695391276067;
+// pointWeightSpecialIso[1] = 0.27735296695391276067;
+// pointWeightSpecialIso[2] = 0.27735296695391276067;
+// pointWeightSpecialIso[3] = 0.27735296695391276067;
+// pointWeightSpecialIso[4] = 0.27735296695391276067;
+// pointWeightSpecialIso[5] = 0.27735296695391276067;
+// pointWeightSpecialIso[6] = 0.27735296695391276067;
+// pointWeightSpecialIso[7] = 0.27735296695391276067;
+// pointWeightSpecialIso[8] = 0.27735296695391276067;
+// pointWeightSpecialIso[9] = 0.27735296695391276067;
+// pointWeightSpecialIso[10] = 0.27735296695391276067;
+// pointWeightSpecialIso[11] = 0.27735296695391276067;
+// pointWeightSpecialIso[12] = 0.27735296695391276067;
+// pointWeightSpecialIso[13] = 0.27735296695391276067;
+// pointWeightSpecialIso[14] = 0.27735296695391276067;
+// pointWeightSpecialIso[15] = 0.27735296695391276067;
+// pointWeightSpecialIso[16] = 0.27735296695391276067;
+// pointWeightSpecialIso[17] = 0.27735296695391276067;
+// pointWeightSpecialIso[18] = 0.27735296695391276067;
+// pointWeightSpecialIso[19] = 0.27735296695391276067;
+// pointWeightSpecialIso[20] = 0.27735296695391276067;
+// pointWeightSpecialIso[21] = 0.27735296695391276067;
+// pointWeightSpecialIso[22] = 0.27735296695391276067;
+// pointWeightSpecialIso[23] = 0.27735296695391276067;
+// pointWeightSpecialIso[24] = 0.27735296695391276067;
+// pointWeightSpecialIso[25] = 0.27735296695391276067;
+// pointWeightSpecialIso[26] = 0.27735296695391276067;
+// pointWeightSpecialIso[27] = 0.27735296695391276067;
+// pointWeightSpecialIso[28] = 0.27735296695391276067;
+// pointWeightSpecialIso[29] = 0.27735296695391276067;
+// pointWeightSpecialIso[30] = 0.27735296695391276067;
+// pointWeightSpecialIso[31] = 0.27735296695391276067;
+// pointWeightSpecialIso[32] = 0.14794033605678127974;
+// pointWeightSpecialIso[33] = 0.14794033605678127974;
+// pointWeightSpecialIso[34] = 0.14794033605678127974;
+// pointWeightSpecialIso[35] = 0.14794033605678127974;
+// pointWeightSpecialIso[36] = 0.14794033605678127974;
+// pointWeightSpecialIso[37] = 0.14794033605678127974;
+// pointWeightSpecialIso[38] = 0.14794033605678127974;
+// pointWeightSpecialIso[39] = 0.14794033605678127974;
+// pointWeightSpecialIso[40] = 0.14794033605678127974;
+// pointWeightSpecialIso[41] = 0.14794033605678127974;
+// pointWeightSpecialIso[42] = 0.14794033605678127974;
+// pointWeightSpecialIso[43] = 0.14794033605678127974;
+// pointWeightSpecialIso[44] = 0.14794033605678127974;
+// pointWeightSpecialIso[45] = 0.14794033605678127974;
+// pointWeightSpecialIso[46] = 0.14794033605678127974;
+// pointWeightSpecialIso[47] = 0.14794033605678127974;
+// pointWeightSpecialIso[48] = 0.14794033605678127974;
+// pointWeightSpecialIso[49] = 0.14794033605678127974;
+// pointWeightSpecialIso[50] = 0.14794033605678127974;
+// pointWeightSpecialIso[51] = 0.14794033605678127974;
+// pointWeightSpecialIso[52] = 0.14794033605678127974;
+// pointWeightSpecialIso[53] = 0.14794033605678127974;
+// pointWeightSpecialIso[54] = 0.14794033605678127974;
+// pointWeightSpecialIso[55] = 0.14794033605678127974;
+// pointWeightSpecialIso[56] = 0.14794033605678127974;
+// pointWeightSpecialIso[57] = 0.14794033605678127974;
+// pointWeightSpecialIso[58] = 0.14794033605678127974;
+// pointWeightSpecialIso[59] = 0.14794033605678127974;
+// pointWeightSpecialIso[60] = 0.14794033605678127974;
+// pointWeightSpecialIso[61] = 0.14794033605678127974;
+// pointWeightSpecialIso[62] = 0.14794033605678127974;
+// pointWeightSpecialIso[63] = 0.14794033605678127974;
     
     pointWeightSpecialIso[0] = 0.702331961591221;
     pointWeightSpecialIso[1] = 0.438957475994514;

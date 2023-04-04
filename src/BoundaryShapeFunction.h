@@ -37,6 +37,9 @@ public:
 
 public:
 
+void basisFunctionsBS(double &xsi, int &deg, double *knot, int &inc, double *phiL);
+void derBasisFunctionsBS(int &degree, double &xsi, int &deg, double *knot, int &inc, double *dphiL);
+
 void evaluateBoundaryFem(double *Xsi, double *phiB_);
 
 void evaluateBoundaryIso(double *Xsi, double *phiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
@@ -46,6 +49,9 @@ void evaluateGradientBoundaryFem(double *Xsi, double **dphiB_);
 void evaluateGradientBoundaryIso(double *Xsi, double **dphiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
 
 void evaluateHessianBoundaryFem(double ***ddphiB_);
+
+void evaluateHessianBoundaryIso(double *Xsi, double ***ddphiB_, double *wpcs, int side, int *inc, std::vector<IParameters_ *> &iparameters, int Npatch);
+
 };
 
 

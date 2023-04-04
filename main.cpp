@@ -68,48 +68,35 @@ int main(int argc, char **args) {
     //1- Fluid Flow Data
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
 
-    //EXEMPLOS FEM/ISO (FINE/COARSE) 
-    //Exemplo tipo Jeferson - Lembrar de colocar os valores de normais no Set Signaled Distance
-    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineT_fem.msh","mirror_fine.txt",0);
-
-    //Exemplo inicial, com uma faixa na regiao inferior da cavidade de elementos fine
-    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fine_fem.msh","mirror_fine.txt",0);
-
-    //EXEMPLO CILINDRO
-    // coarseModel.dataReading_ISO("../../mesh/meshfinecyl_data.txt","../../mesh/coarse_iso_cylinder.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt",0);
-
-
-    // //3D problem cavity 
-    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_iso3d.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/NEWcavity_fem3dEST.msh","mirror_fine.txt",0);
+    //FEM/ISO
 
     //3D LAPLACE - FEM/ISO
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
-
-    //3D LAPLACE - malha contorno com distancia assinalada errada
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceCONT_fem3d.msh","mirror_fine.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
+
+    //2D Laplace - FEM/ISO
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarseP_iso.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineP_fem.msh","mirror_fine.txt",0);
+
+    // ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
 
     //ISO/ISO
-    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
+    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
 
-    //ArlequinProblem needs two objects from fluid:
-    //1 - coarseModel;
-    //2 - fineModel;
-    ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
-    
-    //solveArlequinProblem function needs two parameters:  
-    //1- The maximum number of iterations in the Newton-Raphson process
-    //2- The maximum relative error in the Newton-Raphson process (DU) 
-    //ArlequinProblem.solveArlequinProblem_FEM_ISO(10, 1.e-6);
+    ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
+    ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
 
-    ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
-    
+
+    //FEM/FEM
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
+
+    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
+
+
     //Finalize main program   
     PetscFinalize();
  

@@ -649,7 +649,7 @@ void QuadShapeFunction<3>::evaluateHessianFem(double ***ddphi){
 
 template<int DIM>
 void QuadShapeFunction<DIM>::evaluateHessianIso(double *xsi, double*** ddphi, double* wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch){
-   
+
     std::vector<IParameters_ *> *ipar_ = &iparameters;
 
     int deg[DIM],npc[DIM];

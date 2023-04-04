@@ -73,16 +73,26 @@ private:
     double intPointCorrespElem_FEM[8*DIM-9]; 
     double intPointCorrespXsi_ISO[18*DIM-27][DIM];            
     double intPointCorrespElem_ISO[18*DIM-27]; 
+
+    // double intPointCorrespXsi_ISO[64][DIM];            
+    // double intPointCorrespElem_ISO[64];
     // Integration point energy weight 
     double intPointWeightFunction_FEM[8*DIM-9];
     double intPointWeightFunctionPrev_FEM[8*DIM-9];
+
     double intPointWeightFunction_ISO[18*DIM-27];
     double intPointWeightFunctionPrev_ISO[18*DIM-27];
+    // double intPointWeightFunction_ISO[64];
+    // double intPointWeightFunctionPrev_ISO[64];
+    
     // Integration point energy weight gluing zone
     double intPointWeightFunctionSpecial_FEM[8*DIM-9];
     double intPointWeightFunctionSpecialPrev_FEM[8*DIM-9];
     double intPointWeightFunctionSpecial_ISO[18*DIM-27];
     double intPointWeightFunctionSpecialPrev_ISO[18*DIM-27];
+
+    //  double intPointWeightFunctionSpecial_ISO[64];
+    // double intPointWeightFunctionSpecialPrev_ISO[64];
 
     //time integration data
     int iTimeStep;
@@ -111,6 +121,11 @@ public:
     		intPointWeightFunctionPrev_ISO[i] = 1.;
         };
 
+        // for (int i = 0; i < 64; i++){
+    	// 	intPointWeightFunction_ISO[i] = 1.;
+    	// 	intPointWeightFunctionPrev_ISO[i] = 1.;
+        // };
+
 
         for (int i = 0; i < 8*DIM-9; i++){
             intPointWeightFunctionSpecial_FEM[i] = 1.;
@@ -126,6 +141,13 @@ public:
             for (int j = 0; j < DIM; j++) intPointCorrespXsi_ISO[i][j] = 0.0;
             intPointCorrespElem_ISO[i] = 0;
         };
+
+        // for (int i = 0; i < 64; i++){
+        //     intPointWeightFunctionSpecial_ISO[i] = 1.;
+        //     intPointWeightFunctionSpecialPrev_ISO[i] = 1.;
+        //     for (int j = 0; j < DIM; j++) intPointCorrespXsi_ISO[i][j] = 0.0;
+        //     intPointCorrespElem_ISO[i] = 0;
+        // };
 
         iTimeStep = 0;
           
@@ -245,12 +267,22 @@ public:
         double **Jac;
         Jac= new double*[DIM];
         for (int i = 0; i < DIM; ++i) Jac[i] = new double[DIM];
+
+        double **ainv;
+        ainv= new double*[DIM];
+        for (int i = 0; i < DIM; ++i) ainv[i] = new double[DIM];
         
         double djac_;
-        getJacobianMatrix_FEM(djac_,xsi,Jac,ainv_);
+        getJacobianMatrix_FEM(djac_,xsi,Jac,ainv);
+
+        for (int i = 0; i < DIM; i++)
+            for (int j = 0; j < DIM; j++) ainv_[i][j] = ainv[j][i];
 
         for (int i = 0; i < DIM; ++i) delete [] Jac[i];
         delete [] Jac;
+
+        for (int i = 0; i < DIM; ++i) delete [] ainv[i];
+        delete [] ainv;
     };
 
     void getJacobianMatrixValues_ISO(double *xsi, double **ainv_ ){
@@ -375,11 +407,11 @@ public:
                                                   double **arlequinStab0, double *arlequinStabVector0);
 
     
-    void getMatrixAndVectorsSameMeshLaplace(int &LNN, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
+    void getMatrixAndVectorsSameMeshLaplace(int &LNN, double &djac_, double &weight_,double *phi_,
                                             double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
 
     void getMatrixAndVectorsDifferentMeshLaplace(double &djac_, double &weight_,int &LNN, double *phi_, 
-                                                double **dphi_dx, int &LNNC, double *phiC_, double **dphiC_dx,
+                                                int &LNNC, double *phiC_,
                                                 double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);  
 
 
@@ -401,6 +433,9 @@ public:
     void getLagrangeMultipliersSameMeshLaplace_FEM(double **lagrMultMatrix, 
                                                    double *lagrMultVector, double *rhsVector);
 
+    void getLagrangeMultipliersSameMeshLaplace_ISO(double **lagrMultMatrix, 
+                                                   double *lagrMultVector, double *rhsVector);
+
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                        std::vector<IParameters *> &iparamC, double **arlequinStabD, 
@@ -412,9 +447,18 @@ public:
                                                     std::vector<IParameters *> &iparamC, int &ielem, 
                                                     double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
 
+
     void getLagrangeMultipliersDifferentMeshLaplace_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                             std::vector<IParameters *> &iparamC, int &ielem, 
                                                             double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
+    void getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            int &ielem, double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
+    void getLagrangeMultipliersDifferentMeshLaplace_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            std::vector<IParameters *> &iparamC, int &ielem, 
+                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
 
     void getLagrangeMultipliersDifferentMesh_FEM_ISO_TESTE(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                           std::vector<IParameters *> &iparamC, int &ielem, 

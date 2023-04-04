@@ -109,22 +109,35 @@ private:
 public:
     // Sets the coarse and fine mesh models
     void setFluidModels_FEM_ISO(FluidMesh& coarse, FluidMesh& fine);
+    void setFluidModels_ISO_ISO(FluidMesh& coarse, FluidMesh& fine);
+    void setFluidModels_FEM_FEM(FluidMesh& coarse, FluidMesh& fine);
     
     // Computes and stores the element boxes for coarse mesh for improving the correspondence searching process
     void setElementBoxes_ISO();
+    void setElementBoxes_FEM();
     
     // Computes and store the signaled distance function from Nodes to a defined FEM boundary
     void setSignaledDistance_FEM_ISO();
-    void searchMinDist_FEM(int &inode, double *pointCoord, int &ibound, double &mindist);
+    void setSignaledDistance_ISO_ISO();
+    void setSignaledDistance_FEM_FEM();
+    
+    void searchMinDist_FEM(double *pointCoord, int &ibound, double &mindist);
+    void searchMinDist_ISO(double *pointCoord, int &ibound, double &mindist);
 
     // Defines the Gluing zone
     void setGluingZone_FEM_ISO();
+    void setGluingZone_ISO_ISO();
+    void setGluingZone_FEM_FEM();
 
     // Computes the energy weight function
     void setWeightFunction_FEM_ISO();
+    void setWeightFunction_ISO_ISO();
+    void setWeightFunction_FEM_FEM();
 
     //Sets the nodal and integration points correspondence in the coarse mesh
     void setCorrespondenceFine_FEM_ISO();
+    void setCorrespondenceFine_ISO_ISO();
+    void setCorrespondenceFine_FEM_FEM();
 
    	//Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
@@ -137,11 +150,17 @@ public:
                                       std::vector<Element *> elements, 
                                       std::vector<IsoParameters* > isopar, int numElem,
                                       double *xsiC, int &elemC, int elSearch);
+
+    void searchPointCorrespondence_FEM(int ielem, int ip, double *x,std::vector<Nodes *> nodes,
+                                      std::vector<Element *> elements, int numElem,
+                                      double *xsiC, int &elemC, int elSearch);
     
     //Solves the Arlequin Problem
     int solveArlequinProblem_FEM_ISO(int iterNumber,double tolerance);
 
     int solveArlequinProblemLaplace_FEM_ISO(int iterNumber,double tolerance);
+    int solveArlequinProblemLaplace_ISO_ISO(int iterNumber,double tolerance);
+    int solveArlequinProblemLaplace_FEM_FEM(int iterNumber,double tolerance);
 
     //Assemble system
     void setMatVecValuesCoarse_ISO();
@@ -150,9 +169,18 @@ public:
     void setMatVecValuesLagrangeCoarse_FEM_ISO();
 
     void setMatVecValuesCoarseLaplace_ISO();
+    void setMatVecValuesCoarseLaplace_FEM();
     void setMatVecValuesFineLaplace_FEM();
+    void setMatVecValuesFineLaplace_ISO();
     void setMatVecValuesLagrangeFineLaplace_FEM_ISO();
     void setMatVecValuesLagrangeCoarseLaplace_FEM_ISO();
+
+    void setMatVecValuesLagrangeFineLaplace_ISO_ISO();
+    void setMatVecValuesLagrangeCoarseLaplace_ISO_ISO();
+
+    void setMatVecValuesLagrangeFineLaplace_FEM_FEM();
+    void setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
+
 
     // Compute and print drag and lift coefficients
     void dragAndLiftCoefficients_FEM(std::ofstream& dragLift, int &iTimeStep);
@@ -160,11 +188,16 @@ public:
 
     //Prints the results for Paraview post-processing
     void printResults_FEM_ISO(int step);
+    void printResults_FEM_FEM(int step);
 
     void printResultsLaplace_FEM_ISO(int step);
+    void printResultsLaplace_ISO_ISO(int step);
+    void printResultsLaplace_FEM_FEM(int step);
 
     //Print the results of the gluing in the integration points for Paraview post-processing
     void printResultsIP_FEM_ISO(int step);
+    void printResultsIP_ISO_ISO(int step);
+    void printResultsIP_FEM_FEM(int step);
 
 };
 

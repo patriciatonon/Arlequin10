@@ -74,6 +74,8 @@ private:
     //List of integration points coordinates
     double pointCoordSpecialIso[18*DIM-27][DIM];
     double pointWeightSpecialIso[18*DIM-27]; 
+    // double pointCoordSpecialIso[64][DIM];
+    // double pointWeightSpecialIso[64]; 
 
     double pointCoordSpecialFem[8*DIM-9][DIM];
     double pointWeightSpecialFem[8*DIM-9]; 
