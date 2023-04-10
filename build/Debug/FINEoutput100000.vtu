@@ -4,98 +4,14 @@
   <Piece NumberOfPoints="693"  NumberOfCells="300">
     <Points>
       <DataArray type="Float64" NumberOfComponents="3" format="ascii">
-0 0 0.1
-1 0 0.1
-1 0.5 0.1
-0 0.5 0.1
-1 0.5 0.2
-0 0.5 0.2
 0 0 0.2
 1 0 0.2
-0.1 0 0.1
-0.2 0 0.1
-0.3 0 0.1
-0.4 0 0.1
-0.5 0 0.1
-0.6 0 0.1
-0.7 0 0.1
-0.8 0 0.1
-0.9 0 0.1
-0.05 0 0.1
-0.15 0 0.1
-0.25 0 0.1
-0.35 0 0.1
-0.45 0 0.1
-0.55 0 0.1
-0.65 0 0.1
-0.75 0 0.1
-0.85 0 0.1
-0.95 0 0.1
-1 0.1 0.1
-1 0.2 0.1
-1 0.3 0.1
-1 0.4 0.1
-1 0.05 0.1
-1 0.15 0.1
-1 0.25 0.1
-1 0.35 0.1
-1 0.45 0.1
-0.9 0.5 0.1
-0.8 0.5 0.1
-0.7 0.5 0.1
-0.6 0.5 0.1
-0.5 0.5 0.1
-0.4 0.5 0.1
-0.3 0.5 0.1
-0.2 0.5 0.1
-0.1 0.5 0.1
-0.95 0.5 0.1
-0.85 0.5 0.1
-0.75 0.5 0.1
-0.65 0.5 0.1
-0.55 0.5 0.1
-0.45 0.5 0.1
-0.35 0.5 0.1
-0.25 0.5 0.1
-0.15 0.5 0.1
-0.05 0.5 0.1
-0 0.4 0.1
-0 0.3 0.1
-0 0.2 0.1
-0 0.1 0.1
-0 0.45 0.1
-0 0.35 0.1
-0 0.25 0.1
-0 0.15 0.1
-0 0.05 0.1
-0.9 0.5 0.2
-0.8 0.5 0.2
-0.7 0.5 0.2
-0.6 0.5 0.2
-0.5 0.5 0.2
-0.4 0.5 0.2
-0.3 0.5 0.2
-0.2 0.5 0.2
-0.1 0.5 0.2
-0.95 0.5 0.2
-0.85 0.5 0.2
-0.75 0.5 0.2
-0.65 0.5 0.2
-0.55 0.5 0.2
-0.45 0.5 0.2
-0.35 0.5 0.2
-0.25 0.5 0.2
-0.15 0.5 0.2
-0.05 0.5 0.2
-0 0.4 0.2
-0 0.3 0.2
-0 0.2 0.2
-0 0.1 0.2
-0 0.45 0.2
-0 0.35 0.2
-0 0.25 0.2
-0 0.15 0.2
-0 0.05 0.2
+1 0.5 0.2
+0 0.5 0.2
+1 0.5 0.3
+0 0.5 0.3
+0 0 0.3
+1 0 0.3
 0.1 0 0.2
 0.2 0 0.2
 0.3 0 0.2
@@ -124,237 +40,94 @@
 1 0.25 0.2
 1 0.35 0.2
 1 0.45 0.2
-1 0.5 0.15
-0 0.5 0.15
-0 0 0.15
-1 0 0.15
-0.9 0.4 0.1
-0.9 0.3 0.1
-0.9 0.2 0.1
-0.9 0.1 0.1
-0.8 0.4 0.1
-0.8 0.3 0.1
-0.8 0.2 0.1
-0.8 0.1 0.1
-0.7 0.4 0.1
-0.7 0.3 0.1
-0.7 0.2 0.1
-0.7 0.1 0.1
-0.6 0.4 0.1
-0.6 0.3 0.1
-0.6 0.2 0.1
-0.6 0.1 0.1
-0.5 0.4 0.1
-0.5 0.3 0.1
-0.5 0.2 0.1
-0.5 0.1 0.1
-0.4 0.4 0.1
-0.4 0.3 0.1
-0.4 0.2 0.1
-0.4 0.1 0.1
-0.3 0.4 0.1
-0.3 0.3 0.1
-0.3 0.2 0.1
-0.3 0.1 0.1
-0.2 0.4 0.1
-0.2 0.3 0.1
-0.2 0.2 0.1
-0.2 0.1 0.1
-0.1 0.4 0.1
-0.1 0.3 0.1
-0.1 0.2 0.1
-0.1 0.1 0.1
-0.05 0.05 0.1
-0.95 0.05 0.1
-0.9 0.05 0.1
-0.95 0.1 0.1
-0.95 0.45 0.1
-0.05 0.45 0.1
-0.1 0.45 0.1
-0.05 0.4 0.1
-0.15 0.05 0.1
-0.1 0.05 0.1
-0.05 0.1 0.1
-0.25 0.05 0.1
-0.2 0.05 0.1
-0.15 0.1 0.1
-0.35 0.05 0.1
-0.3 0.05 0.1
-0.25 0.1 0.1
-0.45 0.05 0.1
-0.4 0.05 0.1
-0.35 0.1 0.1
-0.55 0.05 0.1
-0.5 0.05 0.1
-0.45 0.1 0.1
-0.65 0.05 0.1
-0.6 0.05 0.1
-0.55 0.1 0.1
-0.75 0.05 0.1
-0.7 0.05 0.1
-0.65 0.1 0.1
-0.85 0.05 0.1
-0.8 0.05 0.1
-0.75 0.1 0.1
-0.85 0.1 0.1
-0.95 0.2 0.1
-0.95 0.15 0.1
-0.9 0.15 0.1
-0.95 0.3 0.1
-0.95 0.25 0.1
-0.9 0.25 0.1
-0.95 0.4 0.1
-0.95 0.35 0.1
-0.9 0.35 0.1
-0.9 0.45 0.1
-0.85 0.45 0.1
-0.75 0.45 0.1
-0.8 0.45 0.1
-0.85 0.4 0.1
-0.65 0.45 0.1
-0.7 0.45 0.1
-0.75 0.4 0.1
-0.55 0.45 0.1
-0.6 0.45 0.1
-0.65 0.4 0.1
-0.45 0.45 0.1
-0.5 0.45 0.1
-0.55 0.4 0.1
-0.35 0.45 0.1
-0.4 0.45 0.1
-0.45 0.4 0.1
-0.25 0.45 0.1
-0.3 0.45 0.1
-0.35 0.4 0.1
-0.15 0.45 0.1
-0.2 0.45 0.1
-0.25 0.4 0.1
-0.15 0.4 0.1
-0.05 0.35 0.1
-0.05 0.3 0.1
-0.1 0.35 0.1
-0.05 0.25 0.1
-0.05 0.2 0.1
-0.1 0.25 0.1
-0.05 0.15 0.1
-0.1 0.15 0.1
-0.85 0.35 0.1
-0.85 0.3 0.1
-0.85 0.25 0.1
-0.8 0.35 0.1
-0.85 0.2 0.1
-0.85 0.15 0.1
-0.8 0.25 0.1
-0.8 0.15 0.1
-0.75 0.35 0.1
-0.75 0.3 0.1
-0.75 0.25 0.1
-0.7 0.35 0.1
-0.75 0.2 0.1
-0.75 0.15 0.1
-0.7 0.25 0.1
-0.7 0.15 0.1
-0.65 0.35 0.1
-0.65 0.3 0.1
-0.65 0.25 0.1
-0.6 0.35 0.1
-0.65 0.2 0.1
-0.65 0.15 0.1
-0.6 0.25 0.1
-0.6 0.15 0.1
-0.55 0.35 0.1
-0.55 0.3 0.1
-0.55 0.25 0.1
-0.5 0.35 0.1
-0.55 0.2 0.1
-0.55 0.15 0.1
-0.5 0.25 0.1
-0.5 0.15 0.1
-0.45 0.35 0.1
-0.45 0.3 0.1
-0.45 0.25 0.1
-0.4 0.35 0.1
-0.45 0.2 0.1
-0.45 0.15 0.1
-0.4 0.25 0.1
-0.4 0.15 0.1
-0.35 0.35 0.1
-0.35 0.3 0.1
-0.35 0.25 0.1
-0.3 0.35 0.1
-0.35 0.2 0.1
-0.35 0.15 0.1
-0.3 0.25 0.1
-0.3 0.15 0.1
-0.25 0.35 0.1
-0.25 0.3 0.1
-0.25 0.25 0.1
-0.2 0.35 0.1
-0.25 0.2 0.1
-0.25 0.15 0.1
-0.2 0.25 0.1
-0.2 0.15 0.1
-0.15 0.35 0.1
-0.15 0.3 0.1
-0.15 0.25 0.1
-0.15 0.2 0.1
-0.15 0.15 0.1
-0.95 0.5 0.15
-0.05 0.5 0.15
-0.1 0.5 0.15
-0.9 0.5 0.15
-0.85 0.5 0.15
-0.75 0.5 0.15
-0.8 0.5 0.15
-0.65 0.5 0.15
-0.7 0.5 0.15
-0.55 0.5 0.15
-0.6 0.5 0.15
-0.45 0.5 0.15
-0.5 0.5 0.15
-0.35 0.5 0.15
-0.4 0.5 0.15
-0.25 0.5 0.15
-0.3 0.5 0.15
-0.15 0.5 0.15
-0.2 0.5 0.15
-0 0.05 0.15
-0 0.1 0.15
-0 0.45 0.15
-0 0.4 0.15
-0 0.35 0.15
-0 0.25 0.15
-0 0.3 0.15
-0 0.15 0.15
-0 0.2 0.15
-0.05 0 0.15
-0.95 0 0.15
-0.9 0 0.15
-0.1 0 0.15
-0.15 0 0.15
-0.25 0 0.15
-0.2 0 0.15
-0.35 0 0.15
-0.3 0 0.15
-0.45 0 0.15
-0.4 0 0.15
-0.55 0 0.15
-0.5 0 0.15
-0.65 0 0.15
-0.6 0 0.15
-0.75 0 0.15
-0.7 0 0.15
-0.85 0 0.15
-0.8 0 0.15
-1 0.05 0.15
-1 0.45 0.15
-1 0.4 0.15
-1 0.1 0.15
-1 0.15 0.15
-1 0.25 0.15
-1 0.2 0.15
-1 0.35 0.15
-1 0.3 0.15
+0.9 0.5 0.2
+0.8 0.5 0.2
+0.7 0.5 0.2
+0.6 0.5 0.2
+0.5 0.5 0.2
+0.4 0.5 0.2
+0.3 0.5 0.2
+0.2 0.5 0.2
+0.1 0.5 0.2
+0.95 0.5 0.2
+0.85 0.5 0.2
+0.75 0.5 0.2
+0.65 0.5 0.2
+0.55 0.5 0.2
+0.45 0.5 0.2
+0.35 0.5 0.2
+0.25 0.5 0.2
+0.15 0.5 0.2
+0.05 0.5 0.2
+0 0.4 0.2
+0 0.3 0.2
+0 0.2 0.2
+0 0.1 0.2
+0 0.45 0.2
+0 0.35 0.2
+0 0.25 0.2
+0 0.15 0.2
+0 0.05 0.2
+0.9 0.5 0.3
+0.8 0.5 0.3
+0.7 0.5 0.3
+0.6 0.5 0.3
+0.5 0.5 0.3
+0.4 0.5 0.3
+0.3 0.5 0.3
+0.2 0.5 0.3
+0.1 0.5 0.3
+0.95 0.5 0.3
+0.85 0.5 0.3
+0.75 0.5 0.3
+0.65 0.5 0.3
+0.55 0.5 0.3
+0.45 0.5 0.3
+0.35 0.5 0.3
+0.25 0.5 0.3
+0.15 0.5 0.3
+0.05 0.5 0.3
+0 0.4 0.3
+0 0.3 0.3
+0 0.2 0.3
+0 0.1 0.3
+0 0.45 0.3
+0 0.35 0.3
+0 0.25 0.3
+0 0.15 0.3
+0 0.05 0.3
+0.1 0 0.3
+0.2 0 0.3
+0.3 0 0.3
+0.4 0 0.3
+0.5 0 0.3
+0.6 0 0.3
+0.7 0 0.3
+0.8 0 0.3
+0.9 0 0.3
+0.05 0 0.3
+0.15 0 0.3
+0.25 0 0.3
+0.35 0 0.3
+0.45 0 0.3
+0.55 0 0.3
+0.65 0 0.3
+0.75 0 0.3
+0.85 0 0.3
+0.95 0 0.3
+1 0.1 0.3
+1 0.2 0.3
+1 0.3 0.3
+1 0.4 0.3
+1 0.05 0.3
+1 0.15 0.3
+1 0.25 0.3
+1 0.35 0.3
+1 0.45 0.3
+1 0.5 0.25
+0 0.5 0.25
+0 0 0.25
+1 0 0.25
 0.9 0.4 0.2
 0.9 0.3 0.2
 0.9 0.2 0.2
@@ -391,17 +164,50 @@
 0.1 0.3 0.2
 0.1 0.2 0.2
 0.1 0.1 0.2
+0.05 0.05 0.2
+0.95 0.05 0.2
+0.9 0.05 0.2
+0.95 0.1 0.2
 0.95 0.45 0.2
 0.05 0.45 0.2
 0.1 0.45 0.2
 0.05 0.4 0.2
-0.05 0.05 0.2
-0.9 0.05 0.2
-0.95 0.05 0.2
-0.95 0.1 0.2
-0.85 0.45 0.2
-0.9 0.45 0.2
+0.15 0.05 0.2
+0.1 0.05 0.2
+0.05 0.1 0.2
+0.25 0.05 0.2
+0.2 0.05 0.2
+0.15 0.1 0.2
+0.35 0.05 0.2
+0.3 0.05 0.2
+0.25 0.1 0.2
+0.45 0.05 0.2
+0.4 0.05 0.2
+0.35 0.1 0.2
+0.55 0.05 0.2
+0.5 0.05 0.2
+0.45 0.1 0.2
+0.65 0.05 0.2
+0.6 0.05 0.2
+0.55 0.1 0.2
+0.75 0.05 0.2
+0.7 0.05 0.2
+0.65 0.1 0.2
+0.85 0.05 0.2
+0.8 0.05 0.2
+0.75 0.1 0.2
+0.85 0.1 0.2
+0.95 0.2 0.2
+0.95 0.15 0.2
+0.9 0.15 0.2
+0.95 0.3 0.2
+0.95 0.25 0.2
+0.9 0.25 0.2
 0.95 0.4 0.2
+0.95 0.35 0.2
+0.9 0.35 0.2
+0.9 0.45 0.2
+0.85 0.45 0.2
 0.75 0.45 0.2
 0.8 0.45 0.2
 0.85 0.4 0.2
@@ -424,279 +230,473 @@
 0.2 0.45 0.2
 0.25 0.4 0.2
 0.15 0.4 0.2
-0.05 0.3 0.2
 0.05 0.35 0.2
+0.05 0.3 0.2
 0.1 0.35 0.2
-0.05 0.2 0.2
 0.05 0.25 0.2
+0.05 0.2 0.2
 0.1 0.25 0.2
-0.05 0.1 0.2
 0.05 0.15 0.2
 0.1 0.15 0.2
-0.1 0.05 0.2
-0.15 0.05 0.2
-0.2 0.05 0.2
-0.25 0.05 0.2
-0.15 0.1 0.2
-0.3 0.05 0.2
-0.35 0.05 0.2
-0.25 0.1 0.2
-0.4 0.05 0.2
-0.45 0.05 0.2
-0.35 0.1 0.2
-0.5 0.05 0.2
-0.55 0.05 0.2
-0.45 0.1 0.2
-0.6 0.05 0.2
-0.65 0.05 0.2
-0.55 0.1 0.2
-0.7 0.05 0.2
-0.75 0.05 0.2
-0.65 0.1 0.2
-0.8 0.05 0.2
-0.85 0.05 0.2
-0.75 0.1 0.2
-0.85 0.1 0.2
-0.95 0.15 0.2
-0.95 0.2 0.2
-0.9 0.15 0.2
-0.95 0.25 0.2
-0.95 0.3 0.2
-0.9 0.25 0.2
-0.95 0.35 0.2
-0.9 0.35 0.2
 0.85 0.35 0.2
-0.85 0.25 0.2
 0.85 0.3 0.2
+0.85 0.25 0.2
 0.8 0.35 0.2
-0.85 0.15 0.2
 0.85 0.2 0.2
+0.85 0.15 0.2
 0.8 0.25 0.2
 0.8 0.15 0.2
 0.75 0.35 0.2
-0.75 0.25 0.2
 0.75 0.3 0.2
+0.75 0.25 0.2
 0.7 0.35 0.2
-0.75 0.15 0.2
 0.75 0.2 0.2
+0.75 0.15 0.2
 0.7 0.25 0.2
 0.7 0.15 0.2
 0.65 0.35 0.2
-0.65 0.25 0.2
 0.65 0.3 0.2
+0.65 0.25 0.2
 0.6 0.35 0.2
-0.65 0.15 0.2
 0.65 0.2 0.2
+0.65 0.15 0.2
 0.6 0.25 0.2
 0.6 0.15 0.2
 0.55 0.35 0.2
-0.55 0.25 0.2
 0.55 0.3 0.2
+0.55 0.25 0.2
 0.5 0.35 0.2
-0.55 0.15 0.2
 0.55 0.2 0.2
+0.55 0.15 0.2
 0.5 0.25 0.2
 0.5 0.15 0.2
 0.45 0.35 0.2
-0.45 0.25 0.2
 0.45 0.3 0.2
+0.45 0.25 0.2
 0.4 0.35 0.2
-0.45 0.15 0.2
 0.45 0.2 0.2
+0.45 0.15 0.2
 0.4 0.25 0.2
 0.4 0.15 0.2
 0.35 0.35 0.2
-0.35 0.25 0.2
 0.35 0.3 0.2
+0.35 0.25 0.2
 0.3 0.35 0.2
-0.35 0.15 0.2
 0.35 0.2 0.2
+0.35 0.15 0.2
 0.3 0.25 0.2
 0.3 0.15 0.2
 0.25 0.35 0.2
-0.25 0.25 0.2
 0.25 0.3 0.2
+0.25 0.25 0.2
 0.2 0.35 0.2
-0.25 0.15 0.2
 0.25 0.2 0.2
+0.25 0.15 0.2
 0.2 0.25 0.2
 0.2 0.15 0.2
 0.15 0.35 0.2
-0.15 0.25 0.2
 0.15 0.3 0.2
-0.15 0.15 0.2
+0.15 0.25 0.2
 0.15 0.2 0.2
-0.45 0.3 0.15
-0.5 0.3 0.15
-0.5 0.25 0.15
-0.35 0.3 0.15
-0.4 0.3 0.15
-0.4 0.25 0.15
-0.45 0.25 0.15
-0.5 0.2 0.15
-0.65 0.4 0.15
-0.6 0.4 0.15
-0.6 0.45 0.15
-0.65 0.45 0.15
-0.4 0.2 0.15
-0.35 0.25 0.15
-0.3 0.3 0.15
-0.05 0.4 0.15
-0.25 0.3 0.15
-0.3 0.25 0.15
-0.35 0.2 0.15
-0.4 0.15 0.15
-0.45 0.2 0.15
-0.25 0.25 0.15
-0.3 0.2 0.15
-0.2 0.3 0.15
-0.25 0.2 0.15
-0.25 0.15 0.15
-0.3 0.15 0.15
-0.35 0.15 0.15
-0.4 0.1 0.15
-0.2 0.25 0.15
-0.15 0.3 0.15
-0.7 0.4 0.15
-0.45 0.15 0.15
-0.5 0.15 0.15
-0.65 0.35 0.15
-0.65 0.3 0.15
-0.6 0.35 0.15
-0.55 0.45 0.15
-0.2 0.2 0.15
-0.3 0.1 0.15
-0.2 0.15 0.15
-0.15 0.2 0.15
-0.6 0.3 0.15
-0.65 0.25 0.15
-0.65 0.2 0.15
-0.6 0.25 0.15
-0.15 0.25 0.15
-0.1 0.3 0.15
-0.55 0.2 0.15
-0.55 0.15 0.15
-0.7 0.45 0.15
-0.5 0.1 0.15
-0.5 0.45 0.15
-0.45 0.45 0.15
-0.5 0.4 0.15
-0.75 0.45 0.15
-0.55 0.3 0.15
-0.55 0.25 0.15
-0.35 0.1 0.15
-0.45 0.35 0.15
-0.05 0.3 0.15
-0.1 0.25 0.15
-0.6 0.15 0.15
-0.6 0.2 0.15
-0.75 0.4 0.15
-0.7 0.3 0.15
-0.7 0.25 0.15
-0.75 0.25 0.15
-0.65 0.15 0.15
-0.55 0.1 0.15
-0.7 0.35 0.15
-0.4 0.35 0.15
-0.75 0.35 0.15
-0.2 0.1 0.15
-0.15 0.15 0.15
-0.1 0.2 0.15
-0.45 0.1 0.15
-0.7 0.2 0.15
-0.75 0.2 0.15
-0.95 0.2 0.15
-0.95 0.25 0.15
-0.9 0.2 0.15
-0.9 0.25 0.15
-0.6 0.1 0.15
-0.05 0.2 0.15
-0.1 0.15 0.15
-0.7 0.15 0.15
-0.85 0.2 0.15
-0.8 0.25 0.15
-0.8 0.2 0.15
-0.05 0.05 0.15
-0.75 0.3 0.15
-0.25 0.1 0.15
-0.65 0.1 0.15
-0.75 0.15 0.15
-0.8 0.15 0.15
-0.75 0.1 0.15
-0.95 0.1 0.15
-0.9 0.1 0.15
-0.9 0.15 0.15
-0.35 0.35 0.15
-0.8 0.45 0.15
-0.95 0.15 0.15
-0.05 0.45 0.15
-0.1 0.4 0.15
-0.95 0.45 0.15
-0.7 0.1 0.15
-0.5 0.35 0.15
-0.55 0.4 0.15
-0.25 0.05 0.15
-0.3 0.05 0.15
-0.55 0.05 0.15
-0.1 0.1 0.15
-0.05 0.15 0.15
-0.3 0.35 0.15
-0.4 0.05 0.15
-0.35 0.05 0.15
-0.9 0.3 0.15
-0.65 0.05 0.15
-0.95 0.05 0.15
-0.8 0.1 0.15
-0.85 0.1 0.15
-0.85 0.05 0.15
-0.8 0.4 0.15
-0.8 0.05 0.15
-0.75 0.05 0.15
-0.6 0.05 0.15
-0.9 0.05 0.15
-0.8 0.3 0.15
-0.7 0.05 0.15
-0.4 0.4 0.15
-0.15 0.1 0.15
-0.95 0.35 0.15
-0.95 0.3 0.15
-0.9 0.35 0.15
-0.45 0.4 0.15
-0.85 0.3 0.15
-0.8 0.35 0.15
-0.35 0.45 0.15
-0.35 0.4 0.15
-0.2 0.05 0.15
-0.05 0.1 0.15
-0.25 0.4 0.15
-0.25 0.45 0.15
-0.3 0.4 0.15
-0.25 0.35 0.15
-0.45 0.05 0.15
-0.2 0.4 0.15
-0.15 0.4 0.15
-0.15 0.45 0.15
-0.15 0.05 0.15
-0.85 0.15 0.15
-0.1 0.45 0.15
-0.4 0.45 0.15
-0.3 0.45 0.15
-0.05 0.25 0.15
-0.1 0.05 0.15
-0.2 0.45 0.15
-0.9 0.4 0.15
-0.2 0.35 0.15
-0.85 0.45 0.15
-0.5 0.05 0.15
-0.85 0.4 0.15
-0.55 0.35 0.15
-0.85 0.35 0.15
-0.85 0.25 0.15
-0.9 0.45 0.15
-0.95 0.4 0.15
-0.15 0.35 0.15
-0.05 0.35 0.15
-0.1 0.35 0.15
+0.15 0.15 0.2
+0.95 0.5 0.25
+0.05 0.5 0.25
+0.1 0.5 0.25
+0.9 0.5 0.25
+0.85 0.5 0.25
+0.75 0.5 0.25
+0.8 0.5 0.25
+0.65 0.5 0.25
+0.7 0.5 0.25
+0.55 0.5 0.25
+0.6 0.5 0.25
+0.45 0.5 0.25
+0.5 0.5 0.25
+0.35 0.5 0.25
+0.4 0.5 0.25
+0.25 0.5 0.25
+0.3 0.5 0.25
+0.15 0.5 0.25
+0.2 0.5 0.25
+0 0.05 0.25
+0 0.1 0.25
+0 0.45 0.25
+0 0.4 0.25
+0 0.35 0.25
+0 0.25 0.25
+0 0.3 0.25
+0 0.15 0.25
+0 0.2 0.25
+0.05 0 0.25
+0.95 0 0.25
+0.9 0 0.25
+0.1 0 0.25
+0.15 0 0.25
+0.25 0 0.25
+0.2 0 0.25
+0.35 0 0.25
+0.3 0 0.25
+0.45 0 0.25
+0.4 0 0.25
+0.55 0 0.25
+0.5 0 0.25
+0.65 0 0.25
+0.6 0 0.25
+0.75 0 0.25
+0.7 0 0.25
+0.85 0 0.25
+0.8 0 0.25
+1 0.05 0.25
+1 0.45 0.25
+1 0.4 0.25
+1 0.1 0.25
+1 0.15 0.25
+1 0.25 0.25
+1 0.2 0.25
+1 0.35 0.25
+1 0.3 0.25
+0.9 0.4 0.3
+0.9 0.3 0.3
+0.9 0.2 0.3
+0.9 0.1 0.3
+0.8 0.4 0.3
+0.8 0.3 0.3
+0.8 0.2 0.3
+0.8 0.1 0.3
+0.7 0.4 0.3
+0.7 0.3 0.3
+0.7 0.2 0.3
+0.7 0.1 0.3
+0.6 0.4 0.3
+0.6 0.3 0.3
+0.6 0.2 0.3
+0.6 0.1 0.3
+0.5 0.4 0.3
+0.5 0.3 0.3
+0.5 0.2 0.3
+0.5 0.1 0.3
+0.4 0.4 0.3
+0.4 0.3 0.3
+0.4 0.2 0.3
+0.4 0.1 0.3
+0.3 0.4 0.3
+0.3 0.3 0.3
+0.3 0.2 0.3
+0.3 0.1 0.3
+0.2 0.4 0.3
+0.2 0.3 0.3
+0.2 0.2 0.3
+0.2 0.1 0.3
+0.1 0.4 0.3
+0.1 0.3 0.3
+0.1 0.2 0.3
+0.1 0.1 0.3
+0.95 0.45 0.3
+0.05 0.45 0.3
+0.1 0.45 0.3
+0.05 0.4 0.3
+0.05 0.05 0.3
+0.9 0.05 0.3
+0.95 0.05 0.3
+0.95 0.1 0.3
+0.85 0.45 0.3
+0.9 0.45 0.3
+0.95 0.4 0.3
+0.75 0.45 0.3
+0.8 0.45 0.3
+0.85 0.4 0.3
+0.65 0.45 0.3
+0.7 0.45 0.3
+0.75 0.4 0.3
+0.55 0.45 0.3
+0.6 0.45 0.3
+0.65 0.4 0.3
+0.45 0.45 0.3
+0.5 0.45 0.3
+0.55 0.4 0.3
+0.35 0.45 0.3
+0.4 0.45 0.3
+0.45 0.4 0.3
+0.25 0.45 0.3
+0.3 0.45 0.3
+0.35 0.4 0.3
+0.15 0.45 0.3
+0.2 0.45 0.3
+0.25 0.4 0.3
+0.15 0.4 0.3
+0.05 0.3 0.3
+0.05 0.35 0.3
+0.1 0.35 0.3
+0.05 0.2 0.3
+0.05 0.25 0.3
+0.1 0.25 0.3
+0.05 0.1 0.3
+0.05 0.15 0.3
+0.1 0.15 0.3
+0.1 0.05 0.3
+0.15 0.05 0.3
+0.2 0.05 0.3
+0.25 0.05 0.3
+0.15 0.1 0.3
+0.3 0.05 0.3
+0.35 0.05 0.3
+0.25 0.1 0.3
+0.4 0.05 0.3
+0.45 0.05 0.3
+0.35 0.1 0.3
+0.5 0.05 0.3
+0.55 0.05 0.3
+0.45 0.1 0.3
+0.6 0.05 0.3
+0.65 0.05 0.3
+0.55 0.1 0.3
+0.7 0.05 0.3
+0.75 0.05 0.3
+0.65 0.1 0.3
+0.8 0.05 0.3
+0.85 0.05 0.3
+0.75 0.1 0.3
+0.85 0.1 0.3
+0.95 0.15 0.3
+0.95 0.2 0.3
+0.9 0.15 0.3
+0.95 0.25 0.3
+0.95 0.3 0.3
+0.9 0.25 0.3
+0.95 0.35 0.3
+0.9 0.35 0.3
+0.85 0.35 0.3
+0.85 0.25 0.3
+0.85 0.3 0.3
+0.8 0.35 0.3
+0.85 0.15 0.3
+0.85 0.2 0.3
+0.8 0.25 0.3
+0.8 0.15 0.3
+0.75 0.35 0.3
+0.75 0.25 0.3
+0.75 0.3 0.3
+0.7 0.35 0.3
+0.75 0.15 0.3
+0.75 0.2 0.3
+0.7 0.25 0.3
+0.7 0.15 0.3
+0.65 0.35 0.3
+0.65 0.25 0.3
+0.65 0.3 0.3
+0.6 0.35 0.3
+0.65 0.15 0.3
+0.65 0.2 0.3
+0.6 0.25 0.3
+0.6 0.15 0.3
+0.55 0.35 0.3
+0.55 0.25 0.3
+0.55 0.3 0.3
+0.5 0.35 0.3
+0.55 0.15 0.3
+0.55 0.2 0.3
+0.5 0.25 0.3
+0.5 0.15 0.3
+0.45 0.35 0.3
+0.45 0.25 0.3
+0.45 0.3 0.3
+0.4 0.35 0.3
+0.45 0.15 0.3
+0.45 0.2 0.3
+0.4 0.25 0.3
+0.4 0.15 0.3
+0.35 0.35 0.3
+0.35 0.25 0.3
+0.35 0.3 0.3
+0.3 0.35 0.3
+0.35 0.15 0.3
+0.35 0.2 0.3
+0.3 0.25 0.3
+0.3 0.15 0.3
+0.25 0.35 0.3
+0.25 0.25 0.3
+0.25 0.3 0.3
+0.2 0.35 0.3
+0.25 0.15 0.3
+0.25 0.2 0.3
+0.2 0.25 0.3
+0.2 0.15 0.3
+0.15 0.35 0.3
+0.15 0.25 0.3
+0.15 0.3 0.3
+0.15 0.15 0.3
+0.15 0.2 0.3
+0.45 0.3 0.25
+0.5 0.3 0.25
+0.5 0.25 0.25
+0.35 0.3 0.25
+0.4 0.3 0.25
+0.4 0.25 0.25
+0.45 0.25 0.25
+0.5 0.2 0.25
+0.65 0.4 0.25
+0.6 0.4 0.25
+0.6 0.45 0.25
+0.65 0.45 0.25
+0.4 0.2 0.25
+0.35 0.25 0.25
+0.3 0.3 0.25
+0.05 0.4 0.25
+0.25 0.3 0.25
+0.3 0.25 0.25
+0.35 0.2 0.25
+0.4 0.15 0.25
+0.45 0.2 0.25
+0.25 0.25 0.25
+0.3 0.2 0.25
+0.2 0.3 0.25
+0.25 0.2 0.25
+0.25 0.15 0.25
+0.3 0.15 0.25
+0.35 0.15 0.25
+0.4 0.1 0.25
+0.2 0.25 0.25
+0.15 0.3 0.25
+0.7 0.4 0.25
+0.45 0.15 0.25
+0.5 0.15 0.25
+0.65 0.35 0.25
+0.65 0.3 0.25
+0.6 0.35 0.25
+0.55 0.45 0.25
+0.2 0.2 0.25
+0.3 0.1 0.25
+0.2 0.15 0.25
+0.15 0.2 0.25
+0.6 0.3 0.25
+0.65 0.25 0.25
+0.65 0.2 0.25
+0.6 0.25 0.25
+0.15 0.25 0.25
+0.1 0.3 0.25
+0.55 0.2 0.25
+0.55 0.15 0.25
+0.7 0.45 0.25
+0.5 0.1 0.25
+0.5 0.45 0.25
+0.45 0.45 0.25
+0.5 0.4 0.25
+0.75 0.45 0.25
+0.55 0.3 0.25
+0.55 0.25 0.25
+0.35 0.1 0.25
+0.45 0.35 0.25
+0.05 0.3 0.25
+0.1 0.25 0.25
+0.6 0.15 0.25
+0.6 0.2 0.25
+0.75 0.4 0.25
+0.7 0.3 0.25
+0.7 0.25 0.25
+0.75 0.25 0.25
+0.65 0.15 0.25
+0.55 0.1 0.25
+0.7 0.35 0.25
+0.4 0.35 0.25
+0.75 0.35 0.25
+0.2 0.1 0.25
+0.15 0.15 0.25
+0.1 0.2 0.25
+0.45 0.1 0.25
+0.7 0.2 0.25
+0.75 0.2 0.25
+0.95 0.2 0.25
+0.95 0.25 0.25
+0.9 0.2 0.25
+0.9 0.25 0.25
+0.6 0.1 0.25
+0.05 0.2 0.25
+0.1 0.15 0.25
+0.7 0.15 0.25
+0.85 0.2 0.25
+0.8 0.25 0.25
+0.8 0.2 0.25
+0.05 0.05 0.25
+0.75 0.3 0.25
+0.25 0.1 0.25
+0.65 0.1 0.25
+0.75 0.15 0.25
+0.8 0.15 0.25
+0.75 0.1 0.25
+0.95 0.1 0.25
+0.9 0.1 0.25
+0.9 0.15 0.25
+0.35 0.35 0.25
+0.8 0.45 0.25
+0.95 0.15 0.25
+0.05 0.45 0.25
+0.1 0.4 0.25
+0.95 0.45 0.25
+0.7 0.1 0.25
+0.5 0.35 0.25
+0.55 0.4 0.25
+0.25 0.05 0.25
+0.3 0.05 0.25
+0.55 0.05 0.25
+0.1 0.1 0.25
+0.05 0.15 0.25
+0.3 0.35 0.25
+0.4 0.05 0.25
+0.35 0.05 0.25
+0.9 0.3 0.25
+0.65 0.05 0.25
+0.95 0.05 0.25
+0.8 0.1 0.25
+0.85 0.1 0.25
+0.85 0.05 0.25
+0.8 0.4 0.25
+0.8 0.05 0.25
+0.75 0.05 0.25
+0.6 0.05 0.25
+0.9 0.05 0.25
+0.8 0.3 0.25
+0.7 0.05 0.25
+0.4 0.4 0.25
+0.15 0.1 0.25
+0.95 0.35 0.25
+0.95 0.3 0.25
+0.9 0.35 0.25
+0.45 0.4 0.25
+0.85 0.3 0.25
+0.8 0.35 0.25
+0.35 0.45 0.25
+0.35 0.4 0.25
+0.2 0.05 0.25
+0.05 0.1 0.25
+0.25 0.4 0.25
+0.25 0.45 0.25
+0.3 0.4 0.25
+0.25 0.35 0.25
+0.45 0.05 0.25
+0.2 0.4 0.25
+0.15 0.4 0.25
+0.15 0.45 0.25
+0.15 0.05 0.25
+0.85 0.15 0.25
+0.1 0.45 0.25
+0.4 0.45 0.25
+0.3 0.45 0.25
+0.05 0.25 0.25
+0.1 0.05 0.25
+0.2 0.45 0.25
+0.9 0.4 0.25
+0.2 0.35 0.25
+0.85 0.45 0.25
+0.5 0.05 0.25
+0.85 0.4 0.25
+0.55 0.35 0.25
+0.85 0.35 0.25
+0.85 0.25 0.25
+0.9 0.45 0.25
+0.95 0.4 0.25
+0.15 0.35 0.25
+0.05 0.35 0.25
+0.1 0.35 0.25
       </DataArray>
     </Points>
     <Cells>
@@ -1609,1402 +1609,1402 @@
     </Cells>
     <PointData>
       <DataArray type="Float64" NumberOfComponents="3" Name="Velocity" format="ascii">
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
       </DataArray> 
       <DataArray type="Float64" NumberOfComponents="3" Name="Real Velocity" format="ascii">
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
--nan -nan -nan
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
-inf inf inf
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+inf 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
+-nan 0 0
       </DataArray> 
       <DataArray type="Float64" NumberOfComponents="3" Name="Lagrange Multipliers" format="ascii">
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3028,66 +3028,66 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3112,61 +3112,61 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3195,131 +3195,131 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3342,86 +3342,86 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3456,144 +3456,144 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3612,7 +3612,7 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
@@ -3621,77 +3621,77 @@ inf inf inf
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
 0 0 0 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
-inf inf inf 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
+inf 0 0 
       </DataArray> 
       <DataArray type="Float64" NumberOfComponents="1" Name="printDistFunction" format="ascii">
 0.5
@@ -4418,13 +4418,13 @@ inf inf inf
 0.99
 0.99
 0.99
-0.980198
-0.490099
+0.99
+0.495
 0.99
 0.99
 0.99
-0.735149
-0.24505
+0.7425
+0.2475
 -0
 -0
 -0
@@ -4435,35 +4435,24 @@ inf inf inf
 -0
 -0
 -0
-5.44119e-16
+5.4956e-16
 -0
-7.4231e-29
--0
--0
-1.71694e-46
+7.49733e-29
 -0
 -0
+1.73411e-46
 -0
-0.490099
-0.980198
-0.99
-0.99
-0.24505
-0.735149
+-0
+-0
+0.495
 0.99
 0.99
 0.99
--0
--0
--0
--0
--0
--0
--0
--0
--0
-1.08824e-15
-6.80149e-17
+0.2475
+0.7425
+0.99
+0.99
+0.99
 -0
 -0
 -0
@@ -4472,223 +4461,9 @@ inf inf inf
 -0
 -0
 -0
-0.490099
-0.980198
-0.99
-0.99
-0.24505
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.980198
-0.490099
-0.99
-0.99
-0.99
-0.735149
-0.24505
-1.09036e-15
-2.7206e-17
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.490099
-0.980198
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.24505
-0.24505
-0.24505
-0.490099
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.99
-0.980198
-0.99
-0.99
-0.490099
-0.735149
-0.735149
-0.24505
-0.24505
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.490099
-0.735149
-0.980198
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.735149
-0.99
-0.99
-0.99
-0.99
-0.735149
-0.980198
-0.99
-0.99
-0.99
-5.48354e-16
 -0
--0
--0
-1.02022e-16
+1.09912e-15
+6.8695e-17
 -0
 -0
 -0
@@ -4697,7 +4472,232 @@ inf inf inf
 -0
 -0
 -0
-2.7206e-16
+0.495
+0.99
+0.99
+0.99
+0.2475
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.7425
+0.2475
+1.10127e-15
+2.7478e-17
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.2475
+0.2475
+0.2475
+0.495
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.495
+0.7425
+0.7425
+0.2475
+0.2475
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.495
+0.7425
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+5.53837e-16
+-0
+-0
+-0
+1.03043e-16
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+-0
+2.7478e-16
 -0
 -0
 -0
@@ -4705,11 +4705,10 @@ inf inf inf
 -0
 0.99
 0.99
-0.24505
-0.490099
-0.735149
+0.2475
+0.495
+0.7425
 0.99
-0.980198
 0.99
 0.99
 0.99
@@ -4732,98 +4731,87 @@ inf inf inf
 0.99
 0.99
 0.99
-0.24505
-0.490099
 0.99
+0.2475
+0.495
 0.99
 0.99
 0.99
-0.735149
-0.980198
-0.490099
-0.980198
 0.99
+0.7425
 0.99
-0.490099
-0.980198
+0.495
 0.99
 0.99
-0.490099
-0.980198
 0.99
+0.495
 0.99
-0.490099
-0.980198
 0.99
 0.99
-0.490099
-0.980198
+0.495
 0.99
 0.99
-0.490099
-0.980198
 0.99
+0.495
 0.99
-0.490099
-0.980198
 0.99
 0.99
-0.490099
-0.980198
+0.495
 0.99
 0.99
-0.490099
-0.980198
 0.99
+0.495
 0.99
-0.24505
-0.24505
-0.24505
-0.490099
 0.99
 0.99
+0.495
 0.99
 0.99
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.24505
-0.24505
-0.490099
-0.490099
-0.980198
-0.735149
-0.735149
 0.99
+0.495
 0.99
 0.99
 0.99
+0.495
 0.99
 0.99
 0.99
+0.2475
+0.2475
+0.2475
+0.495
 0.99
 0.99
 0.99
 0.99
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.2475
+0.2475
+0.495
+0.495
 0.99
+0.7425
+0.7425
 0.99
 0.99
 0.99
@@ -4846,144 +4834,107 @@ inf inf inf
 0.99
 0.99
 0.99
-0.980198
 0.99
-0.735149
-0.735149
-0.735149
 0.99
-0.980198
-0.735149
 0.99
 0.99
 0.99
 0.99
-0.735149
 0.99
-0.980198
-0.735149
 0.99
 0.99
 0.99
 0.99
-0.735149
 0.99
-0.980198
-0.735149
 0.99
 0.99
+0.7425
+0.7425
+0.7425
 0.99
 0.99
-0.735149
+0.7425
 0.99
-0.980198
-0.735149
 0.99
 0.99
 0.99
+0.7425
 0.99
-0.735149
 0.99
-0.980198
-0.735149
+0.7425
 0.99
 0.99
 0.99
 0.99
-0.735149
+0.7425
 0.99
-0.980198
-0.735149
 0.99
+0.7425
 0.99
 0.99
 0.99
-0.735149
 0.99
-0.980198
-0.735149
+0.7425
 0.99
 0.99
+0.7425
 0.99
 0.99
-0.735149
 0.99
-0.980198
 0.99
+0.7425
 0.99
-0.980198
-0.980198
 0.99
-0.980198
-0.980198
+0.7425
 0.99
 0.99
 0.99
-0.490099
-0.490099
-0.24505
-0.24505
 0.99
+0.7425
 0.99
-0.980198
-0.490099
-0.980198
 0.99
+0.7425
 0.99
 0.99
 0.99
 0.99
+0.7425
 0.99
-0.980198
 0.99
+0.7425
 0.99
 0.99
 0.99
 0.99
+0.7425
 0.99
-0.980198
-0.490099
 0.99
 0.99
-0.735149
-0.980198
-0.735149
-0.24505
 0.99
 0.99
 0.99
 0.99
-0.980198
 0.99
 0.99
 0.99
 0.99
-0.980198
 0.99
+0.495
+0.495
+0.2475
+0.2475
 0.99
-0.24505
 0.99
-0.24505
-0.24505
-0.490099
-0.24505
-0.980198
 0.99
+0.495
 0.99
-0.735149
-0.980198
 0.99
 0.99
 0.99
-0.490099
-0.980198
 0.99
 0.99
 0.99
 0.99
-0.735149
-0.735149
-0.735149
 0.99
 0.99
 0.99
@@ -4991,9 +4942,13 @@ inf inf inf
 0.99
 0.99
 0.99
+0.495
 0.99
 0.99
+0.7425
 0.99
+0.7425
+0.2475
 0.99
 0.99
 0.99
@@ -5002,86 +4957,131 @@ inf inf inf
 0.99
 0.99
 0.99
-0.980198
 0.99
 0.99
 0.99
 0.99
+0.2475
 0.99
+0.2475
+0.2475
+0.495
+0.2475
 0.99
 0.99
 0.99
-0.735149
-0.24505
+0.7425
 0.99
-0.24505
-0.490099
-0.24505
 0.99
-0.735149
-0.490099
 0.99
 0.99
+0.495
 0.99
 0.99
 0.99
-0.735149
 0.99
 0.99
-0.980198
+0.7425
+0.7425
+0.7425
 0.99
 0.99
 0.99
 0.99
 0.99
-0.490099
 0.99
 0.99
 0.99
 0.99
-0.980198
 0.99
-0.490099
 0.99
-0.735149
-0.980198
-0.735149
-0.490099
-0.980198
-0.735149
-0.24505
-0.490099
 0.99
 0.99
-0.490099
-0.24505
-0.490099
-0.735149
 0.99
-0.490099
-0.490099
-0.24505
 0.99
 0.99
-0.24505
-0.24505
-0.24505
 0.99
 0.99
-0.24505
-0.490099
-0.735149
-0.24505
 0.99
-0.490099
-0.735149
-0.735149
 0.99
-0.24505
-0.490099
-0.735149
-0.735149
-0.735149
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.2475
+0.99
+0.2475
+0.495
+0.2475
+0.99
+0.7425
+0.495
+0.99
+0.99
+0.99
+0.99
+0.99
+0.7425
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.495
+0.99
+0.99
+0.99
+0.99
+0.99
+0.99
+0.495
+0.99
+0.7425
+0.99
+0.7425
+0.495
+0.99
+0.7425
+0.2475
+0.495
+0.99
+0.99
+0.495
+0.2475
+0.495
+0.7425
+0.99
+0.495
+0.495
+0.2475
+0.99
+0.99
+0.2475
+0.2475
+0.2475
+0.99
+0.99
+0.2475
+0.495
+0.7425
+0.2475
+0.99
+0.495
+0.7425
+0.7425
+0.99
+0.2475
+0.495
+0.7425
+0.7425
+0.7425
       </DataArray> 
     </PointData>
     <CellData>

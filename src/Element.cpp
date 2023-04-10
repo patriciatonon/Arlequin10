@@ -4993,10 +4993,10 @@ void Element<DIM>::getLaplace_FEM(double **jacobianNRMatrix, double *rhsVector)
         index++;
     };
 
-    // Computes the RHS vector
-    getResidualVectorLaplace(LNN,rhsVector);
+    // // Computes the RHS vector
+    // getResidualVectorLaplace(LNN,rhsVector);
 
-    setDirichletConstrain(LNN,jacobianNRMatrix);
+    // setDirichletConstrain(LNN,jacobianNRMatrix);
 
     for (int i = 0; i < DIM; ++i)
         delete[] dphi_dx[i];

@@ -82,19 +82,19 @@ int main(int argc, char **args) {
     // ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
 
     //ISO/ISO
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
 
-    ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
-    ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
+    // ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
 
 
     //FEM/FEM
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
-    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
+    coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
 
-    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
-    // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
+    ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
 
 
     //Finalize main program   

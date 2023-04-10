@@ -95,7 +95,7 @@ private:
     std::pair<idx_t*,idx_t*> domDecompFine;     // Fine Model Domain Decomposition
     double pi = M_PI;
     Mat               A,F;
-    Vec               b, u, All;
+    Vec               b, b2, u, All;
     PetscErrorCode    ierr;
     PetscInt          Istart, Iend, Ii, Ij, Ione, iterations, *dof;
     KSP               ksp;
@@ -141,6 +141,8 @@ public:
 
    	//Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
+
+    void setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
     //Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp);

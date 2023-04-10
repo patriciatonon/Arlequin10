@@ -2,8 +2,8 @@ Number of Time Steps   = 100000
 Printing Frequence     = 1
 Thickness of glue zone   = 0.2
 Epsilon from Arlequin formulation   = 0.01
-Arlequin k1   = 1
-Arlequin k2   = 0
+Arlequin k1   = 10
+Arlequin k2   = 4
 Undisturbed Velocity x = 0
 Undisturbed Velocity y = 0
 Undisturbed Velocity z = 0
@@ -727,8 +727,8 @@ Nodal Coordinates
 0.15 0.35 0.05 
 0.05 0.35 0.05 
 0.1 0.35 0.05 
-Number of Boundary groups (FEM MESH) = 6
-Number of Boundary Elements (FEM MESH)= 260
+Number of Boundary groups (FEM MESH) = 7
+Number of Boundary Elements (FEM MESH)= 280
 Constrains 0 1 0 1 0 1 0
 Constrains 1 1 0 1 0 1 0
 Constrains 2 0 0 0 0 0 0

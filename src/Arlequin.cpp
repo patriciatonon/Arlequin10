@@ -7659,6 +7659,53 @@ void Arlequin<DIM>::setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp)
     // dofTemp.push_back(NCNumberNodesF * DIM + (DIM + 1) * NCNumberNodesC);
 };
 
+
+template <int DIM>
+void Arlequin<DIM>::setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp,std::vector<double> &dofValue){
+
+    
+    // Coarse mesh (FEM elements)
+    int LNNC = 4*DIM-2;
+    for (int ielem = 0; ielem < numElemCoarse; ielem++)
+    {
+        int *connec = elementsCoarse_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNNC; i++)
+        {
+            // velocity constrain
+      
+            int constrain = nodesCoarse_[connec[i]]->getConstrains(0);
+            if ((constrain == 1) || (constrain == 3))
+            {
+                dofTemp.push_back(connec[i]);
+                dofValue.push_back(nodesCoarse_[connec[i]]->getConstrainValue(0));
+            };
+   
+        };
+    };
+
+    // dofTemp.push_back(numNodesCoarse*DIM+1451);
+
+
+    // Fine mesh (FEM elements)
+    int LNN = 4*DIM-2;
+    for (int ielem = 0; ielem < numElemFine; ielem++)
+    {
+        int *connec = elementsFine_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNN; i++)
+        {
+            int constrain = nodesFine_[connec[i]]->getConstrains(0);
+            if ((constrain == 1) || (constrain == 3))
+            {
+                dofTemp.push_back(connec[i]+NCNumberNodesC);
+                dofValue.push_back(nodesFine_[connec[i]]->getConstrainValue(0));
+            };
+        };
+    };
+
+}
+
 template <int DIM>
 void Arlequin<DIM>::setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp)
 {
@@ -9636,6 +9683,18 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
 
     printResultsIP_FEM_FEM(0);
 
+
+
+    std::vector<int> dofTemp;
+    std::vector<double>dofValue;
+    setDirichletConstrain_FEM_FEM(dofTemp,dofValue);
+    PetscMalloc1(dofTemp.size(), &dof);
+    for (size_t i = 0; i < dofTemp.size(); i++)
+    {
+        dof[i] = dofTemp[i];
+    };
+
+
     std::clock_t t1 = std::clock();
 
     int sysSize = NCNumberNodesC + NCNumberNodesF + NCnumNodesGlueZoneFine;
@@ -9643,7 +9702,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
                         sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
 
-    for (int i=0; i<sysSize; i++){
+    for (int i=(NCNumberNodesC); i<sysSize; i++){
         double valu = 1.e-20;
         ierr = MatSetValues(A,1,&i,1,&i,&valu,ADD_VALUES);
     }
@@ -9655,18 +9714,34 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = VecCreate(PETSC_COMM_WORLD,&b);CHKERRQ(ierr);
     ierr = VecSetSizes(b,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
     ierr = VecSetFromOptions(b);CHKERRQ(ierr);
+
+    ierr = VecCreate(PETSC_COMM_WORLD,&b2);CHKERRQ(ierr);
+    ierr = VecSetSizes(b2,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
+    ierr = VecSetFromOptions(b2);CHKERRQ(ierr);
+       
+    
     ierr = VecDuplicate(b,&u);CHKERRQ(ierr);
     ierr = VecDuplicate(b,&All);CHKERRQ(ierr);
+
+    if (rank == 0){
+    for (int i = 0; i < dofTemp.size(); i++){
+
+        int ind = dof[i];
+        ierr = VecSetValues(b2, 1, &ind, &dofValue[i],
+                            INSERT_VALUES);
+    };
+    };
+    
 
     // //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_FEM();
     // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
-    setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
+    // setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
     // //Matrix and vectors -FINE MESH  - FEM mesh
-    setMatVecValuesFineLaplace_FEM();
+    // setMatVecValuesFineLaplace_FEM();
     // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
-    setMatVecValuesLagrangeFineLaplace_FEM_FEM();
+    // setMatVecValuesLagrangeFineLaplace_FEM_FEM();
 
     //Assemble matrices and vectors
     ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
@@ -9675,10 +9750,17 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
     ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
 
+    ierr = VecAssemblyBegin(b2);CHKERRQ(ierr);
+    ierr = VecAssemblyEnd(b2);CHKERRQ(ierr);
+
     //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
     //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
-    // MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
+
+    MatZeroRows(A,dofTemp.size(),dof,1.0,b2,b);
+
+    // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+    VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
     //Create KSP context to solve the linear system
     ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
