@@ -69,7 +69,6 @@ int main(int argc, char **args) {
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
 
     //FEM/ISO
-
     //3D LAPLACE - FEM/ISO
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
@@ -90,6 +89,11 @@ int main(int argc, char **args) {
 
 
     //FEM/FEM
+    //2D
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJ_fem.msh","mirror_fine.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
+
+    //3D
     fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
     coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
 

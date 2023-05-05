@@ -67,10 +67,46 @@ void Arlequin<DIM>::setElementBoxes_ISO()
     return;
 };
 
-template <int DIM>
-void Arlequin<DIM>::setElementBoxes_FEM()
+template <>
+void Arlequin<2>::setElementBoxes_FEM()
 {
    
+    // Compute element boxes for coarse model (IGA coarse mesh)
+    int DIM = 2;
+    double &alpha_f = parametersCoarse->getAlphaF();
+
+    for (int jel = 0; jel < numElemCoarse; jel++)
+    {
+
+        int *connec = elementsCoarse_[jel] -> getConnectivity();
+        double xk[DIM], Xk[DIM],x1[DIM],x2[DIM],x3[DIM];
+
+        double *xx1 = nodesCoarse_[connec[0]] -> getCoordinates();
+        double *xx2 = nodesCoarse_[connec[1]] -> getCoordinates();
+        double *xx3 = nodesCoarse_[connec[2]] -> getCoordinates();
+
+        for (int i = 0; i < DIM; i++){
+            x1[i] = xx1[i];
+            x2[i] = xx2[i];
+            x3[i] = xx3[i];
+        };
+        
+        for (int i = 0; i < DIM; i++){
+            xk[i] = std::min(x1[i],std::min(x2[i],x3[i]));
+            Xk[i] = std::max(x1[i],std::max(x2[i],x3[i]));
+        };
+     
+        elementsCoarse_[jel] -> setIntersectionParameters(xk, Xk);
+
+    };
+
+    return;
+};
+
+template <>
+void Arlequin<3>::setElementBoxes_FEM()
+{
+    int DIM = 3;
     // Compute element boxes for coarse model (IGA coarse mesh)
     double &alpha_f = parametersCoarse->getAlphaF();
 
@@ -524,12 +560,13 @@ void Arlequin<3>::searchPointCorrespondence_ISO(double *x, std::vector<Nodes *> 
 };
 
 
-
-template <int DIM>
-void Arlequin<DIM>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, std::vector<Nodes *> nodes,
+template <>
+void Arlequin<2>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, std::vector<Nodes *> nodes,
                                                   std::vector<Element *> elements,
                                                   int numElem, double *xsiC, int &elemC, int elSearch)
 {
+
+    int const DIM = 2;
 
     int LNNC = 4*DIM-2;
 
@@ -551,8 +588,199 @@ void Arlequin<DIM>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, 
         xsiC[i] = 1.e50;
     };
 
-    for (int i = 0; i < DIM + 1; i++)
-        xsiCC[i] = 1.e10;
+    for (int i = 0; i < DIM + 1; i++) xsiCC[i] = 1.e10;
+
+    int *connec = elements[elSearch]->getConnectivity();
+
+    // Computing basis functions
+    double phi_[LNNC];
+    shapeQuad.evaluateFem(xsi, phi_);
+
+    for (int i = 0; i < LNNC; i++)
+    {
+        double *xint = nodes[connec[i]]->getCoordinates();
+        for (int j = 0; j < DIM; j++) x_[j] += xint[j] * phi_[i];
+    };
+
+    double error = 1.e6;
+    int iterations = 0;
+
+    while ((error > 1.e-8) && (iterations < 4))
+    {
+
+        iterations++;
+
+        for (int i = 0; i < DIM; i++)
+        {
+            deltaX[i] = x[i] - x_[i];
+            deltaXsi[i] = 0.0;
+        };
+
+        elements[elSearch]->getJacobianMatrixValues_FEM(xsi, ainv);
+
+        for (int i = 0; i < DIM; i++)
+            for (int j = 0; j < DIM; j++)
+                deltaXsi[i] += ainv[i][j] * deltaX[j];
+
+        error = 0.;
+        for (int i = 0; i < DIM; i++)
+        {
+            xsi[i] += deltaXsi[i];
+            x_[i] = 0.0;
+            error += deltaXsi[i] * deltaXsi[i];
+        };
+
+        error = sqrt(error);
+
+        shapeQuad.evaluateFem(xsi, phi_);
+
+        for (int i = 0; i < LNNC; i++)
+        {
+            double *xint = nodes[connec[i]]->getCoordinates();
+            for (int j = 0; j < DIM; j++)
+                x_[j] += xint[j] * phi_[i];
+        };
+    };
+
+    double t1 = -1.e-2;
+    double t2 = 1. - t1;
+
+    if ((xsi[0] >= t1) && (xsi[1] >= t1) &&  
+        (xsi[0] <= t2) && (xsi[1] <= t2))
+    {
+        xsiC[0] = xsi[0];
+        xsiC[1] = xsi[1];
+        elemC = elSearch;
+    }
+   
+    else
+    {
+
+        for (int jel = 0; jel < numElem; jel++)
+        {
+
+            int *connec = elements[jel]->getConnectivity();
+
+            // get boxes information
+            std::pair<double *, double *> XK;
+            XK = elements[jel]->getXIntersectionParameter();
+
+            //Chech if the node is inside the element box
+            if ((x[0] < XK.first[0] - 0.0001) || (x[0] > XK.second[0] + 0.001) ||
+                (x[1] < XK.first[1] - 0.0001) || (x[1] > XK.second[1] + 0.001))
+                continue;
+
+            // Compute the basis functions
+            double phi_[LNNC];
+            for (int i = 0; i < DIM; i++)
+            {
+                xsi[i] = 1./3.; // central element cooordinates
+                x_[i] = 0.0;
+            };
+
+            shapeQuad.evaluateFem(xsi, phi_);
+
+            for (int i = 0; i < LNNC; i++)
+            {
+                double *xint = nodes[connec[i]]->getCoordinates();
+                for (int j = 0; j < DIM; j++)
+                    x_[j] += xint[j] * phi_[i];
+            };
+
+            double error = 1.e6;
+
+            int iterations = 0;
+
+            while ((error > 1.e-8) && (iterations < 4))
+            {
+
+                iterations++;
+
+                for (int i = 0; i < DIM; i++)
+                {
+                    deltaX[i] = x[i] - x_[i];
+                    deltaXsi[i] = 0.0;
+                };
+
+                elements[jel]->getJacobianMatrixValues_FEM(xsi, ainv);
+
+                for (int i = 0; i < DIM; i++)
+                    for (int j = 0; j < DIM; j++)
+                        deltaXsi[i] += ainv[i][j] * deltaX[j];
+
+                error = 0.;
+                for (int i = 0; i < DIM; i++)
+                {
+                    xsi[i] += deltaXsi[i];
+                    x_[i] = 0.0;
+                    error = deltaXsi[i] * deltaXsi[i];
+                };
+
+                error = sqrt(error);
+
+                shapeQuad.evaluateFem(xsi, phi_);
+
+                for (int i = 0; i < LNNC; i++)
+                {
+                    double *xint = nodes[connec[i]]->getCoordinates();
+                    for (int j = 0; j < DIM; j++)
+                        x_[j] += xint[j] * phi_[i];
+                };
+            };
+
+               double t1 = -1.e-2;
+               double t2 = 1. - t1;
+
+            if ((xsi[0] >= t1) && (xsi[1] >= t1) &&
+                (xsi[0] <= t2) && (xsi[1] <= t2))
+            {
+                xsiC[0] = xsi[0];
+                xsiC[1] = xsi[1];
+                elemC = jel;
+                break;
+            };
+        };
+    };
+
+    if (fabs(xsi[0]) > 2.){
+
+        std::cout << "PROBEM SEARCHING NODE CORRESPONDENCE "
+                  << std::endl;
+    };
+        
+
+    for (int i = 0; i < DIM; ++i)
+        delete[] ainv[i];
+    delete[] ainv;
+};
+
+template <>
+void Arlequin<3>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, std::vector<Nodes *> nodes,
+                                                  std::vector<Element *> elements,
+                                                  int numElem, double *xsiC, int &elemC, int elSearch)
+{
+    int const DIM = 3;
+    int LNNC = 4*DIM-2;
+
+    QuadShapeFunction<DIM> shapeQuad;
+
+    double x_[DIM], deltaX[DIM], deltaXsi[DIM], xsi[DIM], xsiCC[DIM + 1];
+
+    double **ainv;
+    ainv = new double *[DIM];
+    for (int i = 0; i < DIM; ++i)
+        ainv[i] = new double[DIM];
+
+    // double &alpha_f = isopar -> getAlphaF();
+
+    for (int i = 0; i < DIM; i++)
+    {
+        xsi[i] = 1./3.; // central element cooordinates
+        x_[i] = 0.0;
+        xsiC[i] = 1.e50;
+    };
+
+    for (int i = 0; i < DIM + 1; i++) xsiCC[i] = 1.e10;
 
     int *connec = elements[elSearch]->getConnectivity();
 
@@ -846,12 +1074,73 @@ void Arlequin<3>::setCorrespondenceFine_FEM_ISO()
     };
 };
 
-
-
-template <int DIM>
-void Arlequin<DIM>::setCorrespondenceFine_FEM_FEM()
+template <>
+void Arlequin<2>::setCorrespondenceFine_FEM_FEM()
 {
+    int DIM = 2;
 
+    // Node correspondence
+    for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
+    {
+       
+        double *x = nodesFine_[nodesGlueZoneFine_[inode]]->getCoordinates();
+
+        int elemC = 0;
+        double xsiC[DIM] = {};
+        int const val = 1;
+        searchPointCorrespondence_FEM(nodesGlueZoneFine_[inode], val, x, nodesCoarse_, elementsCoarse_,
+                                      elementsCoarse_.size(), xsiC, elemC,
+                                      nodesFine_[nodesGlueZoneFine_[inode]]->getNodalElemCorrespondence());
+
+        nodesFine_[nodesGlueZoneFine_[inode]]->setNodalCorrespondence(elemC, xsiC);
+
+
+    };
+
+    // integration points correspondence
+    int LNN = 4*DIM-2;
+    for (int i = 0; i < numElemGlueZoneFine; i++)
+    {
+
+        SpecialQuadrature squad;
+
+        int *connec = elementsFine_[elementsGlueZoneFine_[i]]->getConnectivity();
+
+        double x1[LNN], x2[LNN];
+        for (int j = 0; j < LNN; j++)
+        {
+            double *x = nodesFine_[connec[j]]->getCoordinates();
+            x1[j] = x[0];
+            x2[j] = x[1];
+        };
+
+        int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]]->getNumberOfIntegrationPointsSpecial_FEM();
+
+        for (int ip = 0; ip < numberIntPoints; ip++)
+        {
+
+            int elemC = 0;
+            double xsiC[DIM] = {};
+            double x_[DIM] = {};
+
+            x_[0] = squad.interpolateQuadraticVariableFem(x1, ip);
+            x_[1] = squad.interpolateQuadraticVariableFem(x2, ip);
+
+            searchPointCorrespondence_FEM(elementsGlueZoneFine_[i], ip, x_, nodesCoarse_, elementsCoarse_,
+                                          elementsCoarse_.size(), xsiC, elemC,
+                                          elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCorrespondenceElement_FEM(ip));
+            
+           
+            elementsFine_[elementsGlueZoneFine_[i]]->setIntegrationPointCorrespondence_FEM(ip, xsiC, elemC);
+
+        };
+    };
+};
+
+template <>
+void Arlequin<3>::setCorrespondenceFine_FEM_FEM()
+{
+    int DIM = 3;
     // Node correspondence
     for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
     {
@@ -2336,52 +2625,82 @@ void Arlequin<DIM>::setSignaledDistance_FEM_FEM()
     // Fine mesh - closer distance for nodes from defined fine boundary
     for (int ino = 0; ino < numNodesFine; ino++)
     {
-        double x[DIM];
         double *xx = nodesFine_[ino]->getCoordinates();
-        for (int i = 0; i < DIM; i++) x[i] = xx[i];
-
-        dist = 10000000000000000000000000000.;
-        for (int ibound = 0; ibound < numBoundElemFine; ibound++)
-        {
-            if (boundaryFine_[ibound]->getConstrain(0) == 2)
-            {
-                double mindist;
-                searchMinDist_FEM(x, ibound, mindist);
-                if (fabs(mindist) < fabs(dist))
-                    dist = mindist;
-                
-            };
-        };
-
-        if (dist < 0) {
-            dist = -dist;
-            //dist = 0;
-        };
-
+        dist = (0.5 - xx[1]);
         nodesFine_[ino]->setDistFunction(dist);
     };
 
     // Coarse mesh - closer distance for nodes or control points from defined fine boundary
     for (int ino = 0; ino < numNodesCoarse; ino++)
     {
-        double x[DIM];
         double *xx = nodesCoarse_[ino]->getCoordinates();
-        for (int i = 0; i < DIM; i++) x[i] = xx[i];
-
-        dist = 10000000000000000000000000000.;
-        for (int ibound = 0; ibound < numBoundElemFine; ibound++)
-        {
-            if (boundaryFine_[ibound]->getConstrain(0) == 2)
-            {
-                double mindist;
-                searchMinDist_FEM(x, ibound, mindist);
-                if (fabs(mindist) < fabs(dist))
-                    dist = mindist;
-            };
-        };
-
+        dist = (0.5 - xx[1]);
         nodesCoarse_[ino]->setDistFunction(dist);
     };
+
+
+
+    // for (int inode = 0; inode < numNodesFine; inode++)
+    // {
+    //     nodesFine_[inode]->setDistFunction(0.0);
+    // };
+
+    // for (int inode = 0; inode < numNodesCoarse; inode++)
+    // {
+    //     nodesCoarse_[inode]->setDistFunction(0.0);
+    // };
+
+    // double dist;
+
+    // // Fine mesh - closer distance for nodes from defined fine boundary
+    // for (int ino = 0; ino < numNodesFine; ino++)
+    // {
+    //     double x[DIM];
+    //     double *xx = nodesFine_[ino]->getCoordinates();
+    //     for (int i = 0; i < DIM; i++) x[i] = xx[i];
+
+    //     dist = 10000000000000000000000000000.;
+    //     for (int ibound = 0; ibound < numBoundElemFine; ibound++)
+    //     {
+    //         if (boundaryFine_[ibound]->getConstrain(0) == 2)
+    //         {
+    //             double mindist;
+    //             searchMinDist_FEM(x, ibound, mindist);
+    //             if (fabs(mindist) < fabs(dist))
+    //                 dist = mindist;
+                
+    //         };
+    //     };
+
+    //     if (dist < 0) {
+    //         dist = -dist;
+    //         //dist = 0;
+    //     };
+
+    //     nodesFine_[ino]->setDistFunction(dist);
+    // };
+
+    // // Coarse mesh - closer distance for nodes or control points from defined fine boundary
+    // for (int ino = 0; ino < numNodesCoarse; ino++)
+    // {
+    //     double x[DIM];
+    //     double *xx = nodesCoarse_[ino]->getCoordinates();
+    //     for (int i = 0; i < DIM; i++) x[i] = xx[i];
+
+    //     dist = 10000000000000000000000000000.;
+    //     for (int ibound = 0; ibound < numBoundElemFine; ibound++)
+    //     {
+    //         if (boundaryFine_[ibound]->getConstrain(0) == 2)
+    //         {
+    //             double mindist;
+    //             searchMinDist_FEM(x, ibound, mindist);
+    //             if (fabs(mindist) < fabs(dist))
+    //                 dist = mindist;
+    //         };
+    //     };
+
+    //     nodesCoarse_[ino]->setDistFunction(dist);
+    // };
 };
 
 
@@ -2970,7 +3289,7 @@ void Arlequin<DIM>::setWeightFunction_FEM_FEM()
     double glueZoneThickness = fineModel.glueZoneThickness;
     double arlequinEpsilon = fineModel.arlequinEpsilon;
 
-    glueZoneThickness *= 1.00; // Thickness from gluing zone
+    glueZoneThickness *= 1.01; // Thickness from gluing zone
 
     // FEM coarse mesh
     for (int iNode = 0; iNode < numNodesCoarse; iNode++)
@@ -4127,10 +4446,419 @@ void Arlequin<3>::printResults_FEM_ISO(int step)
 };
 
 
-template <int DIM>
-void Arlequin<DIM>::printResults_FEM_FEM(int step)
+template <>
+void Arlequin<2>::printResults_FEM_FEM(int step)
 {
+    int DIM = 2;
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
+    if (step % fineModel.printFreq == 0)
+    {
+
+        if (rank == 0)
+        {
+
+            std::string result;
+            std::ostringstream convert;
+            convert << step + 100000;
+            result = convert.str();
+
+            // COARSE MESH
+            std::string s = "COARSEoutput" + result + ".vtu";
+            std::fstream output_v(s.c_str(), std::ios_base::out);
+
+            int LNNC = 4*DIM-2;
+
+            output_v << "<?xml version=\"1.0\"?>" << std::endl
+                     << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                     << "  <UnstructuredGrid>" << std::endl
+                     << "  <Piece NumberOfPoints=\"" << numNodesCoarse
+                     << "\"  NumberOfCells=\"" << numElemCoarse
+                     << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_v << "    <Points>" << std::endl
+                     << "      <DataArray type=\"Float64\" "
+                     << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+
+            for (int i = 0; i < numNodesCoarse; i++)
+            {
+                double *x = nodesCoarse_[i]->getCoordinates();
+                output_v << x[0] << " " << x[1] << " " << 0.0 << std::endl;
+            };
+
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_v << "    <Cells>" << std::endl
+                     << "      <DataArray type=\"Int32\" "
+                     << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int iElem = 0; iElem < numElemCoarse; ++iElem)
+            {
+                int *connec = elementsCoarse_[iElem]->getConnectivity();
+                int con[LNNC];
+                for (int i = 0; i < LNNC; i++) con[i] = connec[i];
+                    output_v << con[0] << " " << con[1] << " " << con[2] << " "
+                             << con[3] << " " << con[4] << " " << con[5] << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_v << "      <DataArray type=\"Int32\""
+                     << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+            int aux = 0;
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << aux + LNNC << std::endl;
+                aux += LNNC;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                     << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << 22 << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_v << "    <PointData>" << std::endl;
+
+            if (coarseModel.printVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << nodesCoarse_[i]->getVelocity(0) << " "
+                             << nodesCoarse_[i]->getVelocity(1) << " "
+                             << 0.0 << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << nodesCoarse_[i]->getVelocityArlequin(0) << " "
+                             << nodesCoarse_[i]->getVelocityArlequin(1) << " "
+                             << 0.0 << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << nodesCoarse_[i]->getPressure() << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << nodesCoarse_[i]->getPressureArlequin() << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printDistFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << nodesCoarse_[i]->getDistFunction() << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printEnergyWeightFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Energy Weight Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << nodesCoarse_[i]->getWeightFunction() << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_v << "    <CellData>" << std::endl;
+
+            if (coarseModel.printProcess)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    output_v << domDecompFine.first[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printGlueZone)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                int cont = 0;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    if (elementsGlueZoneCoarse_[cont] == i)
+                    {
+                        output_v << 1.0 << std::endl;
+                        cont += 1;
+                    }
+                    else
+                    {
+                        output_v << 0.0 << std::endl;
+                    };
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+            output_v << "  </Piece>" << std::endl
+                     << "  </UnstructuredGrid>" << std::endl
+                     << "</VTKFile>" << std::endl;
+
+            // PRINT FINE MODEL RESULTS - FEM mesh
+            std::string f = "FINEoutput" + result + ".vtu";
+
+            std::fstream output_vf(f.c_str(), std::ios_base::out);
+
+            int LNN = 4*DIM-2;
+
+            output_vf << "<?xml version=\"1.0\"?>" << std::endl
+                      << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                      << "  <UnstructuredGrid>" << std::endl
+                      << "  <Piece NumberOfPoints=\"" << numNodesFine
+                      << "\"  NumberOfCells=\"" << numElemFine
+                      << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_vf << "    <Points>" << std::endl
+                      << "      <DataArray type=\"Float64\" "
+                      << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numNodesFine; i++)
+            {
+                double *x = nodesFine_[i]->getCoordinates();
+                output_vf << x[0] << " " << x[1] << " " << 0.0 << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_vf << "    <Cells>" << std::endl
+                      << "      <DataArray type=\"Int32\" "
+                      << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemFine; i++)
+            {
+                int *connec = elementsFine_[i]->getConnectivity();
+                int con[LNN];
+                for (int i = 0; i < LNN; i++) con[i] = connec[i];
+                     
+                output_vf << con[0] << " " << con[1] << " " << con[2] << " "
+                          << con[3] << " " << con[4] << " " << con[5] << std::endl;
+
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_vf << "      <DataArray type=\"Int32\""
+                      << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+
+            aux = 0;
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << aux + LNN << std::endl;
+                aux += LNN;
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                      << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << 22 << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_vf << "    <PointData>" << std::endl;
+
+            if (fineModel.printVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << nodesFine_[i]->getVelocity(0) << " "
+                              << nodesFine_[i]->getVelocity(1) << " "
+                              << 0.0 << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << nodesFine_[i]->getVelocityArlequin(0) << " "
+                              << nodesFine_[i]->getVelocityArlequin(1) << " "
+                              << 0.0 << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                              << nodesFine_[i]->getPressure() << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                              << nodesFine_[i]->getPressureArlequin() << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printLagrangeMultipliers)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << nodesFine_[i]->getLagrangeMultiplier(0) << " "
+                              << nodesFine_[i]->getLagrangeMultiplier(1) << " "
+                              << 0.0 << " " << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printDistFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << nodesFine_[i]->getDistFunction() << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+
+            if (fineModel.printEnergyWeightFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesFine; i++)
+                {
+                    output_vf << nodesFine_[i]->getWeightFunction() << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_vf << "    <CellData>" << std::endl;
+
+            if (fineModel.printProcess)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    output_vf << domDecompFine.first[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            int cont = 0;
+            if (fineModel.printGlueZone)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                cont = 0;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    if (elementsGlueZoneFine_[cont] == i)
+                    {
+                        output_vf << 1.0 << std::endl;
+                        cont++;
+                    }
+                    else
+                    {
+                        output_vf << 0.0 << std::endl;
+                    };
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+
+            output_vf << "  </Piece>" << std::endl
+                      << "  </UnstructuredGrid>" << std::endl
+                      << "</VTKFile>" << std::endl;
+
+        }; // rank == 0
+    };     // printfreq
+};
+
+
+
+template <>
+void Arlequin<3>::printResults_FEM_FEM(int step)
+{
+    int DIM = 3;
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
     if (step % fineModel.printFreq == 0)
@@ -6781,11 +7509,220 @@ void Arlequin<3>::printResultsIP_FEM_ISO(int step)
     };
 };
 
-template <int DIM>
-void Arlequin<DIM>::printResultsIP_FEM_FEM(int step)
+template <>
+void Arlequin<2>::printResultsIP_FEM_FEM(int step)
 {
 
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+    int const DIM = 2;
+
+    // Coarse Mesh (FEM MESH)
+    if (rank == 0)
+    {
+        std::string result;
+        std::ostringstream convert;
+
+        convert << step + 100000;
+        result = convert.str();
+        std::string s = "saidaCoarseIP" + result + ".vtu";
+
+        std::fstream output_v(s.c_str(), std::ios_base::out);
+
+        int numberIntPoints = elementsFine_[0]->getNumberOfIntegrationPointsSpecial_FEM();
+
+        output_v << "<?xml version=\"1.0\"?>" << std::endl
+                 << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                 << "  <UnstructuredGrid>" << std::endl
+                 << "  <Piece NumberOfPoints=\"" << numElemGlueZoneFine * numberIntPoints
+                 << "\"  NumberOfCells=\"" << numElemGlueZoneFine * numberIntPoints
+                 << "\">" << std::endl;
+
+        output_v << "    <Points>" << std::endl
+                 << "      <DataArray type=\"Float64\" "
+                 << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+        int LNNC = 4*DIM-2;
+
+        for (int i = 0; i < numElemGlueZoneFine; i++)
+        {
+
+            for (int ip = 0; ip < numberIntPoints; ip++)
+            {
+
+                QuadShapeFunction<DIM> shapeQuad;
+                double qxsiC[DIM];
+                int indCoarseElem;
+
+                // correspondent integration point in the coarse mesh
+                for (int j = 0; j < DIM; j++)
+                    qxsiC[j] = elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCoordinatesValue_FEM(ip, j);
+
+                // coarse element index
+                indCoarseElem = elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCorrespondenceElement_FEM(ip);
+
+                int *connec = elementsCoarse_[indCoarseElem]->getConnectivity();
+
+                // Computes nurbs basis functions
+                double phi_[LNNC];
+                shapeQuad.evaluateFem(qxsiC, phi_);
+
+                double coord[DIM] = {};
+                for (int j = 0; j < LNNC; j++)
+                {
+                    double *x = nodesCoarse_[connec[j]]->getCoordinates();
+                    for (int k = 0; k < DIM; k++)
+                        coord[k] += x[k] * phi_[j];
+                };
+                
+                output_v << coord[0] << " " << coord[1] << " " << 0.0<< std::endl;
+
+
+            }; // loop integration points
+        };     // loop glue fine mesh elements
+
+        output_v << "      </DataArray>" << std::endl
+                 << "    </Points>" << std::endl;
+
+        // WRITE ELEMENT CONNECTIVITY
+        output_v << "    <Cells>" << std::endl
+                 << "      <DataArray type=\"Int32\" "
+                 << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+        for (int numN = 0; numN < numElemGlueZoneFine * numberIntPoints; ++numN)
+        {
+            output_v << numN << std::endl;
+        }
+
+        output_v << "      </DataArray>" << std::endl;
+
+        // WRITE OFFSETS IN DATA ARRAY
+        output_v << "      <DataArray type=\"Int32\""
+                 << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+
+        int aux = 0;
+        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        {
+            output_v << aux + 1 << std::endl;
+            aux += 1;
+        };
+
+        output_v << "      </DataArray>" << std::endl;
+
+        // WRITE ELEMENT TYPES
+        output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                 << "format=\"ascii\">" << std::endl;
+
+        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        {
+            output_v << 1 << std::endl;
+        };
+
+        output_v << "      </DataArray>" << std::endl
+                 << "    </Cells>" << std::endl;
+
+        // FINALIZE OUTPUT FILE
+        output_v << "  </Piece>" << std::endl;
+        output_v << "  </UnstructuredGrid>" << std::endl
+                 << "</VTKFile>" << std::endl;
+
+        // PRINT FINE MODEL RESULTS (FEM mesh)
+        std::string f = "saidaFineIP" + result + ".vtu";
+        std::fstream output_vf(f.c_str(), std::ios_base::out);
+
+        output_vf << "<?xml version=\"1.0\"?>" << std::endl
+                  << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                  << "  <UnstructuredGrid>" << std::endl
+                  << "  <Piece NumberOfPoints=\"" << numElemGlueZoneFine * numberIntPoints
+                  << "\"  NumberOfCells=\"" << numElemGlueZoneFine * numberIntPoints
+                  << "\">" << std::endl;
+
+        // WRITE NODAL COORDINATES
+        output_vf << "    <Points>" << std::endl
+                  << "      <DataArray type=\"Float64\" "
+                  << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+        int LNN = 4*DIM-2;
+        for (int i = 0; i < numElemGlueZoneFine; i++)
+        {
+
+            SpecialQuadrature squad;
+            double x1[LNN], x2[LNN];
+            int *connec = elementsFine_[elementsGlueZoneFine_[i]]->getConnectivity();
+
+            for (int j = 0; j < LNN; j++)
+            {
+                double *x = nodesFine_[connec[j]]->getCoordinates();
+                x1[j] = x[0];
+                x2[j] = x[1];
+            };
+
+            for (int ip = 0; ip < numberIntPoints; ip++)
+            {
+
+                double x_[DIM];
+                x_[0] = squad.interpolateQuadraticVariableFem(x1, ip);
+                x_[1] = squad.interpolateQuadraticVariableFem(x2, ip);
+
+                output_vf << x_[0] << " " << x_[1] << " " << 0.0 << std::endl;
+            };
+        };
+
+        output_vf << "      </DataArray>" << std::endl
+                  << "    </Points>" << std::endl;
+
+        // WRITE ELEMENT CONNECTIVITY
+        output_vf << "    <Cells>" << std::endl
+                  << "      <DataArray type=\"Int32\" "
+                  << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+        for (int numN = 0; numN < numElemGlueZoneFine * numberIntPoints; ++numN)
+        {
+            output_vf << numN << std::endl;
+        }
+
+        output_vf << "      </DataArray>" << std::endl;
+
+        // WRITE OFFSETS IN DATA ARRAY
+        output_vf << "      <DataArray type=\"Int32\""
+                  << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+
+        aux = 0;
+        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        {
+            output_vf << aux + 1 << std::endl;
+            aux += 1;
+        };
+
+        output_vf << "      </DataArray>" << std::endl;
+
+        // WRITE ELEMENT TYPES
+        output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                  << "format=\"ascii\">" << std::endl;
+
+        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        {
+            output_vf << 1 << std::endl;
+        };
+
+        output_vf << "      </DataArray>" << std::endl
+                  << "    </Cells>" << std::endl;
+
+        // FINALIZE OUTPUT FILE
+        output_vf << "  </Piece>" << std::endl;
+        output_vf << "  </UnstructuredGrid>" << std::endl
+                  << "</VTKFile>" << std::endl;
+    };
+};
+
+
+template <>
+void Arlequin<3>::printResultsIP_FEM_FEM(int step)
+{
+
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+    int const DIM = 3;
 
     // Coarse Mesh (FEM MESH)
     if (rank == 0)
@@ -7591,8 +8528,7 @@ void Arlequin<DIM>::setFluidModels_FEM_FEM(FluidMesh &coarse, FluidMesh &fine)
 
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-    //just for 3D
-
+ 
     // Boxes for the integration points search in coarse mesh
     setElementBoxes_FEM(); 
 
@@ -7607,6 +8543,11 @@ void Arlequin<DIM>::setFluidModels_FEM_FEM(FluidMesh &coarse, FluidMesh &fine)
     setWeightFunction_FEM_FEM();
 
     printResults_FEM_FEM(-10);
+
+    // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
+    setCorrespondenceFine_FEM_FEM();
+
+    printResultsIP_FEM_FEM(0);
 };
 
 
@@ -7673,7 +8614,6 @@ void Arlequin<DIM>::setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp,std:
         for (int i = 0; i < LNNC; i++)
         {
             // velocity constrain
-      
             int constrain = nodesCoarse_[connec[i]]->getConstrains(0);
             if ((constrain == 1) || (constrain == 3))
             {
@@ -7683,8 +8623,6 @@ void Arlequin<DIM>::setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp,std:
    
         };
     };
-
-    // dofTemp.push_back(numNodesCoarse*DIM+1451);
 
 
     // Fine mesh (FEM elements)
@@ -8449,12 +9387,12 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFineLaplace_FEM_FEM()
 
                 }; // j
 
-                // Lagrange Multipliers
-                int dof_i = NCNumberNodesC + connec[i];
-                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
+                // // Lagrange Multipliers
+                // int dof_i = NCNumberNodesC + connec[i];
+                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
 
-                dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
+                // dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
 
 
             }; // i
@@ -8994,14 +9932,16 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_FEM()
 
                 int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
 
-                elementsFine_[jel]->getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(nodesCoarse_, connecC, iElemCoarse,
-                                                                                       elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);
 
-            
+                elementsFine_[jel]->getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(nodesCoarse_, connecC, iElemCoarse,
+                                                                                       elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);              
+
+
                 for (int i = 0; i < LNN; i++)
                 {
                     for (int j = 0; j < LNNC; j++)
                     {
+
                         // Lagrange multipliers matrixes
                         int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
                         int dof_j = connecC[j];
@@ -9013,18 +9953,18 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_FEM()
                     }; // j
 
 
-                    // Lagrange multipliers vector
-                    int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[i], ADD_VALUES);
+                    // // Lagrange multipliers vector
+                    // int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[i], ADD_VALUES);
 
                 }; // j
 
-                for (int i = 0; i < LNNC; i++)
-                {
-                    // Lagrange multipliers vector
-                    int dof_i = connecC[i];
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[i], ADD_VALUES);
-                }; // i
+                // for (int i = 0; i < LNNC; i++)
+                // {
+                //     // // Lagrange multipliers vector
+                //     // int dof_i = connecC[i];
+                //     // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[i], ADD_VALUES);
+                // }; // i
 
 
                 for (int i = 0; i < LNN; ++i)
@@ -9678,13 +10618,6 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-    // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
-    setCorrespondenceFine_FEM_FEM();
-
-    printResultsIP_FEM_FEM(0);
-
-
-
     std::vector<int> dofTemp;
     std::vector<double>dofValue;
     setDirichletConstrain_FEM_FEM(dofTemp,dofValue);
@@ -9702,7 +10635,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
                         sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
 
-    for (int i=(NCNumberNodesC); i<sysSize; i++){
+    for (int i=0; i<sysSize; i++){
         double valu = 1.e-20;
         ierr = MatSetValues(A,1,&i,1,&i,&valu,ADD_VALUES);
     }
@@ -9719,29 +10652,28 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = VecSetSizes(b2,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
     ierr = VecSetFromOptions(b2);CHKERRQ(ierr);
        
-    
     ierr = VecDuplicate(b,&u);CHKERRQ(ierr);
     ierr = VecDuplicate(b,&All);CHKERRQ(ierr);
 
-    if (rank == 0){
     for (int i = 0; i < dofTemp.size(); i++){
 
-        int ind = dof[i];
+        int ind = dofTemp[i];
         ierr = VecSetValues(b2, 1, &ind, &dofValue[i],
                             INSERT_VALUES);
     };
-    };
-    
-
-    // //Matrix and vectors - COARSE MESH - IGA mesh
+   
+    ierr = VecAssemblyBegin(b2);CHKERRQ(ierr);
+    ierr = VecAssemblyEnd(b2);CHKERRQ(ierr);
+  
+    //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_FEM();
-    // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
-    // setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
+    //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+    setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
-    // //Matrix and vectors -FINE MESH  - FEM mesh
-    // setMatVecValuesFineLaplace_FEM();
-    // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
-    // setMatVecValuesLagrangeFineLaplace_FEM_FEM();
+    // // //Matrix and vectors -FINE MESH  - FEM mesh
+    setMatVecValuesFineLaplace_FEM();
+    // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
+    setMatVecValuesLagrangeFineLaplace_FEM_FEM();
 
     //Assemble matrices and vectors
     ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
@@ -9750,17 +10682,10 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
     ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
 
-    ierr = VecAssemblyBegin(b2);CHKERRQ(ierr);
-    ierr = VecAssemblyEnd(b2);CHKERRQ(ierr);
-
-    //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-    //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-
-
     MatZeroRows(A,dofTemp.size(),dof,1.0,b2,b);
 
     // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-    VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+    // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
     //Create KSP context to solve the linear system
     ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
@@ -9786,9 +10711,9 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     ierr = KSPSolve(ksp,b,u);CHKERRQ(ierr);
     ierr = KSPGetTotalIterations(ksp, &iterations);
 
-    // //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-    // //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-    // //VecView(u,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+    // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+    // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+    // VecView(u,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
     //Gathers the solution vector to the master process
     ierr = VecScatterCreateToAll(u, &ctx, &All);CHKERRQ(ierr);
@@ -9808,7 +10733,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
         Ii = i;
         ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
         u_ = val;
-        nodesCoarse_[i] -> incrementVelocity(0,u_);
+        nodesCoarse_[i] -> setVelocityComponent(0,u_);
         normU += val*val;
     };
 
@@ -9816,7 +10741,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
         Ii = i + NCNumberNodesC;
         ierr = VecGetValues(All, Ione, &Ii, &val);
         u_ = val;
-        nodesFine_[i] -> incrementVelocity(0,u_);
+        nodesFine_[i] -> setVelocityComponent(0,u_);
         normU += val*val;
     };
 
@@ -9825,7 +10750,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
         ierr = VecGetValues(All, Ione, &Ii, &val);
         lag_ = val;
         normL += val * val;
-        nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(0,lag_);
+        nodesFine_[nodesGlueZoneFine_[i]] -> setLagrangeMultiplier(0,lag_);
     };
 
     std::clock_t t2 = std::clock();
@@ -9877,15 +10802,12 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
             nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(k,u_int);
         };
 
-        for (int i=0; i<numNodesCoarse; i++){
-            for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
-        };
     };
 
     // Printing results
-    printResultsLaplace_FEM_FEM(0);
+    printResults_FEM_FEM(0);
 
-    // PetscFree(dof);
+    PetscFree(dof);
     return 0;
 };
 

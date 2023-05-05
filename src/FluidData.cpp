@@ -13,7 +13,7 @@ void FluidData<DIM>::domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_
     int LNN = 4*DIM - 2;
     
     std::string mirror2;
-    mirror2 = "domain_decomposition.txt";
+    mirror2 = "domain_decompositionFEM.txt";
     std::ofstream mirrorData(mirror2.c_str());
     int size;
 
@@ -96,7 +96,7 @@ void FluidData<DIM>::domainDecompositionMETIS_ISO(std::vector<Elements *> &elem_
     int LNN = 18*DIM - 27;
 
     std::string mirror2;
-    mirror2 = "domain_decomposition.txt";
+    mirror2 = "domain_decompositionISO.txt";
     std::ofstream mirrorData(mirror2.c_str());
     
     int size;

@@ -2,8 +2,8 @@ Number of Time Steps   = 100000
 Printing Frequence     = 1
 Thickness of glue zone   = 0.2
 Epsilon from Arlequin formulation   = 0.01
-Arlequin k1   = 10
-Arlequin k2   = 4
+Arlequin k1   = 1
+Arlequin k2   = 0
 Undisturbed Velocity x = 0
 Undisturbed Velocity y = 0
 Undisturbed Velocity z = 0
@@ -729,33 +729,33 @@ Nodal Coordinates
 0.1 0.35 0.05 
 Number of Boundary groups (FEM MESH) = 7
 Number of Boundary Elements (FEM MESH)= 280
-Constrains 0 1 0 1 0 1 0
-Constrains 1 1 0 1 0 1 0
+Constrains 0 1 0 0 0 0 0
+Constrains 1 1 0 0 0 0 0
 Constrains 2 0 0 0 0 0 0
 Constrains 3 0 0 0 0 0 0
 Constrains 4 0 0 0 0 0 0
 Constrains 5 0 0 0 0 0 0
-Constrains 6 1 0 1 0 1 0
-Constrains 7 1 0 1 0 1 0
-Constrains 8 1 0 1 0 1 0
-Constrains 9 1 0 1 0 1 0
-Constrains 10 1 0 1 0 1 0
-Constrains 11 1 0 1 0 1 0
-Constrains 12 1 0 1 0 1 0
-Constrains 13 1 0 1 0 1 0
-Constrains 14 1 0 1 0 1 0
-Constrains 15 1 0 1 0 1 0
-Constrains 16 1 0 1 0 1 0
-Constrains 17 1 0 1 0 1 0
-Constrains 18 1 0 1 0 1 0
-Constrains 19 1 0 1 0 1 0
-Constrains 20 1 0 1 0 1 0
-Constrains 21 1 0 1 0 1 0
-Constrains 22 1 0 1 0 1 0
-Constrains 23 1 0 1 0 1 0
-Constrains 24 1 0 1 0 1 0
-Constrains 25 1 0 1 0 1 0
-Constrains 26 1 0 1 0 1 0
+Constrains 6 1 0 0 0 0 0
+Constrains 7 1 0 0 0 0 0
+Constrains 8 1 0 0 0 0 0
+Constrains 9 1 0 0 0 0 0
+Constrains 10 1 0 0 0 0 0
+Constrains 11 1 0 0 0 0 0
+Constrains 12 1 0 0 0 0 0
+Constrains 13 1 0 0 0 0 0
+Constrains 14 1 0 0 0 0 0
+Constrains 15 1 0 0 0 0 0
+Constrains 16 1 0 0 0 0 0
+Constrains 17 1 0 0 0 0 0
+Constrains 18 1 0 0 0 0 0
+Constrains 19 1 0 0 0 0 0
+Constrains 20 1 0 0 0 0 0
+Constrains 21 1 0 0 0 0 0
+Constrains 22 1 0 0 0 0 0
+Constrains 23 1 0 0 0 0 0
+Constrains 24 1 0 0 0 0 0
+Constrains 25 1 0 0 0 0 0
+Constrains 26 1 0 0 0 0 0
 Constrains 27 0 0 0 0 0 0
 Constrains 28 0 0 0 0 0 0
 Constrains 29 0 0 0 0 0 0
@@ -821,25 +821,25 @@ Constrains 88 0 0 0 0 0 0
 Constrains 89 0 0 0 0 0 0
 Constrains 90 0 0 0 0 0 0
 Constrains 91 0 0 0 0 0 0
-Constrains 92 1 0 1 0 1 0
-Constrains 93 1 0 1 0 1 0
-Constrains 94 1 0 1 0 1 0
-Constrains 95 1 0 1 0 1 0
-Constrains 96 1 0 1 0 1 0
-Constrains 97 1 0 1 0 1 0
-Constrains 98 1 0 1 0 1 0
-Constrains 99 1 0 1 0 1 0
-Constrains 100 1 0 1 0 1 0
-Constrains 101 1 0 1 0 1 0
-Constrains 102 1 0 1 0 1 0
-Constrains 103 1 0 1 0 1 0
-Constrains 104 1 0 1 0 1 0
-Constrains 105 1 0 1 0 1 0
-Constrains 106 1 0 1 0 1 0
-Constrains 107 1 0 1 0 1 0
-Constrains 108 1 0 1 0 1 0
-Constrains 109 1 0 1 0 1 0
-Constrains 110 1 0 1 0 1 0
+Constrains 92 1 0 0 0 0 0
+Constrains 93 1 0 0 0 0 0
+Constrains 94 1 0 0 0 0 0
+Constrains 95 1 0 0 0 0 0
+Constrains 96 1 0 0 0 0 0
+Constrains 97 1 0 0 0 0 0
+Constrains 98 1 0 0 0 0 0
+Constrains 99 1 0 0 0 0 0
+Constrains 100 1 0 0 0 0 0
+Constrains 101 1 0 0 0 0 0
+Constrains 102 1 0 0 0 0 0
+Constrains 103 1 0 0 0 0 0
+Constrains 104 1 0 0 0 0 0
+Constrains 105 1 0 0 0 0 0
+Constrains 106 1 0 0 0 0 0
+Constrains 107 1 0 0 0 0 0
+Constrains 108 1 0 0 0 0 0
+Constrains 109 1 0 0 0 0 0
+Constrains 110 1 0 0 0 0 0
 Constrains 111 0 0 0 0 0 0
 Constrains 112 0 0 0 0 0 0
 Constrains 113 0 0 0 0 0 0
@@ -851,8 +851,8 @@ Constrains 118 0 0 0 0 0 0
 Constrains 119 0 0 0 0 0 0
 Constrains 120 0 0 0 0 0 0
 Constrains 121 0 0 0 0 0 0
-Constrains 122 1 0 1 0 1 0
-Constrains 123 1 0 1 0 1 0
+Constrains 122 1 0 0 0 0 0
+Constrains 123 1 0 0 0 0 0
 Constrains 124 0 0 0 0 0 0
 Constrains 125 0 0 0 0 0 0
 Constrains 126 0 0 0 0 0 0
@@ -1052,25 +1052,25 @@ Constrains 319 0 0 0 0 0 0
 Constrains 320 0 0 0 0 0 0
 Constrains 321 0 0 0 0 0 0
 Constrains 322 0 0 0 0 0 0
-Constrains 323 1 0 1 0 1 0
-Constrains 324 1 0 1 0 1 0
-Constrains 325 1 0 1 0 1 0
-Constrains 326 1 0 1 0 1 0
-Constrains 327 1 0 1 0 1 0
-Constrains 328 1 0 1 0 1 0
-Constrains 329 1 0 1 0 1 0
-Constrains 330 1 0 1 0 1 0
-Constrains 331 1 0 1 0 1 0
-Constrains 332 1 0 1 0 1 0
-Constrains 333 1 0 1 0 1 0
-Constrains 334 1 0 1 0 1 0
-Constrains 335 1 0 1 0 1 0
-Constrains 336 1 0 1 0 1 0
-Constrains 337 1 0 1 0 1 0
-Constrains 338 1 0 1 0 1 0
-Constrains 339 1 0 1 0 1 0
-Constrains 340 1 0 1 0 1 0
-Constrains 341 1 0 1 0 1 0
+Constrains 323 1 0 0 0 0 0
+Constrains 324 1 0 0 0 0 0
+Constrains 325 1 0 0 0 0 0
+Constrains 326 1 0 0 0 0 0
+Constrains 327 1 0 0 0 0 0
+Constrains 328 1 0 0 0 0 0
+Constrains 329 1 0 0 0 0 0
+Constrains 330 1 0 0 0 0 0
+Constrains 331 1 0 0 0 0 0
+Constrains 332 1 0 0 0 0 0
+Constrains 333 1 0 0 0 0 0
+Constrains 334 1 0 0 0 0 0
+Constrains 335 1 0 0 0 0 0
+Constrains 336 1 0 0 0 0 0
+Constrains 337 1 0 0 0 0 0
+Constrains 338 1 0 0 0 0 0
+Constrains 339 1 0 0 0 0 0
+Constrains 340 1 0 0 0 0 0
+Constrains 341 1 0 0 0 0 0
 Constrains 342 0 0 0 0 0 0
 Constrains 343 0 0 0 0 0 0
 Constrains 344 0 0 0 0 0 0

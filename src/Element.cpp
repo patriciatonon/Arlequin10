@@ -4175,6 +4175,11 @@ void Element<DIM>::getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(std::vecto
         if ((intPointCorrespElem_FEM[index] == ielem))
         {
 
+            for (int k = 0; k < DIM; k++) xsi[k] = sQuad.PointListFem(index, k);
+
+            // Returns the quadrature integration weight
+            weight_ = sQuad.WeightListFem(index);
+
             // Computes the velocity shape functions
             shapeQuad.evaluateFem(xsi, phi_);
 
@@ -5058,7 +5063,7 @@ void Element<DIM>::getLaplace_ISO(double **jacobianNRMatrix, double *rhsVector)
         getSpatialDerivatives_ISO(xsi, ainv_, dphi_dx);
 
         // Computes the element matrix
-        double wna_ = intPointWeightFunction_ISO[index];
+        double wna_ = 1.;//intPointWeightFunction_ISO[index];
         getElemMatrixLaplace(LNN,wna_,djac_,weight_,dphi_dx,jacobianNRMatrix);
 
         index++;
