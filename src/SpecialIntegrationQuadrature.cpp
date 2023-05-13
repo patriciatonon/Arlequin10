@@ -76,65 +76,168 @@ double SpecialIntegQuadrature<2>::PointListFem(int i, int j){
 template<>
 double SpecialIntegQuadrature<3>::PointListFem(int i, int j){
 
-    pointCoordSpecialFem[0][0] = 1. / 4.;
-    pointCoordSpecialFem[0][1] = 1. / 4.;
-    pointCoordSpecialFem[0][2] = 1. / 4.;
+    pointCoordSpecialFem[0][0] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[0][1] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[0][2] = 0.673422422100981706079627987096265e-1;
 
-    pointCoordSpecialFem[1][0] = 0.;
-    pointCoordSpecialFem[1][1] = 1./3.;
-    pointCoordSpecialFem[1][2] = 1./3.;
+    pointCoordSpecialFem[1][0] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[1][1] = 0.673422422100981706079627987096265e-1;
+    pointCoordSpecialFem[1][2] = 0.310885919263300609797345733763458e+0;
 
-    pointCoordSpecialFem[2][0] = 1./3.;
-    pointCoordSpecialFem[2][1] = 1./3.;
-    pointCoordSpecialFem[2][2] = 1./3.;
+    pointCoordSpecialFem[2][0] = 0.673422422100981706079627987096265e-1;
+    pointCoordSpecialFem[2][1] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[2][2] = 0.310885919263300609797345733763458e+0;
 
-    pointCoordSpecialFem[3][0] = 1./3.;
-    pointCoordSpecialFem[3][1] = 1./3.;
-    pointCoordSpecialFem[3][2] = 0.;
+    pointCoordSpecialFem[3][0] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[3][1] = 0.310885919263300609797345733763458e+0;
+    pointCoordSpecialFem[3][2] = 0.310885919263300609797345733763458e+0;
 
-    pointCoordSpecialFem[4][0] = 1./3.;
-    pointCoordSpecialFem[4][1] = 0.;
-    pointCoordSpecialFem[4][2] = 1./3.;
+    pointCoordSpecialFem[4][0] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[4][1] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[4][2] = 0.721794249067326320793028258788908e+0;
 
-    pointCoordSpecialFem[5][0] = 8./11.;
-    pointCoordSpecialFem[5][1] = 1./11.;
-    pointCoordSpecialFem[5][2] = 1./11.;
+    pointCoordSpecialFem[5][0] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[5][1] = 0.721794249067326320793028258788908e+0;
+    pointCoordSpecialFem[5][2] = 0.927352503108912264023239137370306e-1;
 
-    pointCoordSpecialFem[6][0] = 1./11.;
-    pointCoordSpecialFem[6][1] = 1./11.;
-    pointCoordSpecialFem[6][2] = 1./11.;
+    pointCoordSpecialFem[6][0] = 0.721794249067326320793028258788908e+0;
+    pointCoordSpecialFem[6][1] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[6][2] = 0.927352503108912264023239137370306e-1;
 
-    pointCoordSpecialFem[7][0] = 1./11.;
-    pointCoordSpecialFem[7][1] = 1./11.;
-    pointCoordSpecialFem[7][2] = 8./11.;
+    pointCoordSpecialFem[7][0] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[7][1] = 0.927352503108912264023239137370306e-1;
+    pointCoordSpecialFem[7][2] = 0.927352503108912264023239137370306e-1;
 
-    pointCoordSpecialFem[8][0] = 1./11.;
-    pointCoordSpecialFem[8][1] = 8./11.;
-    pointCoordSpecialFem[8][2] = 1./11.;
+    pointCoordSpecialFem[8][0] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[8][1] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[8][2] = 0.454496295874350350508119473720661e+0;
 
-    pointCoordSpecialFem[9][0] = 0.4334498464263357;
-    pointCoordSpecialFem[9][1] = 0.0665501535736643;
-    pointCoordSpecialFem[9][2] = 0.0665501535736643;
+    pointCoordSpecialFem[9][0] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[9][1] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[9][2] = 0.454496295874350350508119473720661e+0;
 
-    pointCoordSpecialFem[10][0] = 0.0665501535736643;
-    pointCoordSpecialFem[10][1] = 0.4334498464263357;
-    pointCoordSpecialFem[10][2] = 0.0665501535736643;
+    pointCoordSpecialFem[10][0] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[10][1] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[10][2] = 0.454496295874350350508119473720661e+0;
 
-    pointCoordSpecialFem[11][0] = 0.0665501535736643;
-    pointCoordSpecialFem[11][1] = 0.0665501535736643;
-    pointCoordSpecialFem[11][2] = 0.4334498464263357;
+    pointCoordSpecialFem[11][0] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[11][1] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[11][2] = 0.455037041256496494918805262793394e-1;
 
-    pointCoordSpecialFem[12][0] = 0.0665501535736643;
-    pointCoordSpecialFem[12][1] = 0.4334498464263357;
-    pointCoordSpecialFem[12][2] = 0.4334498464263357;
+    pointCoordSpecialFem[12][0] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[12][1] = 0.455037041256496494918805262793394e-1;
+    pointCoordSpecialFem[12][2] = 0.455037041256496494918805262793394e-1;
 
-    pointCoordSpecialFem[13][0] = 0.4334498464263357;
-    pointCoordSpecialFem[13][1] = 0.0665501535736643;
-    pointCoordSpecialFem[13][2] = 0.4334498464263357;
+    pointCoordSpecialFem[13][0] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[13][1] = 0.454496295874350350508119473720661e+0;
+    pointCoordSpecialFem[13][2] = 0.455037041256496494918805262793394e-1;
 
-    pointCoordSpecialFem[14][0] = 0.4334498464263357;
-    pointCoordSpecialFem[14][1] = 0.4334498464263357;
-    pointCoordSpecialFem[14][2] = 0.0665501535736643;
+    // const double a = (1. + sqrt(5. / 14.)) / 4.;
+    // const double b = (1. - sqrt(5. / 14.)) / 4.;
+
+    // pointCoordSpecialFem[0][0] = 1. / 4.;
+    // pointCoordSpecialFem[0][1] = 1. / 4.;
+    // pointCoordSpecialFem[0][2] = 1. / 4.;
+
+    // pointCoordSpecialFem[1][0] = 11. / 14.;
+    // pointCoordSpecialFem[1][1] = 1. / 14.;
+    // pointCoordSpecialFem[1][2] = 1. / 14.;
+
+    // pointCoordSpecialFem[2][0] = 1. / 14.;
+    // pointCoordSpecialFem[2][1] = 11. / 14.;
+    // pointCoordSpecialFem[2][2] = 1. / 14.;
+
+    // pointCoordSpecialFem[3][0] = 1. / 14.;
+    // pointCoordSpecialFem[3][1] = 1. / 14.;
+    // pointCoordSpecialFem[3][2] = 11. / 14.;
+
+    // pointCoordSpecialFem[4][0] = 1. / 14.;
+    // pointCoordSpecialFem[4][1] = 1. / 14.;
+    // pointCoordSpecialFem[4][2] = 1. / 14.;
+
+    // pointCoordSpecialFem[5][0] = a;
+    // pointCoordSpecialFem[5][1] = a;
+    // pointCoordSpecialFem[5][2] = b;
+
+    // pointCoordSpecialFem[6][0] = a;
+    // pointCoordSpecialFem[6][1] = b;
+    // pointCoordSpecialFem[6][2] = a;
+
+    // pointCoordSpecialFem[7][0] = a;
+    // pointCoordSpecialFem[7][1] = b;
+    // pointCoordSpecialFem[7][2] = b;
+
+    // pointCoordSpecialFem[8][0] = b;
+    // pointCoordSpecialFem[8][1] = a;
+    // pointCoordSpecialFem[8][2] = a;
+
+    // pointCoordSpecialFem[9][0] = b;
+    // pointCoordSpecialFem[9][1] = a;
+    // pointCoordSpecialFem[9][2] = b;
+
+    // pointCoordSpecialFem[10][0] = b;
+    // pointCoordSpecialFem[10][1] = b;
+    // pointCoordSpecialFem[10][2] = a;
+
+    // pointCoordSpecialFem[0][0] = 1. / 4.;
+    // pointCoordSpecialFem[0][1] = 1. / 4.;
+    // pointCoordSpecialFem[0][2] = 1. / 4.;
+
+    // pointCoordSpecialFem[1][0] = 0.;
+    // pointCoordSpecialFem[1][1] = 1./3.;
+    // pointCoordSpecialFem[1][2] = 1./3.;
+
+    // pointCoordSpecialFem[2][0] = 1./3.;
+    // pointCoordSpecialFem[2][1] = 1./3.;
+    // pointCoordSpecialFem[2][2] = 1./3.;
+
+    // pointCoordSpecialFem[3][0] = 1./3.;
+    // pointCoordSpecialFem[3][1] = 1./3.;
+    // pointCoordSpecialFem[3][2] = 0.;
+
+    // pointCoordSpecialFem[4][0] = 1./3.;
+    // pointCoordSpecialFem[4][1] = 0.;
+    // pointCoordSpecialFem[4][2] = 1./3.;
+
+    // pointCoordSpecialFem[5][0] = 8./11.;
+    // pointCoordSpecialFem[5][1] = 1./11.;
+    // pointCoordSpecialFem[5][2] = 1./11.;
+
+    // pointCoordSpecialFem[6][0] = 1./11.;
+    // pointCoordSpecialFem[6][1] = 1./11.;
+    // pointCoordSpecialFem[6][2] = 1./11.;
+
+    // pointCoordSpecialFem[7][0] = 1./11.;
+    // pointCoordSpecialFem[7][1] = 1./11.;
+    // pointCoordSpecialFem[7][2] = 8./11.;
+
+    // pointCoordSpecialFem[8][0] = 1./11.;
+    // pointCoordSpecialFem[8][1] = 8./11.;
+    // pointCoordSpecialFem[8][2] = 1./11.;
+
+    // pointCoordSpecialFem[9][0] = 0.4334498464263357;
+    // pointCoordSpecialFem[9][1] = 0.0665501535736643;
+    // pointCoordSpecialFem[9][2] = 0.0665501535736643;
+
+    // pointCoordSpecialFem[10][0] = 0.0665501535736643;
+    // pointCoordSpecialFem[10][1] = 0.4334498464263357;
+    // pointCoordSpecialFem[10][2] = 0.0665501535736643;
+
+    // pointCoordSpecialFem[11][0] = 0.0665501535736643;
+    // pointCoordSpecialFem[11][1] = 0.0665501535736643;
+    // pointCoordSpecialFem[11][2] = 0.4334498464263357;
+
+    // pointCoordSpecialFem[12][0] = 0.0665501535736643;
+    // pointCoordSpecialFem[12][1] = 0.4334498464263357;
+    // pointCoordSpecialFem[12][2] = 0.4334498464263357;
+
+    // pointCoordSpecialFem[13][0] = 0.4334498464263357;
+    // pointCoordSpecialFem[13][1] = 0.0665501535736643;
+    // pointCoordSpecialFem[13][2] = 0.4334498464263357;
+
+    // pointCoordSpecialFem[14][0] = 0.4334498464263357;
+    // pointCoordSpecialFem[14][1] = 0.4334498464263357;
+    // pointCoordSpecialFem[14][2] = 0.0665501535736643;
 
     return pointCoordSpecialFem[i][j];
 };
@@ -604,22 +707,50 @@ double SpecialIntegQuadrature<2>::WeightListFem(int i){
 
 template<>
 double SpecialIntegQuadrature<3>::WeightListFem(int i){
+
+
+    pointWeightSpecialFem[0] = 0.187813209530026417998642753888811e-1;
+    pointWeightSpecialFem[1] = 0.187813209530026417998642753888811e-1;
+    pointWeightSpecialFem[2] = 0.187813209530026417998642753888811e-1;
+    pointWeightSpecialFem[3] = 0.187813209530026417998642753888811e-1;
+    pointWeightSpecialFem[4] = 0.122488405193936582572850342477213e-1;
+    pointWeightSpecialFem[5] = 0.122488405193936582572850342477213e-1;
+    pointWeightSpecialFem[6] = 0.122488405193936582572850342477213e-1;
+    pointWeightSpecialFem[7] = 0.122488405193936582572850342477213e-1;
+    pointWeightSpecialFem[8] = 0.709100346284691107301157135337624e-2;
+    pointWeightSpecialFem[9] = 0.709100346284691107301157135337624e-2;
+    pointWeightSpecialFem[10] = 0.709100346284691107301157135337624e-2;
+    pointWeightSpecialFem[11] = 0.709100346284691107301157135337624e-2;
+    pointWeightSpecialFem[12] = 0.709100346284691107301157135337624e-2;
+    pointWeightSpecialFem[13] = 0.709100346284691107301157135337624e-2;
+
+    // pointWeightSpecialFem[0] = -74. / 5625.;
+    // pointWeightSpecialFem[1] = 343. / 45000.;
+    // pointWeightSpecialFem[2] = 343. / 45000.;
+    // pointWeightSpecialFem[3] = 343. / 45000.;
+    // pointWeightSpecialFem[4] = 343. / 45000.;
+    // pointWeightSpecialFem[5] = 56. / 2250.;
+    // pointWeightSpecialFem[6] = 56. / 2250.; 
+    // pointWeightSpecialFem[7] = 56. / 2250.;
+    // pointWeightSpecialFem[8] = 56. / 2250.; 
+    // pointWeightSpecialFem[9] = 56. / 2250.;
+    // pointWeightSpecialFem[10] = 56. / 2250.; 
     
-    pointWeightSpecialFem[0] = 0.1817020685825351/6.;
-    pointWeightSpecialFem[1] = 0.0361607142857143/6.;
-    pointWeightSpecialFem[2] = 0.0361607142857143/6.;
-    pointWeightSpecialFem[3] = 0.0361607142857143/6.;
-    pointWeightSpecialFem[4] = 0.0361607142857143/6.;
-    pointWeightSpecialFem[5] = 0.0698714945161738/6.;
-    pointWeightSpecialFem[6] = 0.0698714945161738/6.; 
-    pointWeightSpecialFem[7] = 0.0698714945161738/6.;
-    pointWeightSpecialFem[8] = 0.0698714945161738/6.; 
-    pointWeightSpecialFem[9] = 0.0656948493683187/6.;
-    pointWeightSpecialFem[10] = 0.0656948493683187/6.; 
-    pointWeightSpecialFem[11] = 0.0656948493683187/6.;
-    pointWeightSpecialFem[12] = 0.0656948493683187/6.;
-    pointWeightSpecialFem[13] = 0.0656948493683187/6.;
-    pointWeightSpecialFem[14] = 0.0656948493683187/6.;
+    // pointWeightSpecialFem[0] = 0.1817020685825351/6.;
+    // pointWeightSpecialFem[1] = 0.0361607142857143/6.;
+    // pointWeightSpecialFem[2] = 0.0361607142857143/6.;
+    // pointWeightSpecialFem[3] = 0.0361607142857143/6.;
+    // pointWeightSpecialFem[4] = 0.0361607142857143/6.;
+    // pointWeightSpecialFem[5] = 0.0698714945161738/6.;
+    // pointWeightSpecialFem[6] = 0.0698714945161738/6.; 
+    // pointWeightSpecialFem[7] = 0.0698714945161738/6.;
+    // pointWeightSpecialFem[8] = 0.0698714945161738/6.; 
+    // pointWeightSpecialFem[9] = 0.0656948493683187/6.;
+    // pointWeightSpecialFem[10] = 0.0656948493683187/6.; 
+    // pointWeightSpecialFem[11] = 0.0656948493683187/6.;
+    // pointWeightSpecialFem[12] = 0.0656948493683187/6.;
+    // pointWeightSpecialFem[13] = 0.0656948493683187/6.;
+    // pointWeightSpecialFem[14] = 0.0656948493683187/6.;
 
     return pointWeightSpecialFem[i];
 };

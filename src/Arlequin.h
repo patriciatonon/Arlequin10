@@ -140,9 +140,11 @@ public:
     void setCorrespondenceFine_FEM_FEM();
 
    	//Sets the Dirichelet Constrains in the domain
-   	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
+   	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
     void setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
+
+    void setDirichletConstrain_ISO_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
     //Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp);

@@ -1333,7 +1333,7 @@ BOUNDARY 5   - CONNECTIVITY
 BOUNDARY 2        CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 NUMB. OF ELEM.    Ux     Uy     Uz                                   Ux     Uy     Uz  
 ------------------------------------------------------------------------------------------
-20                0    0     0                                      0.     0.     0.
+20                0   0     0                                      0.     0.     0.
 
 ------------------------------------------------------------------------------------------
 BOUNDARY 2   - CONNECTIVITY

@@ -69,16 +69,23 @@ private:
     bool                       glueZone;            // Defines if the element is in the gluing zone (true = gluing zone)  
     double                     tARLQEL_;
     // Integration points and element in the coarse mesh correspondent to the fine mesh in gluing zone 
-    double intPointCorrespXsi_FEM[8*DIM-9][DIM];            
-    double intPointCorrespElem_FEM[8*DIM-9]; 
+    // double intPointCorrespXsi_FEM[8*DIM-9][DIM];            
+    // double intPointCorrespElem_FEM[8*DIM-9]; 
+
+        double intPointCorrespXsi_FEM[7*DIM-7][DIM];            
+    double intPointCorrespElem_FEM[7*DIM-7]; 
+
     double intPointCorrespXsi_ISO[18*DIM-27][DIM];            
     double intPointCorrespElem_ISO[18*DIM-27]; 
 
     // double intPointCorrespXsi_ISO[64][DIM];            
     // double intPointCorrespElem_ISO[64];
     // Integration point energy weight 
-    double intPointWeightFunction_FEM[8*DIM-9];
-    double intPointWeightFunctionPrev_FEM[8*DIM-9];
+    // double intPointWeightFunction_FEM[8*DIM-9];
+    // double intPointWeightFunctionPrev_FEM[8*DIM-9];
+
+        double intPointWeightFunction_FEM[7*DIM-7];
+    double intPointWeightFunctionPrev_FEM[7*DIM-7];
 
     double intPointWeightFunction_ISO[18*DIM-27];
     double intPointWeightFunctionPrev_ISO[18*DIM-27];
@@ -86,8 +93,13 @@ private:
     // double intPointWeightFunctionPrev_ISO[64];
     
     // Integration point energy weight gluing zone
-    double intPointWeightFunctionSpecial_FEM[8*DIM-9];
-    double intPointWeightFunctionSpecialPrev_FEM[8*DIM-9];
+    // double intPointWeightFunctionSpecial_FEM[8*DIM-9];
+    // double intPointWeightFunctionSpecialPrev_FEM[8*DIM-9];
+
+        double intPointWeightFunctionSpecial_FEM[7*DIM-7];
+    double intPointWeightFunctionSpecialPrev_FEM[7*DIM-7];
+
+
     double intPointWeightFunctionSpecial_ISO[18*DIM-27];
     double intPointWeightFunctionSpecialPrev_ISO[18*DIM-27];
 
@@ -112,7 +124,8 @@ public:
         Npatch_ = ipatch;
         glueZone = false;
 
-    	for (int i = 0; i < 8*DIM-9; i++){
+    	// for (int i = 0; i < 8*DIM-9; i++){
+        for (int i = 0; i < 7*DIM-7; i++){
     		intPointWeightFunction_FEM[i] = 1.;
     		intPointWeightFunctionPrev_FEM[i] = 1.;
         };
@@ -127,7 +140,8 @@ public:
         // };
 
 
-        for (int i = 0; i < 8*DIM-9; i++){
+        // for (int i = 0; i < 8*DIM-9; i++){
+        for (int i = 0; i < 7*DIM-7; i++){
             intPointWeightFunctionSpecial_FEM[i] = 1.;
             intPointWeightFunctionSpecialPrev_FEM[i] = 1.;
             for (int j = 0; j < DIM; j++) intPointCorrespXsi_FEM[i][j] = 0.0;

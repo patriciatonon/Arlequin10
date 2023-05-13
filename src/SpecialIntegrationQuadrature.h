@@ -77,8 +77,11 @@ private:
     // double pointCoordSpecialIso[64][DIM];
     // double pointWeightSpecialIso[64]; 
 
-    double pointCoordSpecialFem[8*DIM-9][DIM];
-    double pointWeightSpecialFem[8*DIM-9]; 
+    // double pointCoordSpecialFem[8*DIM-9][DIM];
+    // double pointWeightSpecialFem[8*DIM-9]; 
+
+    double pointCoordSpecialFem[7*DIM-7][DIM];
+    double pointWeightSpecialFem[7*DIM-7]; 
 
 };
 

@@ -673,7 +673,7 @@ BOUNDARY 5 - CONTROL POINTS INDEXES/DIRECTION(0-uv 1-ut 2-vt)/NUMBER OF PATCH
 BOUNDARY 6         CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 N. CONTROL POINTS  Ux     Uy     Uz                                   Ux     Uy     Uz  
 -------------------------------------------------------------------------------------------
-36                 0     0      0                                     1.      0.      0.  
+36                 0   0      0                                     1.      0.      0.  
 
 -------------------------------------------------------------------------------------------
 BOUNDARY 6 - CONTROL POINTS INDEXES/DIRECTION(0-uv 1-ut 2-vt)/NUMBER OF PATCH

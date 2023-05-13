@@ -1276,6 +1276,7 @@ void Element<2>::getMatrixC(double **MatrixC)
     matrixCv = new double *[deg[1] + 1];
     for (int i = 0; i < deg[1] + 1; ++i)
         matrixCv[i] = new double[deg[1] + 1];
+    
     dim = deg[1] + npc[1] + 1;
     double vknot_[dim];
     dir = 1;
@@ -1336,7 +1337,7 @@ void Element<3>::getMatrixC(double **MatrixC)
     (*iparameters)[Npatch_]->getKnot(dir, dim, vknot_);
     getDirMatrixC(deg[1], dim, inc_[1], vknot_, matrixCv);
 
-    // v direction
+    // t direction
     double **matrixCt;
     matrixCt = new double *[deg[2] + 1];
     for (int i = 0; i < deg[2] + 1; ++i)
@@ -2894,6 +2895,7 @@ void Element<DIM>::getMatrixAndVectorsDifferentMeshLaplace(double &djac_, double
         {
 
             // L2 operator
+            //phiC_[j]
             double L2 = phi_[i] * phiC_[j] * k1;
             lagrMultMatrix[i][j] += L2 * WJ;
 
@@ -4273,7 +4275,7 @@ void Element<DIM>::getLagrangeMultipliersDifferentMeshLaplace_ISO_ISO(int &ipatc
 
             // Coarse mesh computatation
             // Defines the equivalent integration point in coarse mesh
-            for (int k = 0; k < DIM; k++) xsiC[k] = intPointCorrespXsi_FEM[index][k];
+            for (int k = 0; k < DIM; k++) xsiC[k] = intPointCorrespXsi_ISO[index][k];
 
             // Computes the velocity shape functions
             shapeQuad.evaluateIso(xsiC, phiC_, wpcC, incC_, (*iparametersC), NpatchC_);
@@ -5063,16 +5065,16 @@ void Element<DIM>::getLaplace_ISO(double **jacobianNRMatrix, double *rhsVector)
         getSpatialDerivatives_ISO(xsi, ainv_, dphi_dx);
 
         // Computes the element matrix
-        double wna_ = 1.;//intPointWeightFunction_ISO[index];
+        double wna_ = intPointWeightFunction_ISO[index];
         getElemMatrixLaplace(LNN,wna_,djac_,weight_,dphi_dx,jacobianNRMatrix);
 
         index++;
     };
 
     // Computes the RHS vector
-    getResidualVectorLaplace(LNN,rhsVector);
+    // getResidualVectorLaplace(LNN,rhsVector);
 
-    setDirichletConstrain(LNN, jacobianNRMatrix);
+    // setDirichletConstrain(LNN, jacobianNRMatrix);
 
     for (int i = 0; i < DIM; ++i)
         delete[] dphi_dx[i];

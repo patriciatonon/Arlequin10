@@ -31,470 +31,122 @@ printLagrangeMultipliers   = 1
 printNodalCorrespondence   = 1
 PrintProcess               = 0
 
-FEM nodes 231
-FEM elements 100
-Nodal Coordinates 
-1 0 
-1 0.5 
-0 0.5 
-0 0 
-0.1 0 
-0.2 0 
-0.3 0 
-0.4 0 
-0.5 0 
-0.6 0 
-0.7 0 
-0.8 0 
-0.9 0 
-0.05 0 
-0.15 0 
-0.25 0 
-0.35 0 
-0.45 0 
-0.55 0 
-0.65 0 
-0.75 0 
-0.85 0 
-0.95 0 
-1 0.1 
-1 0.2 
-1 0.3 
-1 0.4 
-1 0.05 
-1 0.15 
-1 0.25 
-1 0.35 
-1 0.45 
-0.9 0.5 
-0.8 0.5 
-0.7 0.5 
-0.6 0.5 
-0.5 0.5 
-0.4 0.5 
-0.3 0.5 
-0.2 0.5 
-0.1 0.5 
-0.95 0.5 
-0.85 0.5 
-0.75 0.5 
-0.65 0.5 
-0.55 0.5 
-0.45 0.5 
-0.35 0.5 
-0.25 0.5 
-0.15 0.5 
-0.05 0.5 
-0 0.4 
-0 0.3 
-0 0.2 
-0 0.1 
-0 0.45 
-0 0.35 
-0 0.25 
-0 0.15 
-0 0.05 
-0.1 0.4 
-0.2 0.4 
-0.3 0.4 
-0.4 0.4 
-0.5 0.4 
-0.6 0.4 
-0.7 0.4 
-0.8 0.4 
-0.9 0.4 
-0.1 0.3 
-0.2 0.3 
-0.3 0.3 
-0.4 0.3 
-0.5 0.3 
-0.6 0.3 
-0.7 0.3 
-0.8 0.3 
-0.9 0.3 
-0.1 0.2 
-0.2 0.2 
-0.3 0.2 
-0.4 0.2 
-0.5 0.2 
-0.6 0.2 
-0.7 0.2 
-0.8 0.2 
-0.9 0.2 
-0.1 0.1 
-0.2 0.1 
-0.3 0.1 
-0.4 0.1 
-0.5 0.1 
-0.6 0.1 
-0.7 0.1 
-0.8 0.1 
-0.9 0.1 
-0.05 0.4 
-0.05 0.45 
-0.1 0.45 
-0.15 0.4 
-0.15 0.45 
-0.2 0.45 
-0.25 0.4 
-0.25 0.45 
-0.3 0.45 
-0.35 0.4 
-0.35 0.45 
-0.4 0.45 
-0.45 0.4 
-0.45 0.45 
-0.5 0.45 
-0.55 0.4 
-0.55 0.45 
-0.6 0.45 
-0.65 0.4 
-0.65 0.45 
-0.7 0.45 
-0.75 0.4 
-0.75 0.45 
-0.8 0.45 
-0.85 0.4 
-0.85 0.45 
-0.9 0.45 
-0.95 0.4 
-0.95 0.45 
-0.05 0.3 
-0.05 0.35 
-0.1 0.35 
-0.15 0.3 
-0.15 0.35 
-0.2 0.35 
-0.25 0.3 
-0.25 0.35 
-0.3 0.35 
-0.35 0.3 
-0.35 0.35 
-0.4 0.35 
-0.45 0.3 
-0.45 0.35 
-0.5 0.35 
-0.55 0.3 
-0.55 0.35 
-0.6 0.35 
-0.65 0.3 
-0.65 0.35 
-0.7 0.35 
-0.75 0.3 
-0.75 0.35 
-0.8 0.35 
-0.85 0.3 
-0.85 0.35 
-0.9 0.35 
-0.95 0.3 
-0.95 0.35 
-0.05 0.2 
-0.05 0.25 
-0.1 0.25 
-0.15 0.2 
-0.15 0.25 
-0.2 0.25 
-0.25 0.2 
-0.25 0.25 
-0.3 0.25 
-0.35 0.2 
-0.35 0.25 
-0.4 0.25 
-0.45 0.2 
-0.45 0.25 
-0.5 0.25 
-0.55 0.2 
-0.55 0.25 
-0.6 0.25 
-0.65 0.2 
-0.65 0.25 
-0.7 0.25 
-0.75 0.2 
-0.75 0.25 
-0.8 0.25 
-0.85 0.2 
-0.85 0.25 
-0.9 0.25 
-0.95 0.2 
-0.95 0.25 
-0.05 0.1 
-0.05 0.15 
-0.1 0.15 
-0.15 0.1 
-0.15 0.15 
-0.2 0.15 
-0.25 0.1 
-0.25 0.15 
-0.3 0.15 
-0.35 0.1 
-0.35 0.15 
-0.4 0.15 
-0.45 0.1 
-0.45 0.15 
-0.5 0.15 
-0.55 0.1 
-0.55 0.15 
-0.6 0.15 
-0.65 0.1 
-0.65 0.15 
-0.7 0.15 
-0.75 0.1 
-0.75 0.15 
-0.8 0.15 
-0.85 0.1 
-0.85 0.15 
-0.9 0.15 
-0.95 0.1 
-0.95 0.15 
-0.05 0.05 
-0.1 0.05 
-0.15 0.05 
-0.2 0.05 
-0.25 0.05 
-0.3 0.05 
-0.35 0.05 
-0.4 0.05 
-0.45 0.05 
-0.5 0.05 
-0.55 0.05 
-0.6 0.05 
-0.65 0.05 
-0.7 0.05 
-0.75 0.05 
-0.8 0.05 
-0.85 0.05 
-0.9 0.05 
-0.95 0.05 
-Number of Boundary groups (FEM MESH) = 3
-Number of Boundary Elements (FEM MESH)= 30
-Constrains 0 1 0 0 0
-Constrains 1 0 0 0 0
-Constrains 2 0 0 0 0
-Constrains 3 1 0 0 0
-Constrains 4 1 0 0 0
-Constrains 5 1 0 0 0
-Constrains 6 1 0 0 0
-Constrains 7 1 0 0 0
-Constrains 8 1 0 0 0
-Constrains 9 1 0 0 0
-Constrains 10 1 0 0 0
-Constrains 11 1 0 0 0
-Constrains 12 1 0 0 0
-Constrains 13 1 0 0 0
-Constrains 14 1 0 0 0
-Constrains 15 1 0 0 0
-Constrains 16 1 0 0 0
-Constrains 17 1 0 0 0
-Constrains 18 1 0 0 0
-Constrains 19 1 0 0 0
-Constrains 20 1 0 0 0
-Constrains 21 1 0 0 0
-Constrains 22 1 0 0 0
-Constrains 23 0 0 0 0
-Constrains 24 0 0 0 0
-Constrains 25 0 0 0 0
-Constrains 26 0 0 0 0
-Constrains 27 0 0 0 0
-Constrains 28 0 0 0 0
-Constrains 29 0 0 0 0
-Constrains 30 0 0 0 0
-Constrains 31 0 0 0 0
-Constrains 32 0 0 0 0
-Constrains 33 0 0 0 0
-Constrains 34 0 0 0 0
-Constrains 35 0 0 0 0
-Constrains 36 0 0 0 0
-Constrains 37 0 0 0 0
-Constrains 38 0 0 0 0
-Constrains 39 0 0 0 0
-Constrains 40 0 0 0 0
-Constrains 41 0 0 0 0
-Constrains 42 0 0 0 0
-Constrains 43 0 0 0 0
-Constrains 44 0 0 0 0
-Constrains 45 0 0 0 0
-Constrains 46 0 0 0 0
-Constrains 47 0 0 0 0
-Constrains 48 0 0 0 0
-Constrains 49 0 0 0 0
-Constrains 50 0 0 0 0
-Constrains 51 0 0 0 0
-Constrains 52 0 0 0 0
-Constrains 53 0 0 0 0
-Constrains 54 0 0 0 0
-Constrains 55 0 0 0 0
-Constrains 56 0 0 0 0
-Constrains 57 0 0 0 0
-Constrains 58 0 0 0 0
-Constrains 59 0 0 0 0
-Constrains 60 0 0 0 0
-Constrains 61 0 0 0 0
-Constrains 62 0 0 0 0
-Constrains 63 0 0 0 0
-Constrains 64 0 0 0 0
-Constrains 65 0 0 0 0
-Constrains 66 0 0 0 0
-Constrains 67 0 0 0 0
-Constrains 68 0 0 0 0
-Constrains 69 0 0 0 0
-Constrains 70 0 0 0 0
-Constrains 71 0 0 0 0
-Constrains 72 0 0 0 0
-Constrains 73 0 0 0 0
-Constrains 74 0 0 0 0
-Constrains 75 0 0 0 0
-Constrains 76 0 0 0 0
-Constrains 77 0 0 0 0
-Constrains 78 0 0 0 0
-Constrains 79 0 0 0 0
-Constrains 80 0 0 0 0
-Constrains 81 0 0 0 0
-Constrains 82 0 0 0 0
-Constrains 83 0 0 0 0
-Constrains 84 0 0 0 0
-Constrains 85 0 0 0 0
-Constrains 86 0 0 0 0
-Constrains 87 0 0 0 0
-Constrains 88 0 0 0 0
-Constrains 89 0 0 0 0
-Constrains 90 0 0 0 0
-Constrains 91 0 0 0 0
-Constrains 92 0 0 0 0
-Constrains 93 0 0 0 0
-Constrains 94 0 0 0 0
-Constrains 95 0 0 0 0
-Constrains 96 0 0 0 0
-Constrains 97 0 0 0 0
-Constrains 98 0 0 0 0
-Constrains 99 0 0 0 0
-Constrains 100 0 0 0 0
-Constrains 101 0 0 0 0
-Constrains 102 0 0 0 0
-Constrains 103 0 0 0 0
-Constrains 104 0 0 0 0
-Constrains 105 0 0 0 0
-Constrains 106 0 0 0 0
-Constrains 107 0 0 0 0
-Constrains 108 0 0 0 0
-Constrains 109 0 0 0 0
-Constrains 110 0 0 0 0
-Constrains 111 0 0 0 0
-Constrains 112 0 0 0 0
-Constrains 113 0 0 0 0
-Constrains 114 0 0 0 0
-Constrains 115 0 0 0 0
-Constrains 116 0 0 0 0
-Constrains 117 0 0 0 0
-Constrains 118 0 0 0 0
-Constrains 119 0 0 0 0
-Constrains 120 0 0 0 0
-Constrains 121 0 0 0 0
-Constrains 122 0 0 0 0
-Constrains 123 0 0 0 0
-Constrains 124 0 0 0 0
-Constrains 125 0 0 0 0
-Constrains 126 0 0 0 0
-Constrains 127 0 0 0 0
-Constrains 128 0 0 0 0
-Constrains 129 0 0 0 0
-Constrains 130 0 0 0 0
-Constrains 131 0 0 0 0
-Constrains 132 0 0 0 0
-Constrains 133 0 0 0 0
-Constrains 134 0 0 0 0
-Constrains 135 0 0 0 0
-Constrains 136 0 0 0 0
-Constrains 137 0 0 0 0
-Constrains 138 0 0 0 0
-Constrains 139 0 0 0 0
-Constrains 140 0 0 0 0
-Constrains 141 0 0 0 0
-Constrains 142 0 0 0 0
-Constrains 143 0 0 0 0
-Constrains 144 0 0 0 0
-Constrains 145 0 0 0 0
-Constrains 146 0 0 0 0
-Constrains 147 0 0 0 0
-Constrains 148 0 0 0 0
-Constrains 149 0 0 0 0
-Constrains 150 0 0 0 0
-Constrains 151 0 0 0 0
-Constrains 152 0 0 0 0
-Constrains 153 0 0 0 0
-Constrains 154 0 0 0 0
-Constrains 155 0 0 0 0
-Constrains 156 0 0 0 0
-Constrains 157 0 0 0 0
-Constrains 158 0 0 0 0
-Constrains 159 0 0 0 0
-Constrains 160 0 0 0 0
-Constrains 161 0 0 0 0
-Constrains 162 0 0 0 0
-Constrains 163 0 0 0 0
-Constrains 164 0 0 0 0
-Constrains 165 0 0 0 0
-Constrains 166 0 0 0 0
-Constrains 167 0 0 0 0
-Constrains 168 0 0 0 0
-Constrains 169 0 0 0 0
-Constrains 170 0 0 0 0
-Constrains 171 0 0 0 0
-Constrains 172 0 0 0 0
-Constrains 173 0 0 0 0
-Constrains 174 0 0 0 0
-Constrains 175 0 0 0 0
-Constrains 176 0 0 0 0
-Constrains 177 0 0 0 0
-Constrains 178 0 0 0 0
-Constrains 179 0 0 0 0
-Constrains 180 0 0 0 0
-Constrains 181 0 0 0 0
-Constrains 182 0 0 0 0
-Constrains 183 0 0 0 0
-Constrains 184 0 0 0 0
-Constrains 185 0 0 0 0
-Constrains 186 0 0 0 0
-Constrains 187 0 0 0 0
-Constrains 188 0 0 0 0
-Constrains 189 0 0 0 0
-Constrains 190 0 0 0 0
-Constrains 191 0 0 0 0
-Constrains 192 0 0 0 0
-Constrains 193 0 0 0 0
-Constrains 194 0 0 0 0
-Constrains 195 0 0 0 0
-Constrains 196 0 0 0 0
-Constrains 197 0 0 0 0
-Constrains 198 0 0 0 0
-Constrains 199 0 0 0 0
-Constrains 200 0 0 0 0
-Constrains 201 0 0 0 0
-Constrains 202 0 0 0 0
-Constrains 203 0 0 0 0
-Constrains 204 0 0 0 0
-Constrains 205 0 0 0 0
-Constrains 206 0 0 0 0
-Constrains 207 0 0 0 0
-Constrains 208 0 0 0 0
-Constrains 209 0 0 0 0
-Constrains 210 0 0 0 0
-Constrains 211 0 0 0 0
-Constrains 212 0 0 0 0
-Constrains 213 0 0 0 0
-Constrains 214 0 0 0 0
-Constrains 215 0 0 0 0
-Constrains 216 0 0 0 0
-Constrains 217 0 0 0 0
-Constrains 218 0 0 0 0
-Constrains 219 0 0 0 0
-Constrains 220 0 0 0 0
-Constrains 221 0 0 0 0
-Constrains 222 0 0 0 0
-Constrains 223 0 0 0 0
-Constrains 224 0 0 0 0
-Constrains 225 0 0 0 0
-Constrains 226 0 0 0 0
-Constrains 227 0 0 0 0
-Constrains 228 0 0 0 0
-Constrains 229 0 0 0 0
-Constrains 230 0 0 0 0
+Total number of Control Points 84
+Number of patches 1
+Data in the 0 PATCH
+Number of control points 84
+0 0 1
+0.05 0 1
+0.15 0 1
+0.25 0 1
+0.35 0 1
+0.45 0 1
+0.55 0 1
+0.65 0 1
+0.75 0 1
+0.85 0 1
+0.95 0 1
+1 0 1
+0 0.05 1
+0.05 0.05 1
+0.15 0.05 1
+0.25 0.05 1
+0.35 0.05 1
+0.45 0.05 1
+0.55 0.05 1
+0.65 0.05 1
+0.75 0.05 1
+0.85 0.05 1
+0.95 0.05 1
+1 0.05 1
+0 0.15 1
+0.05 0.15 1
+0.15 0.15 1
+0.25 0.15 1
+0.35 0.15 1
+0.45 0.15 1
+0.55 0.15 1
+0.65 0.15 1
+0.75 0.15 1
+0.85 0.15 1
+0.95 0.15 1
+1 0.15 1
+0 0.25 1
+0.05 0.25 1
+0.15 0.25 1
+0.25 0.25 1
+0.35 0.25 1
+0.45 0.25 1
+0.55 0.25 1
+0.65 0.25 1
+0.75 0.25 1
+0.85 0.25 1
+0.95 0.25 1
+1 0.25 1
+0 0.35 1
+0.05 0.35 1
+0.15 0.35 1
+0.25 0.35 1
+0.35 0.35 1
+0.45 0.35 1
+0.55 0.35 1
+0.65 0.35 1
+0.75 0.35 1
+0.85 0.35 1
+0.95 0.35 1
+1 0.35 1
+0 0.45 1
+0.05 0.45 1
+0.15 0.45 1
+0.25 0.45 1
+0.35 0.45 1
+0.45 0.45 1
+0.55 0.45 1
+0.65 0.45 1
+0.75 0.45 1
+0.85 0.45 1
+0.95 0.45 1
+1 0.45 1
+0 0.5 1
+0.05 0.5 1
+0.15 0.5 1
+0.25 0.5 1
+0.35 0.5 1
+0.45 0.5 1
+0.55 0.5 1
+0.65 0.5 1
+0.75 0.5 1
+0.85 0.5 1
+0.95 0.5 1
+1 0.5 1
+ Number of Control Points x: 12 Function Degree: 2
+ Number of Control Points y: 7 Function Degree: 2
+uKnot 
+0
+0
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+1
+1
+vKnot 
+0
+0
+0
+0.2
+0.4
+0.6
+0.8
+1
+1
+1
+Number of Boundary groups (IA MESH) = 3
+Number of Boundary Elements (IA MESH)= 30
