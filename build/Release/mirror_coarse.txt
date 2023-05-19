@@ -31,445 +31,156 @@ printLagrangeMultipliers   = 1
 printNodalCorrespondence   = 1
 PrintProcess               = 0
 
-Total number of Control Points 432
+Total number of Control Points 144
 Number of patches 1
 Data in the 0 PATCH
-Number of control points 432
-0 0 0 1
-0.05 0 0 1
-0.15 0 0 1
-0.25 0 0 1
-0.35 0 0 1
-0.45 0 0 1
-0.55 0 0 1
-0.65 0 0 1
-0.75 0 0 1
-0.85 0 0 1
-0.95 0 0 1
-1 0 0 1
-0 0.05 0 1
-0.05 0.05 0 1
-0.15 0.05 0 1
-0.25 0.05 0 1
-0.35 0.05 0 1
-0.45 0.05 0 1
-0.55 0.05 0 1
-0.65 0.05 0 1
-0.75 0.05 0 1
-0.85 0.05 0 1
-0.95 0.05 0 1
-1 0.05 0 1
-0 0.15 0 1
-0.05 0.15 0 1
-0.15 0.15 0 1
-0.25 0.15 0 1
-0.35 0.15 0 1
-0.45 0.15 0 1
-0.55 0.15 0 1
-0.65 0.15 0 1
-0.75 0.15 0 1
-0.85 0.15 0 1
-0.95 0.15 0 1
-1 0.15 0 1
-0 0.25 0 1
-0.05 0.25 0 1
-0.15 0.25 0 1
-0.25 0.25 0 1
-0.35 0.25 0 1
-0.45 0.25 0 1
-0.55 0.25 0 1
-0.65 0.25 0 1
-0.75 0.25 0 1
-0.85 0.25 0 1
-0.95 0.25 0 1
-1 0.25 0 1
-0 0.35 0 1
-0.05 0.35 0 1
-0.15 0.35 0 1
-0.25 0.35 0 1
-0.35 0.35 0 1
-0.45 0.35 0 1
-0.55 0.35 0 1
-0.65 0.35 0 1
-0.75 0.35 0 1
-0.85 0.35 0 1
-0.95 0.35 0 1
-1 0.35 0 1
-0 0.45 0 1
-0.05 0.45 0 1
-0.15 0.45 0 1
-0.25 0.45 0 1
-0.35 0.45 0 1
-0.45 0.45 0 1
-0.55 0.45 0 1
-0.65 0.45 0 1
-0.75 0.45 0 1
-0.85 0.45 0 1
-0.95 0.45 0 1
-1 0.45 0 1
-0 0.55 0 1
-0.05 0.55 0 1
-0.15 0.55 0 1
-0.25 0.55 0 1
-0.35 0.55 0 1
-0.45 0.55 0 1
-0.55 0.55 0 1
-0.65 0.55 0 1
-0.75 0.55 0 1
-0.85 0.55 0 1
-0.95 0.55 0 1
-1 0.55 0 1
-0 0.65 0 1
-0.05 0.65 0 1
-0.15 0.65 0 1
-0.25 0.65 0 1
-0.35 0.65 0 1
-0.45 0.65 0 1
-0.55 0.65 0 1
-0.65 0.65 0 1
-0.75 0.65 0 1
-0.85 0.65 0 1
-0.95 0.65 0 1
-1 0.65 0 1
-0 0.75 0 1
-0.05 0.75 0 1
-0.15 0.75 0 1
-0.25 0.75 0 1
-0.35 0.75 0 1
-0.45 0.75 0 1
-0.55 0.75 0 1
-0.65 0.75 0 1
-0.75 0.75 0 1
-0.85 0.75 0 1
-0.95 0.75 0 1
-1 0.75 0 1
-0 0.85 0 1
-0.05 0.85 0 1
-0.15 0.85 0 1
-0.25 0.85 0 1
-0.35 0.85 0 1
-0.45 0.85 0 1
-0.55 0.85 0 1
-0.65 0.85 0 1
-0.75 0.85 0 1
-0.85 0.85 0 1
-0.95 0.85 0 1
-1 0.85 0 1
-0 0.95 0 1
-0.05 0.95 0 1
-0.15 0.95 0 1
-0.25 0.95 0 1
-0.35 0.95 0 1
-0.45 0.95 0 1
-0.55 0.95 0 1
-0.65 0.95 0 1
-0.75 0.95 0 1
-0.85 0.95 0 1
-0.95 0.95 0 1
-1 0.95 0 1
-0 1 0 1
-0.05 1 0 1
-0.15 1 0 1
-0.25 1 0 1
-0.35 1 0 1
-0.45 1 0 1
-0.55 1 0 1
-0.65 1 0 1
-0.75 1 0 1
-0.85 1 0 1
-0.95 1 0 1
-1 1 0 1
-0 0 0.05 1
-0.05 0 0.05 1
-0.15 0 0.05 1
-0.25 0 0.05 1
-0.35 0 0.05 1
-0.45 0 0.05 1
-0.55 0 0.05 1
-0.65 0 0.05 1
-0.75 0 0.05 1
-0.85 0 0.05 1
-0.95 0 0.05 1
-1 0 0.05 1
-0 0.05 0.05 1
-0.05 0.05 0.05 1
-0.15 0.05 0.05 1
-0.25 0.05 0.05 1
-0.35 0.05 0.05 1
-0.45 0.05 0.05 1
-0.55 0.05 0.05 1
-0.65 0.05 0.05 1
-0.75 0.05 0.05 1
-0.85 0.05 0.05 1
-0.95 0.05 0.05 1
-1 0.05 0.05 1
-0 0.15 0.05 1
-0.05 0.15 0.05 1
-0.15 0.15 0.05 1
-0.25 0.15 0.05 1
-0.35 0.15 0.05 1
-0.45 0.15 0.05 1
-0.55 0.15 0.05 1
-0.65 0.15 0.05 1
-0.75 0.15 0.05 1
-0.85 0.15 0.05 1
-0.95 0.15 0.05 1
-1 0.15 0.05 1
-0 0.25 0.05 1
-0.05 0.25 0.05 1
-0.15 0.25 0.05 1
-0.25 0.25 0.05 1
-0.35 0.25 0.05 1
-0.45 0.25 0.05 1
-0.55 0.25 0.05 1
-0.65 0.25 0.05 1
-0.75 0.25 0.05 1
-0.85 0.25 0.05 1
-0.95 0.25 0.05 1
-1 0.25 0.05 1
-0 0.35 0.05 1
-0.05 0.35 0.05 1
-0.15 0.35 0.05 1
-0.25 0.35 0.05 1
-0.35 0.35 0.05 1
-0.45 0.35 0.05 1
-0.55 0.35 0.05 1
-0.65 0.35 0.05 1
-0.75 0.35 0.05 1
-0.85 0.35 0.05 1
-0.95 0.35 0.05 1
-1 0.35 0.05 1
-0 0.45 0.05 1
-0.05 0.45 0.05 1
-0.15 0.45 0.05 1
-0.25 0.45 0.05 1
-0.35 0.45 0.05 1
-0.45 0.45 0.05 1
-0.55 0.45 0.05 1
-0.65 0.45 0.05 1
-0.75 0.45 0.05 1
-0.85 0.45 0.05 1
-0.95 0.45 0.05 1
-1 0.45 0.05 1
-0 0.55 0.05 1
-0.05 0.55 0.05 1
-0.15 0.55 0.05 1
-0.25 0.55 0.05 1
-0.35 0.55 0.05 1
-0.45 0.55 0.05 1
-0.55 0.55 0.05 1
-0.65 0.55 0.05 1
-0.75 0.55 0.05 1
-0.85 0.55 0.05 1
-0.95 0.55 0.05 1
-1 0.55 0.05 1
-0 0.65 0.05 1
-0.05 0.65 0.05 1
-0.15 0.65 0.05 1
-0.25 0.65 0.05 1
-0.35 0.65 0.05 1
-0.45 0.65 0.05 1
-0.55 0.65 0.05 1
-0.65 0.65 0.05 1
-0.75 0.65 0.05 1
-0.85 0.65 0.05 1
-0.95 0.65 0.05 1
-1 0.65 0.05 1
-0 0.75 0.05 1
-0.05 0.75 0.05 1
-0.15 0.75 0.05 1
-0.25 0.75 0.05 1
-0.35 0.75 0.05 1
-0.45 0.75 0.05 1
-0.55 0.75 0.05 1
-0.65 0.75 0.05 1
-0.75 0.75 0.05 1
-0.85 0.75 0.05 1
-0.95 0.75 0.05 1
-1 0.75 0.05 1
-0 0.85 0.05 1
-0.05 0.85 0.05 1
-0.15 0.85 0.05 1
-0.25 0.85 0.05 1
-0.35 0.85 0.05 1
-0.45 0.85 0.05 1
-0.55 0.85 0.05 1
-0.65 0.85 0.05 1
-0.75 0.85 0.05 1
-0.85 0.85 0.05 1
-0.95 0.85 0.05 1
-1 0.85 0.05 1
-0 0.95 0.05 1
-0.05 0.95 0.05 1
-0.15 0.95 0.05 1
-0.25 0.95 0.05 1
-0.35 0.95 0.05 1
-0.45 0.95 0.05 1
-0.55 0.95 0.05 1
-0.65 0.95 0.05 1
-0.75 0.95 0.05 1
-0.85 0.95 0.05 1
-0.95 0.95 0.05 1
-1 0.95 0.05 1
-0 1 0.05 1
-0.05 1 0.05 1
-0.15 1 0.05 1
-0.25 1 0.05 1
-0.35 1 0.05 1
-0.45 1 0.05 1
-0.55 1 0.05 1
-0.65 1 0.05 1
-0.75 1 0.05 1
-0.85 1 0.05 1
-0.95 1 0.05 1
-1 1 0.05 1
-0 0 0.1 1
-0.05 0 0.1 1
-0.15 0 0.1 1
-0.25 0 0.1 1
-0.35 0 0.1 1
-0.45 0 0.1 1
-0.55 0 0.1 1
-0.65 0 0.1 1
-0.75 0 0.1 1
-0.85 0 0.1 1
-0.95 0 0.1 1
-1 0 0.1 1
-0 0.05 0.1 1
-0.05 0.05 0.1 1
-0.15 0.05 0.1 1
-0.25 0.05 0.1 1
-0.35 0.05 0.1 1
-0.45 0.05 0.1 1
-0.55 0.05 0.1 1
-0.65 0.05 0.1 1
-0.75 0.05 0.1 1
-0.85 0.05 0.1 1
-0.95 0.05 0.1 1
-1 0.05 0.1 1
-0 0.15 0.1 1
-0.05 0.15 0.1 1
-0.15 0.15 0.1 1
-0.25 0.15 0.1 1
-0.35 0.15 0.1 1
-0.45 0.15 0.1 1
-0.55 0.15 0.1 1
-0.65 0.15 0.1 1
-0.75 0.15 0.1 1
-0.85 0.15 0.1 1
-0.95 0.15 0.1 1
-1 0.15 0.1 1
-0 0.25 0.1 1
-0.05 0.25 0.1 1
-0.15 0.25 0.1 1
-0.25 0.25 0.1 1
-0.35 0.25 0.1 1
-0.45 0.25 0.1 1
-0.55 0.25 0.1 1
-0.65 0.25 0.1 1
-0.75 0.25 0.1 1
-0.85 0.25 0.1 1
-0.95 0.25 0.1 1
-1 0.25 0.1 1
-0 0.35 0.1 1
-0.05 0.35 0.1 1
-0.15 0.35 0.1 1
-0.25 0.35 0.1 1
-0.35 0.35 0.1 1
-0.45 0.35 0.1 1
-0.55 0.35 0.1 1
-0.65 0.35 0.1 1
-0.75 0.35 0.1 1
-0.85 0.35 0.1 1
-0.95 0.35 0.1 1
-1 0.35 0.1 1
-0 0.45 0.1 1
-0.05 0.45 0.1 1
-0.15 0.45 0.1 1
-0.25 0.45 0.1 1
-0.35 0.45 0.1 1
-0.45 0.45 0.1 1
-0.55 0.45 0.1 1
-0.65 0.45 0.1 1
-0.75 0.45 0.1 1
-0.85 0.45 0.1 1
-0.95 0.45 0.1 1
-1 0.45 0.1 1
-0 0.55 0.1 1
-0.05 0.55 0.1 1
-0.15 0.55 0.1 1
-0.25 0.55 0.1 1
-0.35 0.55 0.1 1
-0.45 0.55 0.1 1
-0.55 0.55 0.1 1
-0.65 0.55 0.1 1
-0.75 0.55 0.1 1
-0.85 0.55 0.1 1
-0.95 0.55 0.1 1
-1 0.55 0.1 1
-0 0.65 0.1 1
-0.05 0.65 0.1 1
-0.15 0.65 0.1 1
-0.25 0.65 0.1 1
-0.35 0.65 0.1 1
-0.45 0.65 0.1 1
-0.55 0.65 0.1 1
-0.65 0.65 0.1 1
-0.75 0.65 0.1 1
-0.85 0.65 0.1 1
-0.95 0.65 0.1 1
-1 0.65 0.1 1
-0 0.75 0.1 1
-0.05 0.75 0.1 1
-0.15 0.75 0.1 1
-0.25 0.75 0.1 1
-0.35 0.75 0.1 1
-0.45 0.75 0.1 1
-0.55 0.75 0.1 1
-0.65 0.75 0.1 1
-0.75 0.75 0.1 1
-0.85 0.75 0.1 1
-0.95 0.75 0.1 1
-1 0.75 0.1 1
-0 0.85 0.1 1
-0.05 0.85 0.1 1
-0.15 0.85 0.1 1
-0.25 0.85 0.1 1
-0.35 0.85 0.1 1
-0.45 0.85 0.1 1
-0.55 0.85 0.1 1
-0.65 0.85 0.1 1
-0.75 0.85 0.1 1
-0.85 0.85 0.1 1
-0.95 0.85 0.1 1
-1 0.85 0.1 1
-0 0.95 0.1 1
-0.05 0.95 0.1 1
-0.15 0.95 0.1 1
-0.25 0.95 0.1 1
-0.35 0.95 0.1 1
-0.45 0.95 0.1 1
-0.55 0.95 0.1 1
-0.65 0.95 0.1 1
-0.75 0.95 0.1 1
-0.85 0.95 0.1 1
-0.95 0.95 0.1 1
-1 0.95 0.1 1
-0 1 0.1 1
-0.05 1 0.1 1
-0.15 1 0.1 1
-0.25 1 0.1 1
-0.35 1 0.1 1
-0.45 1 0.1 1
-0.55 1 0.1 1
-0.65 1 0.1 1
-0.75 1 0.1 1
-0.85 1 0.1 1
-0.95 1 0.1 1
-1 1 0.1 1
+Number of control points 144
+0 0 1
+0.05 0 1
+0.15 0 1
+0.25 0 1
+0.35 0 1
+0.45 0 1
+0.55 0 1
+0.65 0 1
+0.75 0 1
+0.85 0 1
+0.95 0 1
+1 0 1
+0 0.05 1
+0.05 0.05 1
+0.15 0.05 1
+0.25 0.05 1
+0.35 0.05 1
+0.45 0.05 1
+0.55 0.05 1
+0.65 0.05 1
+0.75 0.05 1
+0.85 0.05 1
+0.95 0.05 1
+1 0.05 1
+0 0.15 1
+0.05 0.15 1
+0.15 0.15 1
+0.25 0.15 1
+0.35 0.15 1
+0.45 0.15 1
+0.55 0.15 1
+0.65 0.15 1
+0.75 0.15 1
+0.85 0.15 1
+0.95 0.15 1
+1 0.15 1
+0 0.25 1
+0.05 0.25 1
+0.15 0.25 1
+0.25 0.25 1
+0.35 0.25 1
+0.45 0.25 1
+0.55 0.25 1
+0.65 0.25 1
+0.75 0.25 1
+0.85 0.25 1
+0.95 0.25 1
+1 0.25 1
+0 0.35 1
+0.05 0.35 1
+0.15 0.35 1
+0.25 0.35 1
+0.35 0.35 1
+0.45 0.35 1
+0.55 0.35 1
+0.65 0.35 1
+0.75 0.35 1
+0.85 0.35 1
+0.95 0.35 1
+1 0.35 1
+0 0.45 1
+0.05 0.45 1
+0.15 0.45 1
+0.25 0.45 1
+0.35 0.45 1
+0.45 0.45 1
+0.55 0.45 1
+0.65 0.45 1
+0.75 0.45 1
+0.85 0.45 1
+0.95 0.45 1
+1 0.45 1
+0 0.55 1
+0.05 0.55 1
+0.15 0.55 1
+0.25 0.55 1
+0.35 0.55 1
+0.45 0.55 1
+0.55 0.55 1
+0.65 0.55 1
+0.75 0.55 1
+0.85 0.55 1
+0.95 0.55 1
+1 0.55 1
+0 0.65 1
+0.05 0.65 1
+0.15 0.65 1
+0.25 0.65 1
+0.35 0.65 1
+0.45 0.65 1
+0.55 0.65 1
+0.65 0.65 1
+0.75 0.65 1
+0.85 0.65 1
+0.95 0.65 1
+1 0.65 1
+0 0.75 1
+0.05 0.75 1
+0.15 0.75 1
+0.25 0.75 1
+0.35 0.75 1
+0.45 0.75 1
+0.55 0.75 1
+0.65 0.75 1
+0.75 0.75 1
+0.85 0.75 1
+0.95 0.75 1
+1 0.75 1
+0 0.85 1
+0.05 0.85 1
+0.15 0.85 1
+0.25 0.85 1
+0.35 0.85 1
+0.45 0.85 1
+0.55 0.85 1
+0.65 0.85 1
+0.75 0.85 1
+0.85 0.85 1
+0.95 0.85 1
+1 0.85 1
+0 0.95 1
+0.05 0.95 1
+0.15 0.95 1
+0.25 0.95 1
+0.35 0.95 1
+0.45 0.95 1
+0.55 0.95 1
+0.65 0.95 1
+0.75 0.95 1
+0.85 0.95 1
+0.95 0.95 1
+1 0.95 1
+0 1 1
+0.05 1 1
+0.15 1 1
+0.25 1 1
+0.35 1 1
+0.45 1 1
+0.55 1 1
+0.65 1 1
+0.75 1 1
+0.85 1 1
+0.95 1 1
+1 1 1
  Number of Control Points x: 12 Function Degree: 2
  Number of Control Points y: 12 Function Degree: 2
- Number of Control Points z: 3 Function Degree: 2
 uKnot 
 0
 0
@@ -502,444 +213,149 @@ vKnot
 1
 1
 1
-tKnot 
-0
-0
-0
-1
-1
-1
-Number of Boundary groups (IA MESH) = 6
-Number of Boundary Elements (IA MESH)= 240
-Constrains 0 1 0 1 0 1 0
-Constrains 1 1 0 1 0 1 0
-Constrains 2 1 0 1 0 1 0
-Constrains 3 1 0 1 0 1 0
-Constrains 4 1 0 1 0 1 0
-Constrains 5 1 0 1 0 1 0
-Constrains 6 1 0 1 0 1 0
-Constrains 7 1 0 1 0 1 0
-Constrains 8 1 0 1 0 1 0
-Constrains 9 1 0 1 0 1 0
-Constrains 10 1 0 1 0 1 0
-Constrains 11 1 0 1 0 1 0
-Constrains 12 0 0 0 0 0 0
-Constrains 13 0 0 0 0 0 0
-Constrains 14 0 0 0 0 0 0
-Constrains 15 0 0 0 0 0 0
-Constrains 16 0 0 0 0 0 0
-Constrains 17 0 0 0 0 0 0
-Constrains 18 0 0 0 0 0 0
-Constrains 19 0 0 0 0 0 0
-Constrains 20 0 0 0 0 0 0
-Constrains 21 0 0 0 0 0 0
-Constrains 22 0 0 0 0 0 0
-Constrains 23 0 0 0 0 0 0
-Constrains 24 0 0 0 0 0 0
-Constrains 25 0 0 0 0 0 0
-Constrains 26 0 0 0 0 0 0
-Constrains 27 0 0 0 0 0 0
-Constrains 28 0 0 0 0 0 0
-Constrains 29 0 0 0 0 0 0
-Constrains 30 0 0 0 0 0 0
-Constrains 31 0 0 0 0 0 0
-Constrains 32 0 0 0 0 0 0
-Constrains 33 0 0 0 0 0 0
-Constrains 34 0 0 0 0 0 0
-Constrains 35 0 0 0 0 0 0
-Constrains 36 0 0 0 0 0 0
-Constrains 37 0 0 0 0 0 0
-Constrains 38 0 0 0 0 0 0
-Constrains 39 0 0 0 0 0 0
-Constrains 40 0 0 0 0 0 0
-Constrains 41 0 0 0 0 0 0
-Constrains 42 0 0 0 0 0 0
-Constrains 43 0 0 0 0 0 0
-Constrains 44 0 0 0 0 0 0
-Constrains 45 0 0 0 0 0 0
-Constrains 46 0 0 0 0 0 0
-Constrains 47 0 0 0 0 0 0
-Constrains 48 0 0 0 0 0 0
-Constrains 49 0 0 0 0 0 0
-Constrains 50 0 0 0 0 0 0
-Constrains 51 0 0 0 0 0 0
-Constrains 52 0 0 0 0 0 0
-Constrains 53 0 0 0 0 0 0
-Constrains 54 0 0 0 0 0 0
-Constrains 55 0 0 0 0 0 0
-Constrains 56 0 0 0 0 0 0
-Constrains 57 0 0 0 0 0 0
-Constrains 58 0 0 0 0 0 0
-Constrains 59 0 0 0 0 0 0
-Constrains 60 0 0 0 0 0 0
-Constrains 61 0 0 0 0 0 0
-Constrains 62 0 0 0 0 0 0
-Constrains 63 0 0 0 0 0 0
-Constrains 64 0 0 0 0 0 0
-Constrains 65 0 0 0 0 0 0
-Constrains 66 0 0 0 0 0 0
-Constrains 67 0 0 0 0 0 0
-Constrains 68 0 0 0 0 0 0
-Constrains 69 0 0 0 0 0 0
-Constrains 70 0 0 0 0 0 0
-Constrains 71 0 0 0 0 0 0
-Constrains 72 0 0 0 0 0 0
-Constrains 73 0 0 0 0 0 0
-Constrains 74 0 0 0 0 0 0
-Constrains 75 0 0 0 0 0 0
-Constrains 76 0 0 0 0 0 0
-Constrains 77 0 0 0 0 0 0
-Constrains 78 0 0 0 0 0 0
-Constrains 79 0 0 0 0 0 0
-Constrains 80 0 0 0 0 0 0
-Constrains 81 0 0 0 0 0 0
-Constrains 82 0 0 0 0 0 0
-Constrains 83 0 0 0 0 0 0
-Constrains 84 0 0 0 0 0 0
-Constrains 85 0 0 0 0 0 0
-Constrains 86 0 0 0 0 0 0
-Constrains 87 0 0 0 0 0 0
-Constrains 88 0 0 0 0 0 0
-Constrains 89 0 0 0 0 0 0
-Constrains 90 0 0 0 0 0 0
-Constrains 91 0 0 0 0 0 0
-Constrains 92 0 0 0 0 0 0
-Constrains 93 0 0 0 0 0 0
-Constrains 94 0 0 0 0 0 0
-Constrains 95 0 0 0 0 0 0
-Constrains 96 0 0 0 0 0 0
-Constrains 97 0 0 0 0 0 0
-Constrains 98 0 0 0 0 0 0
-Constrains 99 0 0 0 0 0 0
-Constrains 100 0 0 0 0 0 0
-Constrains 101 0 0 0 0 0 0
-Constrains 102 0 0 0 0 0 0
-Constrains 103 0 0 0 0 0 0
-Constrains 104 0 0 0 0 0 0
-Constrains 105 0 0 0 0 0 0
-Constrains 106 0 0 0 0 0 0
-Constrains 107 0 0 0 0 0 0
-Constrains 108 0 0 0 0 0 0
-Constrains 109 0 0 0 0 0 0
-Constrains 110 0 0 0 0 0 0
-Constrains 111 0 0 0 0 0 0
-Constrains 112 0 0 0 0 0 0
-Constrains 113 0 0 0 0 0 0
-Constrains 114 0 0 0 0 0 0
-Constrains 115 0 0 0 0 0 0
-Constrains 116 0 0 0 0 0 0
-Constrains 117 0 0 0 0 0 0
-Constrains 118 0 0 0 0 0 0
-Constrains 119 0 0 0 0 0 0
-Constrains 120 0 0 0 0 0 0
-Constrains 121 0 0 0 0 0 0
-Constrains 122 0 0 0 0 0 0
-Constrains 123 0 0 0 0 0 0
-Constrains 124 0 0 0 0 0 0
-Constrains 125 0 0 0 0 0 0
-Constrains 126 0 0 0 0 0 0
-Constrains 127 0 0 0 0 0 0
-Constrains 128 0 0 0 0 0 0
-Constrains 129 0 0 0 0 0 0
-Constrains 130 0 0 0 0 0 0
-Constrains 131 0 0 0 0 0 0
-Constrains 132 1 1 0 0 0 0
-Constrains 133 1 1 0 0 0 0
-Constrains 134 1 1 0 0 0 0
-Constrains 135 1 1 0 0 0 0
-Constrains 136 1 1 0 0 0 0
-Constrains 137 1 1 0 0 0 0
-Constrains 138 1 1 0 0 0 0
-Constrains 139 1 1 0 0 0 0
-Constrains 140 1 1 0 0 0 0
-Constrains 141 1 1 0 0 0 0
-Constrains 142 1 1 0 0 0 0
-Constrains 143 1 1 0 0 0 0
-Constrains 144 1 0 1 0 1 0
-Constrains 145 1 0 1 0 1 0
-Constrains 146 1 0 1 0 1 0
-Constrains 147 1 0 1 0 1 0
-Constrains 148 1 0 1 0 1 0
-Constrains 149 1 0 1 0 1 0
-Constrains 150 1 0 1 0 1 0
-Constrains 151 1 0 1 0 1 0
-Constrains 152 1 0 1 0 1 0
-Constrains 153 1 0 1 0 1 0
-Constrains 154 1 0 1 0 1 0
-Constrains 155 1 0 1 0 1 0
-Constrains 156 0 0 0 0 0 0
-Constrains 157 0 0 0 0 0 0
-Constrains 158 0 0 0 0 0 0
-Constrains 159 0 0 0 0 0 0
-Constrains 160 0 0 0 0 0 0
-Constrains 161 0 0 0 0 0 0
-Constrains 162 0 0 0 0 0 0
-Constrains 163 0 0 0 0 0 0
-Constrains 164 0 0 0 0 0 0
-Constrains 165 0 0 0 0 0 0
-Constrains 166 0 0 0 0 0 0
-Constrains 167 0 0 0 0 0 0
-Constrains 168 0 0 0 0 0 0
-Constrains 169 0 0 0 0 0 0
-Constrains 170 0 0 0 0 0 0
-Constrains 171 0 0 0 0 0 0
-Constrains 172 0 0 0 0 0 0
-Constrains 173 0 0 0 0 0 0
-Constrains 174 0 0 0 0 0 0
-Constrains 175 0 0 0 0 0 0
-Constrains 176 0 0 0 0 0 0
-Constrains 177 0 0 0 0 0 0
-Constrains 178 0 0 0 0 0 0
-Constrains 179 0 0 0 0 0 0
-Constrains 180 0 0 0 0 0 0
-Constrains 181 0 0 0 0 0 0
-Constrains 182 0 0 0 0 0 0
-Constrains 183 0 0 0 0 0 0
-Constrains 184 0 0 0 0 0 0
-Constrains 185 0 0 0 0 0 0
-Constrains 186 0 0 0 0 0 0
-Constrains 187 0 0 0 0 0 0
-Constrains 188 0 0 0 0 0 0
-Constrains 189 0 0 0 0 0 0
-Constrains 190 0 0 0 0 0 0
-Constrains 191 0 0 0 0 0 0
-Constrains 192 0 0 0 0 0 0
-Constrains 193 0 0 0 0 0 0
-Constrains 194 0 0 0 0 0 0
-Constrains 195 0 0 0 0 0 0
-Constrains 196 0 0 0 0 0 0
-Constrains 197 0 0 0 0 0 0
-Constrains 198 0 0 0 0 0 0
-Constrains 199 0 0 0 0 0 0
-Constrains 200 0 0 0 0 0 0
-Constrains 201 0 0 0 0 0 0
-Constrains 202 0 0 0 0 0 0
-Constrains 203 0 0 0 0 0 0
-Constrains 204 0 0 0 0 0 0
-Constrains 205 0 0 0 0 0 0
-Constrains 206 0 0 0 0 0 0
-Constrains 207 0 0 0 0 0 0
-Constrains 208 0 0 0 0 0 0
-Constrains 209 0 0 0 0 0 0
-Constrains 210 0 0 0 0 0 0
-Constrains 211 0 0 0 0 0 0
-Constrains 212 0 0 0 0 0 0
-Constrains 213 0 0 0 0 0 0
-Constrains 214 0 0 0 0 0 0
-Constrains 215 0 0 0 0 0 0
-Constrains 216 0 0 0 0 0 0
-Constrains 217 0 0 0 0 0 0
-Constrains 218 0 0 0 0 0 0
-Constrains 219 0 0 0 0 0 0
-Constrains 220 0 0 0 0 0 0
-Constrains 221 0 0 0 0 0 0
-Constrains 222 0 0 0 0 0 0
-Constrains 223 0 0 0 0 0 0
-Constrains 224 0 0 0 0 0 0
-Constrains 225 0 0 0 0 0 0
-Constrains 226 0 0 0 0 0 0
-Constrains 227 0 0 0 0 0 0
-Constrains 228 0 0 0 0 0 0
-Constrains 229 0 0 0 0 0 0
-Constrains 230 0 0 0 0 0 0
-Constrains 231 0 0 0 0 0 0
-Constrains 232 0 0 0 0 0 0
-Constrains 233 0 0 0 0 0 0
-Constrains 234 0 0 0 0 0 0
-Constrains 235 0 0 0 0 0 0
-Constrains 236 0 0 0 0 0 0
-Constrains 237 0 0 0 0 0 0
-Constrains 238 0 0 0 0 0 0
-Constrains 239 0 0 0 0 0 0
-Constrains 240 0 0 0 0 0 0
-Constrains 241 0 0 0 0 0 0
-Constrains 242 0 0 0 0 0 0
-Constrains 243 0 0 0 0 0 0
-Constrains 244 0 0 0 0 0 0
-Constrains 245 0 0 0 0 0 0
-Constrains 246 0 0 0 0 0 0
-Constrains 247 0 0 0 0 0 0
-Constrains 248 0 0 0 0 0 0
-Constrains 249 0 0 0 0 0 0
-Constrains 250 0 0 0 0 0 0
-Constrains 251 0 0 0 0 0 0
-Constrains 252 0 0 0 0 0 0
-Constrains 253 0 0 0 0 0 0
-Constrains 254 0 0 0 0 0 0
-Constrains 255 0 0 0 0 0 0
-Constrains 256 0 0 0 0 0 0
-Constrains 257 0 0 0 0 0 0
-Constrains 258 0 0 0 0 0 0
-Constrains 259 0 0 0 0 0 0
-Constrains 260 0 0 0 0 0 0
-Constrains 261 0 0 0 0 0 0
-Constrains 262 0 0 0 0 0 0
-Constrains 263 0 0 0 0 0 0
-Constrains 264 0 0 0 0 0 0
-Constrains 265 0 0 0 0 0 0
-Constrains 266 0 0 0 0 0 0
-Constrains 267 0 0 0 0 0 0
-Constrains 268 0 0 0 0 0 0
-Constrains 269 0 0 0 0 0 0
-Constrains 270 0 0 0 0 0 0
-Constrains 271 0 0 0 0 0 0
-Constrains 272 0 0 0 0 0 0
-Constrains 273 0 0 0 0 0 0
-Constrains 274 0 0 0 0 0 0
-Constrains 275 0 0 0 0 0 0
-Constrains 276 1 1 0 0 0 0
-Constrains 277 1 1 0 0 0 0
-Constrains 278 1 1 0 0 0 0
-Constrains 279 1 1 0 0 0 0
-Constrains 280 1 1 0 0 0 0
-Constrains 281 1 1 0 0 0 0
-Constrains 282 1 1 0 0 0 0
-Constrains 283 1 1 0 0 0 0
-Constrains 284 1 1 0 0 0 0
-Constrains 285 1 1 0 0 0 0
-Constrains 286 1 1 0 0 0 0
-Constrains 287 1 1 0 0 0 0
-Constrains 288 1 0 1 0 1 0
-Constrains 289 1 0 1 0 1 0
-Constrains 290 1 0 1 0 1 0
-Constrains 291 1 0 1 0 1 0
-Constrains 292 1 0 1 0 1 0
-Constrains 293 1 0 1 0 1 0
-Constrains 294 1 0 1 0 1 0
-Constrains 295 1 0 1 0 1 0
-Constrains 296 1 0 1 0 1 0
-Constrains 297 1 0 1 0 1 0
-Constrains 298 1 0 1 0 1 0
-Constrains 299 1 0 1 0 1 0
-Constrains 300 0 0 0 0 0 0
-Constrains 301 0 0 0 0 0 0
-Constrains 302 0 0 0 0 0 0
-Constrains 303 0 0 0 0 0 0
-Constrains 304 0 0 0 0 0 0
-Constrains 305 0 0 0 0 0 0
-Constrains 306 0 0 0 0 0 0
-Constrains 307 0 0 0 0 0 0
-Constrains 308 0 0 0 0 0 0
-Constrains 309 0 0 0 0 0 0
-Constrains 310 0 0 0 0 0 0
-Constrains 311 0 0 0 0 0 0
-Constrains 312 0 0 0 0 0 0
-Constrains 313 0 0 0 0 0 0
-Constrains 314 0 0 0 0 0 0
-Constrains 315 0 0 0 0 0 0
-Constrains 316 0 0 0 0 0 0
-Constrains 317 0 0 0 0 0 0
-Constrains 318 0 0 0 0 0 0
-Constrains 319 0 0 0 0 0 0
-Constrains 320 0 0 0 0 0 0
-Constrains 321 0 0 0 0 0 0
-Constrains 322 0 0 0 0 0 0
-Constrains 323 0 0 0 0 0 0
-Constrains 324 0 0 0 0 0 0
-Constrains 325 0 0 0 0 0 0
-Constrains 326 0 0 0 0 0 0
-Constrains 327 0 0 0 0 0 0
-Constrains 328 0 0 0 0 0 0
-Constrains 329 0 0 0 0 0 0
-Constrains 330 0 0 0 0 0 0
-Constrains 331 0 0 0 0 0 0
-Constrains 332 0 0 0 0 0 0
-Constrains 333 0 0 0 0 0 0
-Constrains 334 0 0 0 0 0 0
-Constrains 335 0 0 0 0 0 0
-Constrains 336 0 0 0 0 0 0
-Constrains 337 0 0 0 0 0 0
-Constrains 338 0 0 0 0 0 0
-Constrains 339 0 0 0 0 0 0
-Constrains 340 0 0 0 0 0 0
-Constrains 341 0 0 0 0 0 0
-Constrains 342 0 0 0 0 0 0
-Constrains 343 0 0 0 0 0 0
-Constrains 344 0 0 0 0 0 0
-Constrains 345 0 0 0 0 0 0
-Constrains 346 0 0 0 0 0 0
-Constrains 347 0 0 0 0 0 0
-Constrains 348 0 0 0 0 0 0
-Constrains 349 0 0 0 0 0 0
-Constrains 350 0 0 0 0 0 0
-Constrains 351 0 0 0 0 0 0
-Constrains 352 0 0 0 0 0 0
-Constrains 353 0 0 0 0 0 0
-Constrains 354 0 0 0 0 0 0
-Constrains 355 0 0 0 0 0 0
-Constrains 356 0 0 0 0 0 0
-Constrains 357 0 0 0 0 0 0
-Constrains 358 0 0 0 0 0 0
-Constrains 359 0 0 0 0 0 0
-Constrains 360 0 0 0 0 0 0
-Constrains 361 0 0 0 0 0 0
-Constrains 362 0 0 0 0 0 0
-Constrains 363 0 0 0 0 0 0
-Constrains 364 0 0 0 0 0 0
-Constrains 365 0 0 0 0 0 0
-Constrains 366 0 0 0 0 0 0
-Constrains 367 0 0 0 0 0 0
-Constrains 368 0 0 0 0 0 0
-Constrains 369 0 0 0 0 0 0
-Constrains 370 0 0 0 0 0 0
-Constrains 371 0 0 0 0 0 0
-Constrains 372 0 0 0 0 0 0
-Constrains 373 0 0 0 0 0 0
-Constrains 374 0 0 0 0 0 0
-Constrains 375 0 0 0 0 0 0
-Constrains 376 0 0 0 0 0 0
-Constrains 377 0 0 0 0 0 0
-Constrains 378 0 0 0 0 0 0
-Constrains 379 0 0 0 0 0 0
-Constrains 380 0 0 0 0 0 0
-Constrains 381 0 0 0 0 0 0
-Constrains 382 0 0 0 0 0 0
-Constrains 383 0 0 0 0 0 0
-Constrains 384 0 0 0 0 0 0
-Constrains 385 0 0 0 0 0 0
-Constrains 386 0 0 0 0 0 0
-Constrains 387 0 0 0 0 0 0
-Constrains 388 0 0 0 0 0 0
-Constrains 389 0 0 0 0 0 0
-Constrains 390 0 0 0 0 0 0
-Constrains 391 0 0 0 0 0 0
-Constrains 392 0 0 0 0 0 0
-Constrains 393 0 0 0 0 0 0
-Constrains 394 0 0 0 0 0 0
-Constrains 395 0 0 0 0 0 0
-Constrains 396 0 0 0 0 0 0
-Constrains 397 0 0 0 0 0 0
-Constrains 398 0 0 0 0 0 0
-Constrains 399 0 0 0 0 0 0
-Constrains 400 0 0 0 0 0 0
-Constrains 401 0 0 0 0 0 0
-Constrains 402 0 0 0 0 0 0
-Constrains 403 0 0 0 0 0 0
-Constrains 404 0 0 0 0 0 0
-Constrains 405 0 0 0 0 0 0
-Constrains 406 0 0 0 0 0 0
-Constrains 407 0 0 0 0 0 0
-Constrains 408 0 0 0 0 0 0
-Constrains 409 0 0 0 0 0 0
-Constrains 410 0 0 0 0 0 0
-Constrains 411 0 0 0 0 0 0
-Constrains 412 0 0 0 0 0 0
-Constrains 413 0 0 0 0 0 0
-Constrains 414 0 0 0 0 0 0
-Constrains 415 0 0 0 0 0 0
-Constrains 416 0 0 0 0 0 0
-Constrains 417 0 0 0 0 0 0
-Constrains 418 0 0 0 0 0 0
-Constrains 419 0 0 0 0 0 0
-Constrains 420 1 1 0 0 0 0
-Constrains 421 1 1 0 0 0 0
-Constrains 422 1 1 0 0 0 0
-Constrains 423 1 1 0 0 0 0
-Constrains 424 1 1 0 0 0 0
-Constrains 425 1 1 0 0 0 0
-Constrains 426 1 1 0 0 0 0
-Constrains 427 1 1 0 0 0 0
-Constrains 428 1 1 0 0 0 0
-Constrains 429 1 1 0 0 0 0
-Constrains 430 1 1 0 0 0 0
-Constrains 431 1 1 0 0 0 0
+Number of Boundary groups (IA MESH) = 2
+Number of Boundary Elements (IA MESH)= 20
+Constrains 0 1 0 0 0
+Constrains 1 1 0 0 0
+Constrains 2 1 0 0 0
+Constrains 3 1 0 0 0
+Constrains 4 1 0 0 0
+Constrains 5 1 0 0 0
+Constrains 6 1 0 0 0
+Constrains 7 1 0 0 0
+Constrains 8 1 0 0 0
+Constrains 9 1 0 0 0
+Constrains 10 1 0 0 0
+Constrains 11 1 0 0 0
+Constrains 12 0 0 0 0
+Constrains 13 0 0 0 0
+Constrains 14 0 0 0 0
+Constrains 15 0 0 0 0
+Constrains 16 0 0 0 0
+Constrains 17 0 0 0 0
+Constrains 18 0 0 0 0
+Constrains 19 0 0 0 0
+Constrains 20 0 0 0 0
+Constrains 21 0 0 0 0
+Constrains 22 0 0 0 0
+Constrains 23 0 0 0 0
+Constrains 24 0 0 0 0
+Constrains 25 0 0 0 0
+Constrains 26 0 0 0 0
+Constrains 27 0 0 0 0
+Constrains 28 0 0 0 0
+Constrains 29 0 0 0 0
+Constrains 30 0 0 0 0
+Constrains 31 0 0 0 0
+Constrains 32 0 0 0 0
+Constrains 33 0 0 0 0
+Constrains 34 0 0 0 0
+Constrains 35 0 0 0 0
+Constrains 36 0 0 0 0
+Constrains 37 0 0 0 0
+Constrains 38 0 0 0 0
+Constrains 39 0 0 0 0
+Constrains 40 0 0 0 0
+Constrains 41 0 0 0 0
+Constrains 42 0 0 0 0
+Constrains 43 0 0 0 0
+Constrains 44 0 0 0 0
+Constrains 45 0 0 0 0
+Constrains 46 0 0 0 0
+Constrains 47 0 0 0 0
+Constrains 48 0 0 0 0
+Constrains 49 0 0 0 0
+Constrains 50 0 0 0 0
+Constrains 51 0 0 0 0
+Constrains 52 0 0 0 0
+Constrains 53 0 0 0 0
+Constrains 54 0 0 0 0
+Constrains 55 0 0 0 0
+Constrains 56 0 0 0 0
+Constrains 57 0 0 0 0
+Constrains 58 0 0 0 0
+Constrains 59 0 0 0 0
+Constrains 60 0 0 0 0
+Constrains 61 0 0 0 0
+Constrains 62 0 0 0 0
+Constrains 63 0 0 0 0
+Constrains 64 0 0 0 0
+Constrains 65 0 0 0 0
+Constrains 66 0 0 0 0
+Constrains 67 0 0 0 0
+Constrains 68 0 0 0 0
+Constrains 69 0 0 0 0
+Constrains 70 0 0 0 0
+Constrains 71 0 0 0 0
+Constrains 72 0 0 0 0
+Constrains 73 0 0 0 0
+Constrains 74 0 0 0 0
+Constrains 75 0 0 0 0
+Constrains 76 0 0 0 0
+Constrains 77 0 0 0 0
+Constrains 78 0 0 0 0
+Constrains 79 0 0 0 0
+Constrains 80 0 0 0 0
+Constrains 81 0 0 0 0
+Constrains 82 0 0 0 0
+Constrains 83 0 0 0 0
+Constrains 84 0 0 0 0
+Constrains 85 0 0 0 0
+Constrains 86 0 0 0 0
+Constrains 87 0 0 0 0
+Constrains 88 0 0 0 0
+Constrains 89 0 0 0 0
+Constrains 90 0 0 0 0
+Constrains 91 0 0 0 0
+Constrains 92 0 0 0 0
+Constrains 93 0 0 0 0
+Constrains 94 0 0 0 0
+Constrains 95 0 0 0 0
+Constrains 96 0 0 0 0
+Constrains 97 0 0 0 0
+Constrains 98 0 0 0 0
+Constrains 99 0 0 0 0
+Constrains 100 0 0 0 0
+Constrains 101 0 0 0 0
+Constrains 102 0 0 0 0
+Constrains 103 0 0 0 0
+Constrains 104 0 0 0 0
+Constrains 105 0 0 0 0
+Constrains 106 0 0 0 0
+Constrains 107 0 0 0 0
+Constrains 108 0 0 0 0
+Constrains 109 0 0 0 0
+Constrains 110 0 0 0 0
+Constrains 111 0 0 0 0
+Constrains 112 0 0 0 0
+Constrains 113 0 0 0 0
+Constrains 114 0 0 0 0
+Constrains 115 0 0 0 0
+Constrains 116 0 0 0 0
+Constrains 117 0 0 0 0
+Constrains 118 0 0 0 0
+Constrains 119 0 0 0 0
+Constrains 120 0 0 0 0
+Constrains 121 0 0 0 0
+Constrains 122 0 0 0 0
+Constrains 123 0 0 0 0
+Constrains 124 0 0 0 0
+Constrains 125 0 0 0 0
+Constrains 126 0 0 0 0
+Constrains 127 0 0 0 0
+Constrains 128 0 0 0 0
+Constrains 129 0 0 0 0
+Constrains 130 0 0 0 0
+Constrains 131 0 0 0 0
+Constrains 132 1 1 0 0
+Constrains 133 1 1 0 0
+Constrains 134 1 1 0 0
+Constrains 135 1 1 0 0
+Constrains 136 1 1 0 0
+Constrains 137 1 1 0 0
+Constrains 138 1 1 0 0
+Constrains 139 1 1 0 0
+Constrains 140 1 1 0 0
+Constrains 141 1 1 0 0
+Constrains 142 1 1 0 0
+Constrains 143 1 1 0 0
