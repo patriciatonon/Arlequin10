@@ -68,7 +68,7 @@ void Element<DIM>::setIntegPointWeightFunction_FEM()
 };
 
 template <int DIM>
-void Element<DIM>::setIntegPointWeightFunction_ISO()
+void Element<DIM>::setIntegPointWeightFunctionFINE_ISO(double &glueZoneThickness,double &arlequinEpsilon)
 {
 
     QuadShapFunction shapeQuad;
@@ -95,14 +95,137 @@ void Element<DIM>::setIntegPointWeightFunction_ISO()
     for (double *it = nQuad.beginIso(); it != nQuad.endIso(); it++)
     {
 
-        for (int i = 0; i < DIM; i++)
-            xsi[i] = nQuad.PointListIso(index, i);
+        for (int i = 0; i < DIM; i++) xsi[i] = nQuad.PointListIso(index, i);
         shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, (*iparameters), Npatch_);
 
+        double distFuncIP = 0.;
         for (int i = 0; i < LNN; i++)
         {
-            intPointWeightFunction_ISO[index] += (*nodes_)[connect_[i]]->getWeightFunction() * phi_[i];
+            double r = (*nodes_)[connect_[i]]->getDistFunction();
+            distFuncIP += r * phi_[i];
+            
         };
+
+        double wFuncValue;
+        if (distFuncIP >= glueZoneThickness)
+        {
+            wFuncValue = 1. - arlequinEpsilon;
+        }
+        else
+        {
+            wFuncValue = (1. - arlequinEpsilon) / glueZoneThickness * distFuncIP;
+            if (wFuncValue > (1. - arlequinEpsilon))
+                wFuncValue = 1. - arlequinEpsilon;
+        };
+
+        intPointWeightFunction_ISO[index] = wFuncValue;
+
+        index++;
+    };
+
+    // SPECIAL QUADRATURE
+    SpecialQuad sQuad = SpecialQuad();
+    index = 0;
+    for (double *it = sQuad.beginIso(); it != sQuad.endIso(); it++)
+    {
+        intPointWeightFunctionSpecialPrev_ISO[index] = intPointWeightFunctionSpecial_ISO[index];
+        intPointWeightFunctionSpecial_ISO[index] = 0.;
+        index++;
+    };
+
+    index = 0;
+    for (double *it = sQuad.beginIso(); it != sQuad.endIso(); it++)
+    {
+
+        for (int i = 0; i < DIM; i++) xsi[i] = sQuad.PointListIso(index, i);
+        shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, (*iparameters), Npatch_);
+
+
+        double distFuncIP = 0.;
+        for (int i = 0; i < LNN; i++)
+        {
+            double r = (*nodes_)[connect_[i]]->getDistFunction();
+            distFuncIP += r * phi_[i];
+        };
+            
+        double wFuncValue;
+        if (distFuncIP >= glueZoneThickness)
+        {
+            wFuncValue = 1. - arlequinEpsilon;
+        }
+        else
+        {
+            wFuncValue = (1. - arlequinEpsilon) / glueZoneThickness * distFuncIP;
+            if (wFuncValue > (1. - arlequinEpsilon))
+                wFuncValue = 1. - arlequinEpsilon;
+        };
+            
+        intPointWeightFunctionSpecial_ISO[index] =  wFuncValue;
+
+        index++;
+    };
+};
+
+
+
+template <int DIM>
+void Element<DIM>::setIntegPointWeightFunctionCOARSE_ISO(double &glueZoneThickness,double &arlequinEpsilon)
+{
+
+    QuadShapFunction shapeQuad;
+
+    int LNN = 18 * DIM - 27;
+
+    // NORMAL QUADRATURE
+    NormalQuad nQuad = NormalQuad();
+    int index = 0;
+    for (double *it = nQuad.beginIso(); it != nQuad.endIso(); it++)
+    {
+        intPointWeightFunctionPrev_ISO[index] = intPointWeightFunction_ISO[index];
+        intPointWeightFunction_ISO[index] = 0.;
+        index++;
+    };
+
+    // data for evaluation of NURBS functions
+    double wpc[LNN], phi_[LNN], xsi[DIM];
+    for (int i = 0; i < LNN; i++)
+        wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
+    int *inc_ = (*nodes_)[connect_[LNN - 1]]->getINC();
+
+    index = 0;
+    for (double *it = nQuad.beginIso(); it != nQuad.endIso(); it++)
+    {
+
+        for (int i = 0; i < DIM; i++) xsi[i] = nQuad.PointListIso(index, i);
+        shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, (*iparameters), Npatch_);
+
+        double distFuncIP = 0;
+        for (int i = 0; i < LNN; i++)
+        {
+            double r = (*nodes_)[connect_[i]]->getDistFunction();
+            distFuncIP += r * phi_[i];
+        };
+
+        double wFuncValue;
+        if (distFuncIP < 0)
+        {
+            wFuncValue = 1.;
+        }
+        else
+        {
+            if (distFuncIP >= glueZoneThickness)
+            {
+                wFuncValue = arlequinEpsilon;
+            }
+            else
+            {
+                wFuncValue = 1. - (1. - arlequinEpsilon) / glueZoneThickness * distFuncIP;
+                if (wFuncValue < arlequinEpsilon)
+                    wFuncValue = arlequinEpsilon;
+            };
+        };
+
+        intPointWeightFunction_ISO[index] = wFuncValue;
 
         index++;
     };
@@ -125,10 +248,35 @@ void Element<DIM>::setIntegPointWeightFunction_ISO()
             xsi[i] = sQuad.PointListIso(index, i);
         shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, (*iparameters), Npatch_);
 
+        double distFuncIP = 0;
         for (int i = 0; i < LNN; i++)
         {
-            intPointWeightFunctionSpecial_ISO[index] += (*nodes_)[connect_[i]]->getWeightFunction() * phi_[i];
+            double r = (*nodes_)[connect_[i]]->getDistFunction();
+            distFuncIP += r * phi_[i];
         };
+
+
+        double wFuncValue;
+        if (distFuncIP < 0)
+        {
+            wFuncValue = 1.;
+        }
+        else
+        {
+            if (distFuncIP >= glueZoneThickness)
+            {
+                wFuncValue = arlequinEpsilon;
+            }
+            else
+            {
+                wFuncValue = 1. - (1. - arlequinEpsilon) / glueZoneThickness * distFuncIP;
+                if (wFuncValue < arlequinEpsilon)
+                    wFuncValue = arlequinEpsilon;
+            };
+        };
+        
+        intPointWeightFunctionSpecial_ISO[index] =  wFuncValue;
+       
 
         index++;
     };

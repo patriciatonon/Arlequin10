@@ -132,7 +132,7 @@ void Arlequin<3>::setElementBoxes_FEM()
             xk[i] = std::min(x1[i],std::min(x2[i],std::min(x3[i],x4[i])));
             Xk[i] = std::max(x1[i],std::max(x2[i],std::max(x3[i],x4[i])));
         };
-     
+      
         elementsCoarse_[jel] -> setIntersectionParameters(xk, Xk);
 
     };
@@ -756,8 +756,8 @@ void Arlequin<2>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, st
 
 template <>
 void Arlequin<3>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, std::vector<Nodes *> nodes,
-                                                  std::vector<Element *> elements,
-                                                  int numElem, double *xsiC, int &elemC, int elSearch)
+                                                std::vector<Element *> elements,
+                                                int numElem, double *xsiC, int &elemC, int elSearch)
 {
     int const DIM = 3;
     int LNNC = 4*DIM-2;
@@ -860,9 +860,9 @@ void Arlequin<3>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, st
             XK = elements[jel]->getXIntersectionParameter();
 
             //Chech if the node is inside the element box
-            if ((x[0] < XK.first[0] - 0.0001) || (x[0] > XK.second[0] + 0.001) ||
-                (x[1] < XK.first[1] - 0.0001) || (x[1] > XK.second[1] + 0.001) ||
-                (x[2] < XK.first[2] - 0.0001) || (x[2] > XK.second[2] + 0.001))
+            if ((x[0] < XK.first[0] - 0.0001) || (x[0] > XK.second[0] + 0.0001) ||
+                (x[1] < XK.first[1] - 0.0001) || (x[1] > XK.second[1] + 0.0001) ||
+                (x[2] < XK.first[2] - 0.0001) || (x[2] > XK.second[2] + 0.0001))
                 continue;
 
             // Compute the basis functions
@@ -932,6 +932,7 @@ void Arlequin<3>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, st
                 xsiC[0] = xsi[0];
                 xsiC[1] = xsi[1];
                 xsiC[2] = xsi[2];
+                
                 elemC = jel;
                 break;
             };
@@ -1142,22 +1143,22 @@ void Arlequin<3>::setCorrespondenceFine_FEM_FEM()
 {
     int DIM = 3;
     // Node correspondence
-    for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
-    {
+    // for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
+    // {
        
-        double *x = nodesFine_[nodesGlueZoneFine_[inode]]->getCoordinates();
+    //     double *x = nodesFine_[nodesGlueZoneFine_[inode]]->getCoordinates();
 
-        int elemC = 0;
-        double xsiC[DIM] = {};
-        int const val = 1;
-        searchPointCorrespondence_FEM(nodesGlueZoneFine_[inode], val, x, nodesCoarse_, elementsCoarse_,
-                                      elementsCoarse_.size(), xsiC, elemC,
-                                      nodesFine_[nodesGlueZoneFine_[inode]]->getNodalElemCorrespondence());
+    //     int elemC = 0;
+    //     double xsiC[DIM] = {};
+    //     int const val = 1;
+    //     searchPointCorrespondence_FEM(nodesGlueZoneFine_[inode], val, x, nodesCoarse_, elementsCoarse_,
+    //                                   elementsCoarse_.size(), xsiC, elemC,
+    //                                   nodesFine_[nodesGlueZoneFine_[inode]]->getNodalElemCorrespondence());
 
-        nodesFine_[nodesGlueZoneFine_[inode]]->setNodalCorrespondence(elemC, xsiC);
+    //     nodesFine_[nodesGlueZoneFine_[inode]]->setNodalCorrespondence(elemC, xsiC);
 
 
-    };
+    // };
 
     // integration points correspondence
     int LNN = 4*DIM-2;
@@ -1194,7 +1195,6 @@ void Arlequin<3>::setCorrespondenceFine_FEM_FEM()
                                           elementsCoarse_.size(), xsiC, elemC,
                                           elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCorrespondenceElement_FEM(ip));
             
-           
             elementsFine_[elementsGlueZoneFine_[i]]->setIntegrationPointCorrespondence_FEM(ip, xsiC, elemC);
 
         };
@@ -2970,7 +2970,7 @@ void Arlequin<DIM>::setGluingZone_FEM_FEM()
         for (int ino = 0; ino < LNN; ino++)
         {
             double dist = nodesFine_[connec[ino]]->getDistFunction();
-            if (dist <= glueZoneThickness + 0.00001)
+            if (dist <= (glueZoneThickness + 0.00001) && dist >= -0.00001)
             {
                 flag += 1;
             };
@@ -3309,7 +3309,7 @@ void Arlequin<DIM>::setWeightFunction_FEM_ISO()
 
     for (int jel = 0; jel < numElemCoarse; jel++)
     {
-        elementsCoarse_[jel]->setIntegPointWeightFunction_ISO();
+        elementsCoarse_[jel]->setIntegPointWeightFunctionCOARSE_ISO(glueZoneThickness,arlequinEpsilon);
     };
 
     // FEM FINE MESH
@@ -3397,6 +3397,9 @@ void Arlequin<DIM>::setWeightFunction_FEM_FEM()
             if (wFuncValue > (1. - arlequinEpsilon))
                 wFuncValue = 1. - arlequinEpsilon;
         };
+
+        if (r < -0.00001) wFuncValue = 0.;
+
         nodesFine_[iNode]->setWeightFunction(wFuncValue);
     }; // ielem
 
@@ -3449,7 +3452,7 @@ void Arlequin<DIM>::setWeightFunction_ISO_ISO()
 
     for (int jel = 0; jel < numElemCoarse; jel++)
     {
-        elementsCoarse_[jel]->setIntegPointWeightFunction_ISO();
+        elementsCoarse_[jel]->setIntegPointWeightFunctionCOARSE_ISO(glueZoneThickness,arlequinEpsilon);
     };
 
     // IGA FINE MESH
@@ -3473,7 +3476,7 @@ void Arlequin<DIM>::setWeightFunction_ISO_ISO()
 
     for (int jel = 0; jel < numElemFine; jel++)
     {
-        elementsFine_[jel]->setIntegPointWeightFunction_ISO();
+        elementsFine_[jel]->setIntegPointWeightFunctionFINE_ISO(glueZoneThickness,arlequinEpsilon);
     };
 
     return;
@@ -5137,7 +5140,7 @@ void Arlequin<3>::printResults_FEM_FEM(int step)
             for (int i = 0; i < numNodesFine; i++)
             {
                 double *x = nodesFine_[i]->getCoordinates();
-                output_vf << x[0] << " " << x[1] << " " << x[2]+0.1<< std::endl;
+                output_vf << x[0] << " " << x[1] << " " << x[2]<< std::endl;
             };
 
             output_vf << "      </DataArray>" << std::endl
@@ -5617,7 +5620,7 @@ void Arlequin<2>::printResultsLaplace_FEM_ISO(int step)
             for (int i = 0; i < numNodesFine; i++)
             {
                 double *x = nodesFine_[i]->getCoordinates();
-                output_vf << x[0] << " " << x[1] << " " << 0.1 << std::endl;
+                output_vf << x[0] << " " << x[1] << " " << 0 << std::endl;
             };
 
             output_vf << "      </DataArray>" << std::endl
@@ -8308,8 +8311,8 @@ void Arlequin<3>::printResultsIP_FEM_FEM(int step)
         output_v << "<?xml version=\"1.0\"?>" << std::endl
                  << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
                  << "  <UnstructuredGrid>" << std::endl
-                 << "  <Piece NumberOfPoints=\"" << numElemGlueZoneFine * numberIntPoints
-                 << "\"  NumberOfCells=\"" << numElemGlueZoneFine * numberIntPoints
+                 << "  <Piece NumberOfPoints=\"" << 1 //numElemGlueZoneFine// * numberIntPoints
+                 << "\"  NumberOfCells=\"" << 1 //numElemGlueZoneFine// * numberIntPoints
                  << "\">" << std::endl;
 
         output_v << "    <Points>" << std::endl
@@ -8349,7 +8352,8 @@ void Arlequin<3>::printResultsIP_FEM_FEM(int step)
                         coord[k] += x[k] * phi_[j];
                 };
                 
-                output_v << coord[0] << " " << coord[1] << " " << coord[2]+.1<< std::endl;
+                if  (elementsGlueZoneFine_[i] == 334)
+                if (ip == 11) output_v << coord[0] << " " << coord[1] << " " << coord[2]<< std::endl;
 
 
             }; // loop integration points
@@ -8363,7 +8367,8 @@ void Arlequin<3>::printResultsIP_FEM_FEM(int step)
                  << "      <DataArray type=\"Int32\" "
                  << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
 
-        for (int numN = 0; numN < numElemGlueZoneFine * numberIntPoints; ++numN)
+        //numElemGlueZoneFine * numberIntPoints
+        for (int numN = 0; numN < 1; ++numN)
         {
             output_v << numN << std::endl;
         }
@@ -8375,7 +8380,7 @@ void Arlequin<3>::printResultsIP_FEM_FEM(int step)
                  << " Name=\"offsets\" format=\"ascii\">" << std::endl;
 
         int aux = 0;
-        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        for (int i = 0; i < 1; i++)
         {
             output_v << aux + 1 << std::endl;
             aux += 1;
@@ -8387,7 +8392,7 @@ void Arlequin<3>::printResultsIP_FEM_FEM(int step)
         output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
                  << "format=\"ascii\">" << std::endl;
 
-        for (int i = 0; i < numElemGlueZoneFine * numberIntPoints; i++)
+        for (int i = 0; i < 1; i++)
         {
             output_v << 1 << std::endl;
         };
@@ -11519,12 +11524,12 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
   
     //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_FEM();
-    //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+    // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
     setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
-    // // //Matrix and vectors -FINE MESH  - FEM mesh
+    // // // // //Matrix and vectors -FINE MESH  - FEM mesh
     setMatVecValuesFineLaplace_FEM();
-    // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
+    // // // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
     setMatVecValuesLagrangeFineLaplace_FEM_FEM();
 
     //Assemble matrices and vectors
@@ -11719,7 +11724,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_ISO_ISO(int iterNumber, double to
 
     //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_ISO();
-    // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+    //Matrix and vectors - Lagrange multiplieres - COARSE MESH
     setMatVecValuesLagrangeCoarseLaplace_ISO_ISO();
 
     //Matrix and vectors -FINE MESH  - FEM mesh

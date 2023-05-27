@@ -264,8 +264,8 @@ public:
 
     // Compute the weighted integration points
     void setIntegPointWeightFunction_FEM();
-    void setIntegPointWeightFunction_ISO();
-    
+    void setIntegPointWeightFunctionFINE_ISO(double &glueZoneThickness, double &arlequinEpsilon);
+    void setIntegPointWeightFunctionCOARSE_ISO(double &glueZoneThickness, double &arlequinEpsilon);
 
     //......................Jacobian Matrixes and Derivatives....................
     // Compute and store the spatial jacobian matrix

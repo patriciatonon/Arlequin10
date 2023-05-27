@@ -49,7 +49,7 @@ int main(int argc, char **args) {
     };
 
     // Defines the problem dimension
-    const int dimension = 2;
+    const int dimension = 3;
 
     //Type definition
     typedef FluidData<dimension>     FluidModel;
@@ -73,7 +73,7 @@ int main(int argc, char **args) {
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
 
-    //2D Laplace - FEM/ISO
+    // //2D Laplace - FEM/ISO
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
@@ -83,16 +83,16 @@ int main(int argc, char **args) {
     //ISO/ISO
 
     //2d
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/fine_iso.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/fine_iso.msh","mirror_fine.txt",0);
 
 
     //3d
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
 
-    ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
-    ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
+    // ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
 
 
     //FEM/FEM
@@ -101,11 +101,11 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
     //3D
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
-    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
+    coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseR_fem.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineR_fem.msh","mirror_fine.txt",0);
 
-    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
-    // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
+    ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
 
 
     //Finalize main program   
