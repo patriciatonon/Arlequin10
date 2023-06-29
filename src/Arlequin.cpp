@@ -465,9 +465,9 @@ void Arlequin<3>::searchPointCorrespondence_ISO(double *x, std::vector<Nodes *> 
 
 
             //Chech if the node is inside the element box
-            if ((x[0] < XK.first[0] - 0.0001) || (x[0] > XK.second[0] + 0.001) ||
-                (x[1] < XK.first[1] - 0.0001) || (x[1] > XK.second[1] + 0.001) ||
-                (x[2] < XK.first[2] - 0.0001) || (x[2] > XK.second[2] + 0.001))
+            if ((x[0] < XK.first[0] - 0.0001) || (x[0] > XK.second[0] + 0.0001) ||
+                (x[1] < XK.first[1] - 0.0001) || (x[1] > XK.second[1] + 0.0001) ||
+                (x[2] < XK.first[2] - 0.0001) || (x[2] > XK.second[2] + 0.0001))
                 continue;
 
             // Compute the basis functions
@@ -923,11 +923,12 @@ void Arlequin<3>::searchPointCorrespondence_FEM(int ielem, int ip, double *x, st
                 };
             };
 
-               double t1 = -1.e-2;
-               double t2 = 1. - t1;
+            double t1 = -1.e-3;
+            double t2 = 1. - t1;
+            double xsi4 = 1-xsi[0]-xsi[1]-xsi[2];
 
-            if ((xsi[0] >= t1) && (xsi[1] >= t1) && (xsi[2] >= t1) &&
-                (xsi[0] <= t2) && (xsi[1] <= t2) && (xsi[2] <= t2))
+            if ((xsi[0] >= t1) && (xsi[1] >= t1) && (xsi[2] >= t1) && (xsi4 >= t1) &&
+                (xsi[0] <= t2) && (xsi[1] <= t2) && (xsi[2] <= t2) && (xsi4 <= t2))
             {
                 xsiC[0] = xsi[0];
                 xsiC[1] = xsi[1];
@@ -1068,7 +1069,7 @@ void Arlequin<3>::setCorrespondenceFine_FEM_ISO()
             searchPointCorrespondence_ISO(x_, nodesCoarse_, elementsCoarse_, IsoParCoarse,
                                           elementsCoarse_.size(), xsiC, elemC,
                                           elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCorrespondenceElement_FEM(ip));
-
+            
             elementsFine_[elementsGlueZoneFine_[i]]->setIntegrationPointCorrespondence_FEM(ip, xsiC, elemC);
 
         };
@@ -1143,22 +1144,21 @@ void Arlequin<3>::setCorrespondenceFine_FEM_FEM()
 {
     int DIM = 3;
     // Node correspondence
-    // for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
-    // {
+    for (int inode = 0; inode < numNodesGlueZoneFine; inode++)
+    {
        
-    //     double *x = nodesFine_[nodesGlueZoneFine_[inode]]->getCoordinates();
+        double *x = nodesFine_[nodesGlueZoneFine_[inode]]->getCoordinates();
 
-    //     int elemC = 0;
-    //     double xsiC[DIM] = {};
-    //     int const val = 1;
-    //     searchPointCorrespondence_FEM(nodesGlueZoneFine_[inode], val, x, nodesCoarse_, elementsCoarse_,
-    //                                   elementsCoarse_.size(), xsiC, elemC,
-    //                                   nodesFine_[nodesGlueZoneFine_[inode]]->getNodalElemCorrespondence());
+        int elemC = 0;
+        double xsiC[DIM] = {};
+        int const val = 1;
+        searchPointCorrespondence_FEM(nodesGlueZoneFine_[inode], val, x, nodesCoarse_, elementsCoarse_,
+                                      elementsCoarse_.size(), xsiC, elemC,
+                                      nodesFine_[nodesGlueZoneFine_[inode]]->getNodalElemCorrespondence());
 
-    //     nodesFine_[nodesGlueZoneFine_[inode]]->setNodalCorrespondence(elemC, xsiC);
+        nodesFine_[nodesGlueZoneFine_[inode]]->setNodalCorrespondence(elemC, xsiC);
 
-
-    // };
+    };
 
     // integration points correspondence
     int LNN = 4*DIM-2;
@@ -11524,13 +11524,13 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
   
     //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_FEM();
-    // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
-    setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
+    // // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+    // setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
     // // // // //Matrix and vectors -FINE MESH  - FEM mesh
     setMatVecValuesFineLaplace_FEM();
     // // // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
-    setMatVecValuesLagrangeFineLaplace_FEM_FEM();
+    // setMatVecValuesLagrangeFineLaplace_FEM_FEM();
 
     //Assemble matrices and vectors
     ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);

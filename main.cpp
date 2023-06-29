@@ -70,15 +70,15 @@ int main(int argc, char **args) {
 
     //FEM/ISO
     //3D LAPLACE - FEM/ISO
-    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
+    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d1.msh","mirror_fine.txt",0);
 
     // //2D Laplace - FEM/ISO
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
-    // ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
-    // ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
+    ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
+    ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
 
     //ISO/ISO
 
@@ -101,11 +101,11 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
     //3D
-    coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseR_fem.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineR_fem.msh","mirror_fine.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
 
-    ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
-    ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
+    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
 
 
     //Finalize main program   

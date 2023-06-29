@@ -4,7 +4,6 @@
   <Piece NumberOfPoints="1"  NumberOfCells="1">
     <Points>
       <DataArray type="Float64" NumberOfComponents="3" format="ascii">
-0.831826 0.45 0.0772752
       </DataArray>
     </Points>
     <Cells>

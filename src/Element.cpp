@@ -67,6 +67,7 @@ void Element<DIM>::setIntegPointWeightFunction_FEM()
     };
 };
 
+
 template <int DIM>
 void Element<DIM>::setIntegPointWeightFunctionFINE_ISO(double &glueZoneThickness,double &arlequinEpsilon)
 {
@@ -282,6 +283,9 @@ void Element<DIM>::setIntegPointWeightFunctionCOARSE_ISO(double &glueZoneThickne
     };
 };
 
+
+
+
 //------------------------------------------------------------------------------
 //-----------------SPATIAL TRANSFORMATION - JACOBIAN MATRIXES-------------------
 //------------------------------------------------------------------------------
@@ -324,6 +328,10 @@ void Element<DIM>::getJacobianMatrix_FEM(double &djac_, double *xsi, double **Ja
 
     // Computing the jacobian determinant
     djac_ = ainvAux.determinant();
+
+    if (djac_ <=0) std::cout << "Houston we have a problem: Negative jacobian" << std::endl;
+
+    djac_ = abs(djac_);
 
     // Computing Jacobian inverse (transposed)
     ainvAux = ainvAux.inverse().transpose();
