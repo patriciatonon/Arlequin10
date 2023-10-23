@@ -1128,7 +1128,7 @@ NUMBER OF BOUNDARY TYPES (FEM MESH)    TOTAL NUMBER OF ELEMENTS (FEM MESH)
 BOUNDARY 0        CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 NUMB. OF ELEM.    Ux     Uy     Uz                                   Ux     Uy     Uz  
 ------------------------------------------------------------------------------------------
-200               0      0      0                                    0.     0.     0.
+200               0      0      1                                    0.     0.     0.
 
 ------------------------------------------------------------------------------------------
 BOUNDARY 0   - CONNECTIVITY
@@ -1338,7 +1338,7 @@ BOUNDARY 0   - CONNECTIVITY
 BOUNDARY 1        CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 NUMB. OF ELEM.    Ux     Uy     Uz                                   Ux     Uy     Uz  
 ------------------------------------------------------------------------------------------
-20                0      0      0                                    0.     0.     0.
+20                1      1      1                                    0.     0.     0.
 
 ------------------------------------------------------------------------------------------
 BOUNDARY 1   - CONNECTIVITY
@@ -1368,7 +1368,7 @@ BOUNDARY 1   - CONNECTIVITY
 BOUNDARY 2        CONSTRAINS (0-free 1-const 2-glue 3-FSinterface)   VALUES (default = 0.)
 NUMB. OF ELEM.    Ux     Uy     Uz                                   Ux     Uy     Uz  
 ------------------------------------------------------------------------------------------
-20                2     0     0                                      0.     0.     0.
+20                2     2     2                                      0.     0.     0.
 
 ------------------------------------------------------------------------------------------
 BOUNDARY 2   - CONNECTIVITY

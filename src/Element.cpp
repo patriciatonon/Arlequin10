@@ -329,7 +329,7 @@ void Element<DIM>::getJacobianMatrix_FEM(double &djac_, double *xsi, double **Ja
     // Computing the jacobian determinant
     djac_ = ainvAux.determinant();
 
-    if (djac_ <=0) std::cout << "Houston we have a problem: Negative jacobian" << std::endl;
+    //if (djac_ <=0) std::cout << "Houston we have a problem: Negative jacobian" << std::endl;
 
     djac_ = abs(djac_);
 
@@ -2374,54 +2374,100 @@ void Element<DIM>::getElemMatrix(int &LNN, double &wna_, double &djac_, double &
         for (int j = 0; j < DIM; j++)
             duna_dx[i][j] = alpha_f * du_dx[i][j] + (1. - alpha_f) * duPrev_dx[i][j];
 
+
+    wna_ = 1.0;
+
     double WJ = weight_ * djac_ * wna_;
     double AGDT = alpha_f * gamma * dTime_;
     double VAGDT = visc_ * AGDT;
     double DAGDT = dens_ * AGDT;
     double DAM = dens_ * alpha_m;
 
+    // for (int i = 0; i < LNN; i++)
+    // {
+    //     double wSUPGi = 0.;
+    //     for (int k = 0; k < DIM; k++)
+    //         wSUPGi += (una_[k] - umeshna_[k]) * dphi_dx[k][i];
+
+    //     for (int j = 0; j < LNN; j++)
+    //     {
+
+    //         double wSUPGj = 0.;
+    //         for (int k = 0; k < DIM; k++)
+    //             wSUPGj += (una_[k] - umeshna_[k]) * dphi_dx[k][j];
+
+    //         // Mass matrix
+    //         double M = (phi_[i] * phi_[j] + wSUPGi * phi_[j] * tSUPG_) * DAM;
+
+    //         // Convection matrix
+    //         double C = (wSUPGj * phi_[i] + wSUPGi * wSUPGj * tSUPG_) * DAGDT;
+
+    //         for (int k = 0; k < DIM; k++)
+    //         {
+
+    //             jacobianNRMatrix[DIM * i + k][DIM * j + k] += (M + C) * WJ;
+
+    //             for (int l = 0; l < DIM; l++)
+    //             {
+
+    //                 // Convection derivatives
+    //                 double Cuu = phi_[i] * duna_dx[k][l] * phi_[j] * DAGDT;
+    //                 // LSIC
+    //                 double KLS = dphi_dx[k][i] * dphi_dx[l][j] * tLSIC_ * DAGDT;
+    //                 // Difusion matrix
+    //                 double kk = dphi_dx[l][i] * dphi_dx[k][j] * VAGDT;
+    //                 if (k == l)
+    //                     for (int m = 0; m < DIM; m++)
+    //                         kk += dphi_dx[m][i] * dphi_dx[m][j] * VAGDT;
+
+    //                 jacobianNRMatrix[DIM * i + k][DIM * j + l] += (Cuu + KLS + kk) * WJ;
+    //             };
+
+    //             // Gradient operator
+    //             double QSUPG = -(dphi_dx[k][i] * phi_[j]) + wSUPGi * dphi_dx[k][j] * tSUPG_;
+
+    //             // divergent operator
+    //             double QQ = dphi_dx[k][j] * phi_[i] * AGDT;
+
+    //             jacobianNRMatrix[DIM * i + k][DIM * LNN + j] += QSUPG * WJ;
+    //             jacobianNRMatrix[DIM * LNN + i][DIM * j + k] += QQ * WJ;
+
+    //             // PSPG stabilization matrixes
+    //             double H = dphi_dx[k][i] * phi_[j] * tPSPG_ * alpha_m;
+    //             double G = dphi_dx[k][i] * wSUPGj * tPSPG_ * AGDT;
+
+    //             jacobianNRMatrix[DIM * LNN + i][DIM * j + k] += (H + G) * WJ;
+    //         };
+
+    //         double Q = 0.;
+    //         for (int m = 0; m < DIM; m++)
+    //             Q += dphi_dx[m][i] * dphi_dx[m][j] * tPSPG_ / (dens_);
+
+    //         jacobianNRMatrix[DIM * LNN + i][DIM * LNN + j] += Q * WJ;
+    //     };
+    // };
+
+
+
     for (int i = 0; i < LNN; i++)
     {
-        double wSUPGi = 0.;
-        for (int k = 0; k < DIM; k++)
-            wSUPGi += (una_[k] - umeshna_[k]) * dphi_dx[k][i];
-
         for (int j = 0; j < LNN; j++)
         {
-
-            double wSUPGj = 0.;
-            for (int k = 0; k < DIM; k++)
-                wSUPGj += (una_[k] - umeshna_[k]) * dphi_dx[k][j];
-
-            // Mass matrix
-            double M = (phi_[i] * phi_[j] + wSUPGi * phi_[j] * tSUPG_) * DAM;
-
-            // Convection matrix
-            double C = (wSUPGj * phi_[i] + wSUPGi * wSUPGj * tSUPG_) * DAGDT;
-
             for (int k = 0; k < DIM; k++)
             {
-
-                jacobianNRMatrix[DIM * i + k][DIM * j + k] += (M + C) * WJ;
-
                 for (int l = 0; l < DIM; l++)
                 {
-
-                    // Convection derivatives
-                    double Cuu = phi_[i] * duna_dx[k][l] * phi_[j] * DAGDT;
-                    // LSIC
-                    double KLS = dphi_dx[k][i] * dphi_dx[l][j] * tLSIC_ * DAGDT;
                     // Difusion matrix
                     double kk = dphi_dx[l][i] * dphi_dx[k][j] * VAGDT;
                     if (k == l)
                         for (int m = 0; m < DIM; m++)
                             kk += dphi_dx[m][i] * dphi_dx[m][j] * VAGDT;
 
-                    jacobianNRMatrix[DIM * i + k][DIM * j + l] += (Cuu + KLS + kk) * WJ;
+                    jacobianNRMatrix[DIM * i + k][DIM * j + l] += kk * WJ;
                 };
 
                 // Gradient operator
-                double QSUPG = -(dphi_dx[k][i] * phi_[j]) + wSUPGi * dphi_dx[k][j] * tSUPG_;
+                double QSUPG = -dphi_dx[k][i] * phi_[j];
 
                 // divergent operator
                 double QQ = dphi_dx[k][j] * phi_[i] * AGDT;
@@ -2429,20 +2475,15 @@ void Element<DIM>::getElemMatrix(int &LNN, double &wna_, double &djac_, double &
                 jacobianNRMatrix[DIM * i + k][DIM * LNN + j] += QSUPG * WJ;
                 jacobianNRMatrix[DIM * LNN + i][DIM * j + k] += QQ * WJ;
 
-                // PSPG stabilization matrixes
-                double H = dphi_dx[k][i] * phi_[j] * tPSPG_ * alpha_m;
-                double G = dphi_dx[k][i] * wSUPGj * tPSPG_ * AGDT;
-
-                jacobianNRMatrix[DIM * LNN + i][DIM * j + k] += (H + G) * WJ;
             };
 
             double Q = 0.;
-            for (int m = 0; m < DIM; m++)
-                Q += dphi_dx[m][i] * dphi_dx[m][j] * tPSPG_ / (dens_);
+            for (int m = 0; m < DIM; m++) Q += dphi_dx[m][i] * dphi_dx[m][j] * tPSPG_ / (dens_);
 
             jacobianNRMatrix[DIM * LNN + i][DIM * LNN + j] += Q * WJ;
         };
     };
+
 
     // deallocating memory
     for (int i = 0; i < DIM; ++i)
@@ -2469,6 +2510,7 @@ void Element<DIM>::getElemMatrixLaplace(int &LNN, double &wna_, double &djac_, d
             jacobianNRMatrix[i][j] += Lap * WJ;
         };
     };
+
 
     return;                                           
 
@@ -3425,6 +3467,7 @@ void Element<DIM>::getResidualVector(int &LNN, double &wna_, double &djac_, doub
 
     double duna_dx[DIM][DIM];
     getInterpVelDer(LNN, dphi_dx, du_dx, duPrev_dx);
+    
     for (int i = 0; i < DIM; i++)
     {
         for (int j = 0; j < DIM; j++)
@@ -3441,7 +3484,68 @@ void Element<DIM>::getResidualVector(int &LNN, double &wna_, double &djac_, doub
     double dpress_dx[DIM];
     getInterpPressDer(LNN, dphi_dx, dpress_dx);
 
+    wna_ = 1.0;
+
     double WJ = weight_ * djac_ * wna_;
+
+    // for (int i = 0; i < LNN; i++)
+    // {
+    //     double aux0 = 0.;
+    //     for (int k = 0; k < DIM; k++)
+    //         aux0 += duna_dx[k][k];
+
+    //     double wSUPGi = 0.;
+    //     for (int k = 0; k < DIM; k++)
+    //         wSUPGi += (una_[k] - umeshna_[k]) * dphi_dx[k][i];
+
+    //     for (int j = 0; j < DIM; j++)
+    //     {
+
+    //         double mm = phi_[i] * accelm_[j] * dens_ + wSUPGi * accelm_[j] * tSUPG_ * dens_;
+
+    //         double kls = dphi_dx[j][i] * aux0 * tLSIC_ * dens_;
+
+    //         double kk = 0.;
+    //         for (int k = 0; k < DIM; k++)
+    //             kk += dphi_dx[k][i] * (du_dx[j][k] + du_dx[k][j]) * visc_;
+
+    //         double aux1 = 0.;
+    //         for (int k = 0; k < DIM; k++)
+    //             aux1 += duna_dx[j][k] * (una_[k] - umeshna_[k]);
+    //         double cc = aux1 * phi_[i] * dens_ +
+    //                     wSUPGi * aux1 * tSUPG_ * dens_;
+
+    //         double pp = -(dphi_dx[j][i] * press_) +
+    //                     wSUPGi * dpress_dx[j] * tSUPG_;
+
+    //         double ffv = phi_[i] * dens_ * ff[j] +
+    //                      tSUPG_ * dens_ * wSUPGi * ff[j];
+
+    //         rhsVector[DIM * i + j] += (-mm + ffv - kk - pp - cc - kls) * WJ;
+    //     };
+
+    //     double aux2 = 0.;
+    //     double aux3 = 0.;
+    //     double aux4 = 0.;
+    //     double aux5 = 0.;
+    //     for (int k = 0; k < DIM; k++)
+    //     {
+    //         aux2 += dphi_dx[k][i] * dpress_dx[k];
+    //         aux3 += dphi_dx[k][i] * accelm_[k];
+    //         for (int l = 0; l < DIM; l++)
+    //             aux4 += dphi_dx[k][i] * ((una_[l] - umeshna_[l]) * duna_dx[k][l]);
+    //         aux5 += dphi_dx[k][i] * ff[k];
+    //     };
+
+    //     double qq = aux0 * phi_[i] +
+    //                 aux2 * tPSPG_ / dens_ +
+    //                 aux3 * tPSPG_ +
+    //                 aux4 * tPSPG_;
+
+    //     double ffp = aux5 * tPSPG_;
+
+    //     rhsVector[DIM * LNN + i] += (ffp - qq) * WJ;
+    // };
 
     for (int i = 0; i < LNN; i++)
     {
@@ -3449,58 +3553,28 @@ void Element<DIM>::getResidualVector(int &LNN, double &wna_, double &djac_, doub
         for (int k = 0; k < DIM; k++)
             aux0 += duna_dx[k][k];
 
-        double wSUPGi = 0.;
-        for (int k = 0; k < DIM; k++)
-            wSUPGi += (una_[k] - umeshna_[k]) * dphi_dx[k][i];
-
         for (int j = 0; j < DIM; j++)
         {
-
-            double mm = phi_[i] * accelm_[j] * dens_ + wSUPGi * accelm_[j] * tSUPG_ * dens_;
-
-            double kls = dphi_dx[j][i] * aux0 * tLSIC_ * dens_;
-
             double kk = 0.;
-            for (int k = 0; k < DIM; k++)
+            for (int k = 0; k < DIM; k++) 
                 kk += dphi_dx[k][i] * (du_dx[j][k] + du_dx[k][j]) * visc_;
 
-            double aux1 = 0.;
-            for (int k = 0; k < DIM; k++)
-                aux1 += duna_dx[j][k] * (una_[k] - umeshna_[k]);
-            double cc = aux1 * phi_[i] * dens_ +
-                        wSUPGi * aux1 * tSUPG_ * dens_;
+            double pp = -(dphi_dx[j][i] * press_);
 
-            double pp = -(dphi_dx[j][i] * press_) +
-                        wSUPGi * dpress_dx[j] * tSUPG_;
-
-            double ffv = phi_[i] * dens_ * ff[j] +
-                         tSUPG_ * dens_ * wSUPGi * ff[j];
-
-            rhsVector[DIM * i + j] += (-mm + ffv - kk - pp - cc - kls) * WJ;
+            rhsVector[DIM * i + j] += (- kk - pp) * WJ;
         };
 
         double aux2 = 0.;
-        double aux3 = 0.;
-        double aux4 = 0.;
-        double aux5 = 0.;
         for (int k = 0; k < DIM; k++)
-        {
             aux2 += dphi_dx[k][i] * dpress_dx[k];
-            aux3 += dphi_dx[k][i] * accelm_[k];
-            for (int l = 0; l < DIM; l++)
-                aux4 += dphi_dx[k][i] * ((una_[l] - umeshna_[l]) * duna_dx[k][l]);
-            aux5 += dphi_dx[k][i] * ff[k];
-        };
 
         double qq = aux0 * phi_[i] +
-                    aux2 * tPSPG_ / dens_ +
-                    aux3 * tPSPG_ +
-                    aux4 * tPSPG_;
+                    aux2 * tPSPG_ / dens_;
 
-        double ffp = aux5 * tPSPG_;
 
-        rhsVector[DIM * LNN + i] += (ffp - qq) * WJ;
+        rhsVector[DIM * LNN + i] += (- qq) * WJ;
     };
+
 
     // deallocating memory
     for (int i = 0; i < DIM; ++i)
@@ -3516,14 +3590,31 @@ void Element<DIM>::getResidualVector(int &LNN, double &wna_, double &djac_, doub
 
 
 template <int DIM>
-void Element<DIM>::getResidualVectorLaplace(int &LNN, double *rhsVector){
+void Element<DIM>::getResidualVectorLaplace(int &LNN,  double &wna_, double &djac_, double &weight_,
+                                            double **dphi_dx, double *rhsVector){
 
+    // Velocity Derivatives
+    double **du_dx;
+    du_dx = new double *[DIM];
+    for (int i = 0; i < DIM; ++i)
+    du_dx[i] = new double[DIM];
+
+    double **duPrev_dx;
+    duPrev_dx = new double *[DIM];
+    for (int i = 0; i < DIM; ++i)
+    duPrev_dx[i] = new double[DIM];
+
+    getInterpVelDer(LNN, dphi_dx, du_dx, duPrev_dx);
+
+    double WJ = wna_ * djac_ * weight_;
+    
     for (int i = 0; i < LNN; i++){
-        int constrain = (*nodes_)[connect_[i]] -> getConstrains(0);
-        if (constrain == 1) {
-            rhsVector[i] += (*nodes_)[connect_[i]] -> getConstrainValue(0);
-        };
+        double Lap = 0.;
+        for (int k = 0; k < DIM; k++) Lap += dphi_dx[k][i] * duPrev_dx[k][0];
+        rhsVector[i] += Lap*WJ;
     };
+
+    return;
 
 };
 
@@ -5153,13 +5244,11 @@ void Element<DIM>::getLaplace_FEM(double **jacobianNRMatrix, double *rhsVector)
         double wna_ = intPointWeightFunction_FEM[index];
         getElemMatrixLaplace(LNN,wna_,djac_,weight_,dphi_dx,jacobianNRMatrix);
 
+        // Computes the RHS vector
+        getResidualVectorLaplace(LNN,wna_,djac_,weight_,dphi_dx,rhsVector);
+
         index++;
     };
-
-    // // Computes the RHS vector
-    // getResidualVectorLaplace(LNN,rhsVector);
-
-    // setDirichletConstrain(LNN,jacobianNRMatrix);
 
     for (int i = 0; i < DIM; ++i)
         delete[] dphi_dx[i];

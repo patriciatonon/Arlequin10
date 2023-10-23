@@ -1799,6 +1799,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
   
     //Read each boundary information  
     index = 0;
+
     for (int ibound=0; ibound< numBoundariesIso; ibound++){
 
         getline(file2,line);getline(file2,line);getline(file2,line);
@@ -1822,7 +1823,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         for (int i = 0; i < numGroup; i++){
           file2 >> Icpbc[i][0] >> Icpbc[i][1] >> Icpbc[i][2] >> Icpbc[i][3];    
         };
-        
+       
         //any of the control points belong to the same patch
         int ncp[dim],deg[dim]; 
         deg[0] = IsoPar_[Icpbc[0][3]] -> getDegree(0);
@@ -1867,9 +1868,12 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         };
     };  
 
+    if (rank == 0) std::cout << index << std::endl;
+
     
     //Sets nodal boundary constrains
     numBoundElemIso = index;
+    
     for (int ibound = 0; ibound < numBoundElemIso; ibound++){        
         int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
         int no1 = connectB[0];

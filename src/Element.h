@@ -398,7 +398,8 @@ public:
     void getElemMatrixLaplace(int &LNN, double &wna_, double &djac_, double &weight_, 
                               double **dphi_dx, double **jacobianNRMatrix);
 
-    void getResidualVectorLaplace(int &LNN, double *rhsVector);
+    void getResidualVectorLaplace(int &LNN,  double &wna_, double &djac_, double &weight_,
+                                  double **dphi_dx, double *rhsVector);
 
     //Arlequin Matrixes and Vectores
     void getMatrixAndVectorsSameMesh(int &LNN, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
