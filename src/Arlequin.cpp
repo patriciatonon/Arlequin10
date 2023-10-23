@@ -2664,19 +2664,545 @@ void Arlequin<3>::setSignaledDistance_FEM_ISO()
 };
 
 
-template <int DIM>
-void Arlequin<DIM>::setSignaledDistance_FEM_FEM()
+template <>
+void Arlequin<2>::setSignaledDistance_FEM_FEM()
+
+{
+    int dim = 2;
+
+    double  x[dim], x1[dim], x1B[dim], x2[dim], x2B[dim], x3B[dim];
+    double  n[dim], test[dim];
+    int bconnec[3];
+    double dist;
+
+    for (int inode = 0 ; inode < numNodesFine; inode++){ 
+        nodesFine_[inode] -> clearInnerNormal();
+        nodesFine_[inode] -> setDistFunction(0.0);
+    };
+   
+    for (int inode = 0 ; inode < numNodesCoarse; inode++){ 
+        nodesCoarse_[inode] -> setDistFunction(0.0);
+    };
+  
+    // Normal vector from a defined boundary in fine mesh
+     for (int ibound = 0; ibound < numBoundElemFine; ibound++){
+
+        if (boundaryFine_[ibound]-> getConstrain(0) == 2){
+
+            // double &alpha_f = parametersFine -> getAlphaF();
+        	int *connec = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getConnectivity();
+
+        	//Recognizing the element side
+            std::pair<std::vector<int>, std::vector<int> > elemBound;
+            elemBound = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getElemSideInBoundary();
+            int numofBoundaries = elemBound.first.size(); 
+            int side;
+            for (int j = 0; j < numofBoundaries; j++) {
+                if (elemBound.second[j] == ibound ) {
+                    side = elemBound.first[j];
+                };
+            };
+
+            if (side == 0){                 
+                bconnec[0] = connec[1];
+                bconnec[1] = connec[2];
+                bconnec[2] = connec[4];
+            };
+            if (side == 1){
+                bconnec[0] = connec[2];
+                bconnec[1] = connec[0];
+                bconnec[2] = connec[5];
+            };
+            if (side == 2){
+                bconnec[0] = connec[0];
+                bconnec[1] = connec[1];
+                bconnec[2] = connec[3];              
+            };
+    
+            //first segment
+            int no1 = bconnec[0];
+            int no2 = bconnec[2];
+                
+            double *xx1 = nodesFine_[no1] -> getCoordinates();
+            double *xx2 = nodesFine_[no2] -> getCoordinates();
+            // double *xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+            // double *xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+            for (int k = 0; k < dim; k++) {
+                x1[k] = xx1[k];
+                x2[k] = xx2[k];
+                // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+            }
+            
+            double sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                                    (x1[0] - x2[0]) * (x1[0] - x2[0]));
+            
+            n[0] = ((x2[1] - x1[1]) / sLength);
+            n[1] = ((x1[0] - x2[0]) / sLength);
+
+            nodesFine_[no1] -> setInnerNormal(n);
+            nodesFine_[no2] -> setInnerNormal(n);
+
+            //second segment
+            no1 = bconnec[2];
+            no2 = bconnec[1];
+            
+            xx1 = nodesFine_[no1] -> getCoordinates();
+            xx2 = nodesFine_[no2] -> getCoordinates();
+            //xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+            //xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+            for (int k = 0; k < dim; k++) {
+                x1[k] = xx1[k];
+                x2[k] = xx2[k];
+                // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+            }
+            
+            sLength = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                            (x1[0] - x2[0]) * (x1[0] - x2[0]));
+
+            n[0] = ((x2[1] - x1[1]) / sLength);
+            n[1] = ((x1[0] - x2[0]) / sLength);
+
+            nodesFine_[no1] -> setInnerNormal(n);
+            nodesFine_[no2] -> setInnerNormal(n); 
+
+            
+        };//constrain == 2
+    }; //numBoundFine
+ 
+
+    //Gambiarra para malha FEM fine
+    // n[0] = 1.;
+    // n[1] = 1.;
+
+    // nodesFine_[6] -> setInnerNormal(n);
+
+    // n[0] = -1.;
+    // n[1] = 1.;
+
+    // nodesFine_[8] -> setInnerNormal(n);
+
+    // n[0] = -1.;
+    // n[1] = -1.;
+
+    // nodesFine_[17] -> setInnerNormal(n);
+    
+    // n[0] = 1.;
+    // n[1] = -1.;
+
+    // nodesFine_[15] -> setInnerNormal(n);
+
+
+
+    //Coarse mesh - closer distance for nodes or control points from defined fine boundary 
+    for (int ino = 0; ino < numNodesCoarse; ino++){
+        
+        double *xx = nodesCoarse_[ino]->getCoordinates();
+        for (int i = 0; i < dim; i++) x[i] = xx[i];
+
+        // double &alphaC_f = parametersCoarse -> getAlphaF();
+        // double *xx = nodesCoarse_[ino]->getCoordinates();
+        // double *xxp = nodesCoarse_[ino]->getPreviousCoordinates();
+        // for (int i = 0; i < dim; i++) x[i] = alphaC_f * xx[i] + (1. - alphaC_f) * xxp[i]; 
+        
+        dist=10000000000000000000000000000.;
+        
+        for (int ibound = 0; ibound < numBoundElemFine; ibound++){
+            
+            if (boundaryFine_[ibound] -> getConstrain(0) == 2){
+
+                // double &alpha_f = parametersFine -> getAlphaF();
+                int *connec = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getConnectivity();
+                
+                //side in the boundary
+                std::pair<std::vector<int>, std::vector<int> > elemBound;
+                elemBound = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getElemSideInBoundary();
+                int numofBoundaries = elemBound.first.size();
+                int side;
+                for (int j = 0; j < numofBoundaries; j++) {
+                    if (elemBound.second[j] == ibound ) {
+                        side = elemBound.first[j];
+                    };
+                };
+
+                if (side == 0){                 
+                    bconnec[0] = connec[1];
+                    bconnec[1] = connec[2];
+                    bconnec[2] = connec[4];
+                };
+                if (side == 1){
+                    bconnec[0] = connec[2];
+                    bconnec[1] = connec[0];
+                    bconnec[2] = connec[5];
+                };
+                if (side == 2){
+                    bconnec[0] = connec[0];
+                    bconnec[1] = connec[1];
+                    bconnec[2] = connec[3];              
+                };
+
+                //first segment
+                int no1,no2;
+                no1 = bconnec[0];
+                no2 = bconnec[2];
+                
+                double *xx1 = nodesFine_[no1] -> getCoordinates();
+                double *xx2 = nodesFine_[no2] -> getCoordinates();
+                // double *xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+                // double *xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+                for (int k = 0; k < dim; k++) {
+                    x1[k] = xx1[k];
+                    x2[k] = xx2[k];
+                    // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                    // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+                }
+
+                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+                                (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+                                (x2[0] - x1[0]) * x[1] +
+                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+                
+                if (aux1 > aux0){
+                    
+                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+                                    (x2[0] - x[0]) * (x2[0] - x[0]));
+                    //find signal
+                    //side normal vector
+                    double *normal = nodesFine_[no2] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x2[0];
+                    test[1] = x[1] - x2[1];
+
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                };
+
+                if (aux1 < 0.){
+                    
+                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+                                    (x[0] - x1[0]) * (x[0] - x1[0]));
+                    //find signal
+                    //side normal vector
+                    double *normal = nodesFine_[no1] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x1[0];
+                    test[1] = x[1] - x1[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001) signal = 1.;
+                    
+                    dist2 *= signal;
+                };
+                
+                if (fabs(dist2) < fabs(dist)) dist = dist2;
+                
+                //second segment
+                no1 = bconnec[2];
+                no2 = bconnec[1];
+                
+                xx1 = nodesFine_[no1] -> getCoordinates();
+                xx2 = nodesFine_[no2] -> getCoordinates();
+                // double *xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+                // double *xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+                for (int k = 0; k < dim; k++) {
+                    x1[k] = xx1[k];
+                    x2[k] = xx2[k];
+                    // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                    // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+                }
+
+                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+                            x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+
+                if (aux1 > aux0){
+                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+                                    (x2[0] - x[0]) * (x2[0] - x[0]));
+                    
+                    double *normal = nodesFine_[no2] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x2[0];
+                    test[1] = x[1] - x2[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                                        
+                };
+
+                if (aux1 < 0.){
+                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
+                                    (x[0] - x1[0]) * (x[0] - x1[0]));
+                    
+                    //find signal
+                    //side normal vector
+                    double *normal;
+                    normal = nodesFine_[no1] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x1[0];
+                    test[1] = x[1] - x1[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                    
+                };
+                if (fabs(dist2) < fabs(dist)) dist = dist2;
+
+                
+            }; //if bf is the blend boundary
+        }; // numboundaryfine
+
+        if (fabs(nodesCoarse_[ino] -> getDistFunction()) < 1.e-2){
+            nodesCoarse_[ino] -> setDistFunction(dist); 
+        };
+    
+    }; //numnodescoarse
+
+
+    //Fine mesh - closer distance for nodes or control points from defined fine boundary 
+    for (int ino = 0; ino < numNodesFine; ino++){
+        
+        double &alpha_f = parametersFine -> getAlphaF();  
+
+        double *xx=nodesFine_[ino]->getCoordinates();
+
+        for (int i = 0; i < dim; i++) x[i] = xx[i];
+
+        // double *xx = nodesFine_[ino]->getCoordinates();
+        // double *xxp = nodesFine_[ino]->getPreviousCoordinates();
+        // for (int i = 0; i < dim; i++) x[i] = alpha_f * xx[i] + (1. - alpha_f) * xxp[i]; 
+
+        dist=10000000000000000000000000000.;
+               
+        for (int ibound = 0; ibound < numBoundElemFine; ibound++){
+            
+            if (boundaryFine_[ibound] -> getConstrain(0) == 2){
+                
+                int *connec = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getConnectivity();
+
+                std::pair<std::vector<int>, std::vector<int> > elemBound;
+                elemBound = elementsFine_[boundaryFine_[ibound] -> getElement()] -> getElemSideInBoundary();
+                int numofBoundaries = elemBound.first.size();
+                int side;
+                for (int j = 0; j < numofBoundaries; j++) {
+                    if (elemBound.second[j] == ibound ) {
+                        side = elemBound.first[j];
+                    };
+                };
+
+                if (side == 0){                 
+                    bconnec[0] = connec[1];
+                    bconnec[1] = connec[2];
+                    bconnec[2] = connec[4];
+                };
+                if (side == 1){
+                    bconnec[0] = connec[2];
+                    bconnec[1] = connec[0];
+                    bconnec[2] = connec[5];
+                };
+                if (side == 2){
+                    bconnec[0] = connec[0];
+                    bconnec[1] = connec[1];
+                    bconnec[2] = connec[3];              
+                };
+
+                //first segment
+                int no1,no2;
+                no1 = bconnec[0];
+                no2 = bconnec[2];
+                
+                double *xx1 = nodesFine_[no1] -> getCoordinates();
+                double *xx2 = nodesFine_[no2] -> getCoordinates();
+                // double *xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+                // double *xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+                for (int k = 0; k < dim; k++) {
+                    x1[k] = xx1[k];
+                    x2[k] = xx2[k];
+                    // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                    // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+                }
+
+                double aux0 =  sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                                    (x2[0] - x1[0]) * (x2[0] - x1[0]));
+                double aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0])+
+                                (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+                double dist2 =-((x2[1] - x1[1]) * x[0] - 
+                                (x2[0] - x1[0]) * x[1] +
+                                x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+                
+                if (aux1 > aux0){
+                    
+                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+                                    (x2[0] - x[0]) * (x2[0] - x[0]));
+                    //find signal
+                    //side normal vector
+                    double *normal = nodesFine_[no2] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x2[0];
+                    test[1] = x[1] - x2[1];
+
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                };
+
+                if (aux1 < 0.){
+                    
+                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +
+                                    (x[0] - x1[0]) * (x[0] - x1[0]));
+                    //find signal
+                    //side normal vector
+                    double *normal = nodesFine_[no1] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x1[0];
+                    test[1] = x[1] - x1[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001) signal = 1.;
+                    
+                    dist2 *= signal;
+                };
+                
+                if (fabs(dist2) < fabs(dist)) dist = dist2;
+                
+                //second segment
+                no1 = bconnec[2];
+                no2 = bconnec[1];
+                
+                xx1 = nodesFine_[no1] -> getCoordinates();
+                xx2 = nodesFine_[no2] -> getCoordinates();
+                // double *xxp1 = nodesCoarse_[no1] -> getPreviousCoordinates();
+                // double *xxp2 = nodesCoarse_[no2] -> getPreviousCoordinates();
+
+                for (int k = 0; k < dim; k++) {
+                    x1[k] = xx1[k];
+                    x2[k] = xx2[k];
+                    // x1[k] = alpha_f * xx1[k] + (1. - alpha_f) * xxp1[k];
+                    // x2[k] = alpha_f * xx2[k] + (1. - alpha_f) * xxp2[k];
+                }
+
+                aux0 = sqrt((x2[1] - x1[1]) * (x2[1] - x1[1]) +
+                            (x2[0] - x1[0]) * (x2[0] - x1[0]));
+                aux1 = ((x[0] - x1[0]) * (x2[0] - x1[0]) + 
+                        (x[1] - x1[1]) * (x2[1] - x1[1])) / aux0;
+                dist2 = -((x2[1] - x1[1]) * x[0] - (x2[0] - x1[0]) * x[1] +
+                            x2[0] * x1[1] - x2[1] * x1[0]) / aux0;
+
+                if (aux1 > aux0){
+                    dist2 = sqrt((x2[1] - x[1]) * (x2[1] - x[1]) +
+                                    (x2[0] - x[0]) * (x2[0] - x[0]));
+                    
+                    double *normal = nodesFine_[no2] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x2[0];
+                    test[1] = x[1] - x2[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                                        
+                };
+
+                if (aux1 < 0.){
+                    dist2 = sqrt((x[1] - x1[1]) * (x[1] - x1[1]) +  
+                                    (x[0] - x1[0]) * (x[0] - x1[0]));
+                    
+                    //find signal
+                    //side normal vector
+                    double *normal;
+                    normal = nodesFine_[no1] -> getInnerNormal();
+                    
+                    test[0] = x[0] - x1[0];
+                    test[1] = x[1] - x1[1];
+                    
+                    double signaltest = 0.0;
+                    for (int i=0; i<2; i++){
+                        signaltest += normal[i] * test[i];
+                    }
+                    
+                    double signal = -1.;
+                    if (signaltest <= -0.001)signal = 1.;
+                    
+                    dist2 *= signal;
+                    
+                };
+                if (fabs(dist2) < fabs(dist)) dist = dist2;
+
+            }; //if bf is the blend boundary  
+        }; // numboundfine
+
+        // //MUDANCA DE SINAL PARA PROBLEMA DO CILINDRO
+        // dist *= -1.;
+        if(dist < 0) dist = 0;
+        nodesFine_[ino] -> setDistFunction(dist);
+
+    };//numNodes
+};
+
+
+template <>
+void Arlequin<3>::setSignaledDistance_FEM_FEM()
 {
 
     for (int inode = 0; inode < numNodesFine; inode++)
-    {
         nodesFine_[inode]->setDistFunction(0.0);
-    };
 
     for (int inode = 0; inode < numNodesCoarse; inode++)
-    {
         nodesCoarse_[inode]->setDistFunction(0.0);
-    };
 
     double dist;
 
@@ -2685,6 +3211,7 @@ void Arlequin<DIM>::setSignaledDistance_FEM_FEM()
     {
         double *xx = nodesFine_[ino]->getCoordinates();
         dist = (0.5 - xx[1]);
+        // dist = (1.0 - xx[1]);
         nodesFine_[ino]->setDistFunction(dist);
     };
 
@@ -2693,24 +3220,11 @@ void Arlequin<DIM>::setSignaledDistance_FEM_FEM()
     {
         double *xx = nodesCoarse_[ino]->getCoordinates();
         dist = (0.5 - xx[1]);
+        // dist = (1.0 - xx[1]);
         nodesCoarse_[ino]->setDistFunction(dist);
     };
 
-
-
-    // for (int inode = 0; inode < numNodesFine; inode++)
-    // {
-    //     nodesFine_[inode]->setDistFunction(0.0);
-    // };
-
-    // for (int inode = 0; inode < numNodesCoarse; inode++)
-    // {
-    //     nodesCoarse_[inode]->setDistFunction(0.0);
-    // };
-
-    // double dist;
-
-    // // Fine mesh - closer distance for nodes from defined fine boundary
+   // // Fine mesh - closer distance for nodes from defined fine boundary
     // for (int ino = 0; ino < numNodesFine; ino++)
     // {
     //     double x[DIM];
@@ -3992,6 +4506,1187 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
     };     // printfreq
 };
 
+
+
+template <>
+void Arlequin<2>::printResults_ISO_ISO(int step)
+{
+
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+    const int DIM = 2;
+
+    if (step % fineModel.printFreq == 0)
+    {
+
+        if (rank == 0)
+        {
+
+            std::string result;
+            std::ostringstream convert;
+            convert << step + 100000;
+            result = convert.str();
+
+            // COARSE MESH
+            std::string s = "COARSEoutput" + result + ".vtu";
+            std::fstream output_v(s.c_str(), std::ios_base::out);
+
+            int LNNC = 18*DIM-27;
+
+            int numBezierNodes = coarseModel.NumBezierNodes;
+
+            output_v << "<?xml version=\"1.0\"?>" << std::endl
+                     << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                     << "  <UnstructuredGrid>" << std::endl
+                     << "  <Piece NumberOfPoints=\"" << numBezierNodes
+                     << "\"  NumberOfCells=\"" << numElemCoarse
+                     << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_v << "    <Points>" << std::endl
+                     << "      <DataArray type=\"Float64\" "
+                     << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+            // Bezier Extraction
+            double Vel[numBezierNodes][DIM], realVel[numBezierNodes][DIM], Coord[numBezierNodes][DIM];
+            double Press[numBezierNodes], realPress[numBezierNodes], Distance[numBezierNodes], EnergyW[numBezierNodes];
+
+            for (int iElem = 0; iElem < numElemCoarse; iElem++)
+            {
+
+                int *Bconnec = elementsCoarse_[iElem]->getBezierConnectivity();
+                int *connec = elementsCoarse_[iElem]->getConnectivity();
+
+                double coord_[LNNC][DIM], vel_[LNNC][DIM], realvel_[LNNC][DIM];
+                double press_[LNNC], realpress_[LNNC], distance_[LNNC], energyW_[LNNC];
+
+                // Data in the NURBS control points
+                for (int i = 0; i < LNNC; i++)
+                {
+
+                    double *x = nodesCoarse_[connec[i]]->getCoordinates();
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        coord_[i][j] = x[j];
+                        vel_[i][j] = nodesCoarse_[connec[i]]->getVelocity(j);
+                        realvel_[i][j] = nodesCoarse_[connec[i]]->getVelocityArlequin(j);
+                    };
+
+                    press_[i] = nodesCoarse_[connec[i]]->getPressure();
+                    realpress_[i] = nodesCoarse_[connec[i]]->getPressureArlequin();
+                    distance_[i] = nodesCoarse_[connec[i]]->getDistFunction();
+                    energyW_[i] = nodesCoarse_[connec[i]]->getWeightFunction();
+                };
+
+                // interpolated values (Bézier variables)
+                double Bcoord_[LNNC][DIM] = {};
+                double Bvel_[LNNC][DIM] = {};
+                double Brealvel_[LNNC][DIM] = {};
+                double Bpress_[LNNC] = {};
+                double Brealpress_[LNNC] = {};
+                double Bdistance_[LNNC] = {};
+                double BenergyW_[LNNC] = {};
+
+                for (int i = 0; i < LNNC; i++)
+                {
+
+                    QuadShapeFunction<DIM> shapeQuad;
+                    double phi_[LNNC], wpc[LNNC], xsi[DIM];
+                    for (int k = 0; k < LNNC; k++) wpc[k] = nodesCoarse_[connec[k]]->getWeightPC();
+                    int *inc_ = nodesCoarse_[connec[LNNC - 1]]->getINC();
+                    int patch = elementsCoarse_[iElem]->getPatch();
+                    for (int j = 0; j < DIM; j++) xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
+                    shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, IsoParCoarse, patch);
+
+                    for (int j = 0; j < LNNC; j++)
+                    {
+                        for (int k = 0; k < DIM; k++)
+                        {
+                            Bcoord_[i][k] += phi_[j] * coord_[j][k];
+                            Bvel_[i][k] += phi_[j] * vel_[j][k];
+                            Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+                        };
+                        Bpress_[i] += phi_[j] * press_[j];
+                        Brealpress_[i] += phi_[j] * realpress_[j];
+                        Bdistance_[i] += phi_[j] * distance_[j];
+                        BenergyW_[i] += phi_[j] * energyW_[j];
+                    };
+                };
+
+                for (int i = 0; i < LNNC; i++)
+                {
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        Coord[Bconnec[i]][j] = Bcoord_[i][j];
+                        Vel[Bconnec[i]][j] = Bvel_[i][j];
+                        realVel[Bconnec[i]][j] = Brealvel_[i][j];
+                    };
+                    Press[Bconnec[i]] = Bpress_[i];
+                    realPress[Bconnec[i]] = Brealpress_[i];
+                    Distance[Bconnec[i]] = Bdistance_[i];
+                    EnergyW[Bconnec[i]] = BenergyW_[i];
+                };
+
+            }; // iElem
+
+            for (int i = 0; i < numBezierNodes; i++)
+            {
+                output_v << Coord[i][0] << " " << Coord[i][1] << " " << 0. << std::endl;
+            };
+
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_v << "    <Cells>" << std::endl
+                     << "      <DataArray type=\"Int32\" "
+                     << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int iElem = 0; iElem < numElemCoarse; ++iElem)
+            {
+
+                int *Bconnec_ = elementsCoarse_[iElem]->getBezierConnectivity();
+                int Bconnec[LNNC];
+                for (int i = 0; i < LNNC; i++)
+                    Bconnec[i] = Bconnec_[i];
+
+                output_v << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
+                         << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " "
+                         << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4] << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_v << "      <DataArray type=\"Int32\""
+                     << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+            int aux = 0;
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << aux + LNNC << std::endl;
+                aux += LNNC;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                     << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << 70 << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_v << "    <PointData>" << std::endl;
+
+            if (coarseModel.printVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << Vel[i][0] << " "
+                             << Vel[i][1] << " "
+                             << 0. << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << realVel[i][0] << " "
+                             << realVel[i][1] << " "
+                             << 0. << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << Press[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << realPress[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printDistFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << Distance[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printEnergyWeightFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Energy Weight Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << EnergyW[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_v << "    <CellData>" << std::endl;
+
+            if (coarseModel.printProcess)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    output_v << domDecompFine.first[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printGlueZone)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                int cont = 0;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    if (elementsGlueZoneCoarse_[cont] == i)
+                    {
+                        output_v << 1.0 << std::endl;
+                        cont += 1;
+                    }
+                    else
+                    {
+                        output_v << 0.0 << std::endl;
+                    };
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+            output_v << "  </Piece>" << std::endl
+                     << "  </UnstructuredGrid>" << std::endl
+                     << "</VTKFile>" << std::endl;
+
+            // PRINT FINE MODEL RESULTS - FEM mesh
+            std::string f = "FINEoutput" + result + ".vtu";
+
+            std::fstream output_vf(f.c_str(), std::ios_base::out);
+
+            int LNN = 18 * DIM - 27;
+            numBezierNodes = fineModel.NumBezierNodes;
+
+            output_vf << "<?xml version=\"1.0\"?>" << std::endl
+                      << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                      << "  <UnstructuredGrid>" << std::endl
+                      << "  <Piece NumberOfPoints=\"" << numBezierNodes
+                      << "\"  NumberOfCells=\"" << numElemFine
+                      << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_vf << "    <Points>" << std::endl
+                      << "      <DataArray type=\"Float64\" "
+                      << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+            // Bezier Extraction
+            double VelFine[numBezierNodes][DIM], realVelFine[numBezierNodes][DIM], CoordFine[numBezierNodes][DIM], LagFine[numBezierNodes][DIM];
+            double PressFine[numBezierNodes], realPressFine[numBezierNodes], DistanceFine[numBezierNodes], EnergyWFine[numBezierNodes];
+            
+            for (int iElem = 0; iElem < numElemFine; iElem++)
+            {
+
+                int *Bconnec = elementsFine_[iElem]->getBezierConnectivity();
+                int *connec = elementsFine_[iElem]->getConnectivity();
+
+                double coord_[LNN][DIM], vel_[LNN][DIM], realvel_[LNN][DIM], lag_[LNN][DIM];
+                double press_[LNN], realpress_[LNN], distance_[LNN], energyW_[LNN];
+
+                // Data in the NURBS control points
+                for (int i = 0; i < LNN; i++)
+                {
+
+                    double *x = nodesFine_[connec[i]]->getCoordinates();
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        coord_[i][j] = x[j];
+                        vel_[i][j] = nodesFine_[connec[i]]->getVelocity(j);
+                        realvel_[i][j] = nodesFine_[connec[i]]->getVelocityArlequin(j);
+                        lag_[i][j] = nodesFine_[connec[i]]->getLagrangeMultiplier(j);
+                    };
+
+                    press_[i] = nodesFine_[connec[i]]->getPressure();
+                    realpress_[i] = nodesFine_[connec[i]]->getPressureArlequin();
+                    distance_[i] = nodesFine_[connec[i]]->getDistFunction();
+                    energyW_[i] = nodesFine_[connec[i]]->getWeightFunction();
+                };
+
+                // interpolated values (Bézier variables)
+                double Bcoord_[LNN][DIM] = {};
+                double Bvel_[LNN][DIM] = {};
+                double Brealvel_[LNN][DIM] = {};
+                double Blag_[LNN][DIM] = {};
+                double Bpress_[LNN] = {};
+                double Brealpress_[LNN] = {};
+                double Bdistance_[LNN] = {};
+                double BenergyW_[LNN] = {};
+
+                for (int i = 0; i < LNN; i++)
+                {
+
+                    QuadShapeFunction<DIM> shapeQuad;
+                    double phi_[LNN], wpc[LNN], xsi[DIM];
+                    for (int k = 0; k < LNN; k++) wpc[k] = nodesFine_[connec[k]]->getWeightPC();
+                    int *inc_ = nodesFine_[connec[LNNC - 1]]->getINC();
+                    int patch = elementsFine_[iElem]->getPatch();
+                    for (int j = 0; j < DIM; j++) xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
+                    shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, IsoParFine, patch);
+
+                    for (int j = 0; j < LNN; j++)
+                    {
+                        for (int k = 0; k < DIM; k++)
+                        {
+                            Bcoord_[i][k] += phi_[j] * coord_[j][k];
+                            Bvel_[i][k] += phi_[j] * vel_[j][k];
+                            Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+                            Blag_[i][k] += phi_[j] * lag_[j][k];
+                        };
+                        Bpress_[i] += phi_[j] * press_[j];
+                        Brealpress_[i] += phi_[j] * realpress_[j];
+                        Bdistance_[i] += phi_[j] * distance_[j];
+                        BenergyW_[i] += phi_[j] * energyW_[j];
+                    };
+                };
+
+                for (int i = 0; i < LNN; i++)
+                {
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        CoordFine[Bconnec[i]][j] = Bcoord_[i][j];
+                        VelFine[Bconnec[i]][j] = Bvel_[i][j];
+                        realVelFine[Bconnec[i]][j] = Brealvel_[i][j];
+                        LagFine[Bconnec[i]][j] = Blag_[i][j];
+                    };
+                    PressFine[Bconnec[i]] = Bpress_[i];
+                    realPressFine[Bconnec[i]] = Brealpress_[i];
+                    DistanceFine[Bconnec[i]] = Bdistance_[i];
+                    EnergyWFine[Bconnec[i]] = BenergyW_[i];
+                };
+
+            }; // iElem
+
+            
+             for (int i = 0; i < numBezierNodes; i++)
+            {
+                output_vf << CoordFine[i][0] << " " << CoordFine[i][1] << " " << 0. << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_vf << "    <Cells>" << std::endl
+                      << "      <DataArray type=\"Int32\" "
+                      << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int iElem = 0; iElem < numElemFine; iElem++)
+            {
+                int *Bconnec_ = elementsFine_[iElem]->getBezierConnectivity();
+                int Bconnec[LNNC];
+                for (int i = 0; i < LNNC; i++)
+                    Bconnec[i] = Bconnec_[i];
+
+                output_vf << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[8] << " "
+                         << Bconnec[6] << " " << Bconnec[1] << " " << Bconnec[5] << " "
+                         << Bconnec[7] << " " << Bconnec[3] << " " << Bconnec[4] << std::endl;
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_vf << "      <DataArray type=\"Int32\""
+                      << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+
+            aux = 0;
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << aux + LNN << std::endl;
+                aux += LNN;
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                      << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << 70 << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_vf << "    <PointData>" << std::endl;
+
+            if (fineModel.printVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                  for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << VelFine[i][0] << " "
+                             << VelFine[i][1] << " "
+                             << 0. << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << realVelFine[i][0] << " "
+                             << realVelFine[i][1] << " "
+                             << 0. << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                             << PressFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                 for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                             << realPressFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printLagrangeMultipliers)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << LagFine[i][0] << " "
+                              << LagFine[i][1] << " "
+                              << 0.0 << " " << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printDistFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+                 for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << DistanceFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+          
+
+            if (fineModel.printEnergyWeightFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << EnergyWFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_vf << "    <CellData>" << std::endl;
+
+            if (fineModel.printProcess)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    output_vf << domDecompFine.first[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            int cont = 0;
+            if (fineModel.printGlueZone)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                cont = 0;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    if (elementsGlueZoneFine_[cont] == i)
+                    {
+                        output_vf << 1.0 << std::endl;
+                        cont++;
+                    }
+                    else
+                    {
+                        output_vf << 0.0 << std::endl;
+                    };
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+
+            output_vf << "  </Piece>" << std::endl
+                      << "  </UnstructuredGrid>" << std::endl
+                      << "</VTKFile>" << std::endl;
+
+        }; // rank == 0
+    };     // printfreq
+};
+
+
+
+
+template <>
+void Arlequin<3>::printResults_ISO_ISO(int step)
+{
+
+   MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+    const int DIM = 3;
+
+    if (step % fineModel.printFreq == 0)
+    {
+
+        if (rank == 0)
+        {
+
+            std::string result;
+            std::ostringstream convert;
+            convert << step + 100000;
+            result = convert.str();
+
+            // COARSE MESH
+            std::string s = "COARSEoutput" + result + ".vtu";
+            std::fstream output_v(s.c_str(), std::ios_base::out);
+
+            int LNNC = 18*DIM-27;
+
+            int numBezierNodes = coarseModel.NumBezierNodes;
+
+            output_v << "<?xml version=\"1.0\"?>" << std::endl
+                     << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                     << "  <UnstructuredGrid>" << std::endl
+                     << "  <Piece NumberOfPoints=\"" << numBezierNodes
+                     << "\"  NumberOfCells=\"" << numElemCoarse
+                     << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_v << "    <Points>" << std::endl
+                     << "      <DataArray type=\"Float64\" "
+                     << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+            // Bezier Extraction
+            double Vel[numBezierNodes][DIM], realVel[numBezierNodes][DIM], Coord[numBezierNodes][DIM];
+            double Press[numBezierNodes], realPress[numBezierNodes], Distance[numBezierNodes], EnergyW[numBezierNodes];
+
+            for (int iElem = 0; iElem < numElemCoarse; iElem++)
+            {
+
+                int *Bconnec = elementsCoarse_[iElem]->getBezierConnectivity();
+                int *connec = elementsCoarse_[iElem]->getConnectivity();
+
+                double coord_[LNNC][DIM], vel_[LNNC][DIM], realvel_[LNNC][DIM];
+                double press_[LNNC], realpress_[LNNC], distance_[LNNC], energyW_[LNNC];
+
+                // Data in the NURBS control points
+                for (int i = 0; i < LNNC; i++)
+                {
+
+                    double *x = nodesCoarse_[connec[i]]->getCoordinates();
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        coord_[i][j] = x[j];
+                        vel_[i][j] = nodesCoarse_[connec[i]]->getVelocity(j);
+                        realvel_[i][j] = nodesCoarse_[connec[i]]->getVelocityArlequin(j);
+                    };
+
+                    press_[i] = nodesCoarse_[connec[i]]->getPressure();
+                    realpress_[i] = nodesCoarse_[connec[i]]->getPressureArlequin();
+                    distance_[i] = nodesCoarse_[connec[i]]->getDistFunction();
+                    energyW_[i] = nodesCoarse_[connec[i]]->getWeightFunction();
+                };
+
+                // interpolated values (Bézier variables)
+                double Bcoord_[LNNC][DIM] = {};
+                double Bvel_[LNNC][DIM] = {};
+                double Brealvel_[LNNC][DIM] = {};
+                double Bpress_[LNNC] = {};
+                double Brealpress_[LNNC] = {};
+                double Bdistance_[LNNC] = {};
+                double BenergyW_[LNNC] = {};
+
+                for (int i = 0; i < LNNC; i++)
+                {
+
+                    QuadShapeFunction<DIM> shapeQuad;
+                    double phi_[LNNC], wpc[LNNC], xsi[DIM];
+                    for (int k = 0; k < LNNC; k++) wpc[k] = nodesCoarse_[connec[k]]->getWeightPC();
+                    int *inc_ = nodesCoarse_[connec[LNNC - 1]]->getINC();
+                    int patch = elementsCoarse_[iElem]->getPatch();
+                    for (int j = 0; j < DIM; j++) xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
+                    shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, IsoParCoarse, patch);
+
+                    for (int j = 0; j < LNNC; j++)
+                    {
+                        for (int k = 0; k < DIM; k++)
+                        {
+                            Bcoord_[i][k] += phi_[j] * coord_[j][k];
+                            Bvel_[i][k] += phi_[j] * vel_[j][k];
+                            Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+                        };
+                        Bpress_[i] += phi_[j] * press_[j];
+                        Brealpress_[i] += phi_[j] * realpress_[j];
+                        Bdistance_[i] += phi_[j] * distance_[j];
+                        BenergyW_[i] += phi_[j] * energyW_[j];
+                    };
+                };
+
+                for (int i = 0; i < LNNC; i++)
+                {
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        Coord[Bconnec[i]][j] = Bcoord_[i][j];
+                        Vel[Bconnec[i]][j] = Bvel_[i][j];
+                        realVel[Bconnec[i]][j] = Brealvel_[i][j];
+                    };
+                    Press[Bconnec[i]] = Bpress_[i];
+                    realPress[Bconnec[i]] = Brealpress_[i];
+                    Distance[Bconnec[i]] = Bdistance_[i];
+                    EnergyW[Bconnec[i]] = BenergyW_[i];
+                };
+
+            }; // iElem
+
+            for (int i = 0; i < numBezierNodes; i++)
+            {
+                output_v << Coord[i][0] << " " << Coord[i][1] << " " << Coord[i][2] << std::endl;
+            };
+
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_v << "    <Cells>" << std::endl
+                     << "      <DataArray type=\"Int32\" "
+                     << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int iElem = 0; iElem < numElemCoarse; ++iElem)
+            {
+
+                int *Bconnec_ = elementsCoarse_[iElem]->getBezierConnectivity();
+                int Bconnec[LNNC];
+                for (int i = 0; i < LNNC; i++)
+                    Bconnec[i] = Bconnec_[i];
+
+                output_v << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[20] << " "
+                         << Bconnec[18] << " " << Bconnec[6] << " " << Bconnec[8] << " "
+                         << Bconnec[26] << " " << Bconnec[24] << " " << Bconnec[1] << " "
+                         << Bconnec[11] << " " << Bconnec[19] << " " << Bconnec[9] << " "
+                         << Bconnec[7] << " " << Bconnec[17] << " " << Bconnec[25] << " "
+                         << Bconnec[15] << " " << Bconnec[3] << " " << Bconnec[5] << " "
+                         << Bconnec[23] << " " << Bconnec[21] << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_v << "      <DataArray type=\"Int32\""
+                     << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+            int aux = 0;
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << aux + 20 << std::endl;
+                aux += 20;
+            };
+            output_v << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_v << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                     << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemCoarse; i++)
+            {
+                output_v << 25 << std::endl;
+            };
+            output_v << "      </DataArray>" << std::endl
+                     << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_v << "    <PointData>" << std::endl;
+
+            if (coarseModel.printVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << Vel[i][0] << " "
+                             << Vel[i][1] << " "
+                             << Vel[i][2] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealVelocity)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << realVel[i][0] << " "
+                             << realVel[i][1] << " "
+                             << realVel[i][2] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << Press[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printRealPressure)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << 0. << " " << 0. << " "
+                             << realPress[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printDistFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Dist Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << Distance[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (coarseModel.printEnergyWeightFunction)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Energy Weight Function\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_v << EnergyW[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_v << "    <CellData>" << std::endl;
+
+            if (coarseModel.printProcess)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    output_v << domDecompFine.first[i] << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printGlueZone)
+            {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                         << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                int cont = 0;
+                for (int i = 0; i < numElemCoarse; i++)
+                {
+                    if (elementsGlueZoneCoarse_[cont] == i)
+                    {
+                        output_v << 1.0 << std::endl;
+                        cont += 1;
+                    }
+                    else
+                    {
+                        output_v << 0.0 << std::endl;
+                    };
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
+            output_v << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+            output_v << "  </Piece>" << std::endl
+                     << "  </UnstructuredGrid>" << std::endl
+                     << "</VTKFile>" << std::endl;
+
+            // PRINT FINE MODEL RESULTS - FEM mesh
+            std::string f = "FINEoutput" + result + ".vtu";
+
+            std::fstream output_vf(f.c_str(), std::ios_base::out);
+
+            int LNN = 18 * DIM - 27;
+            numBezierNodes = fineModel.NumBezierNodes;
+
+            output_vf << "<?xml version=\"1.0\"?>" << std::endl
+                      << "<VTKFile type=\"UnstructuredGrid\">" << std::endl
+                      << "  <UnstructuredGrid>" << std::endl
+                      << "  <Piece NumberOfPoints=\"" << numBezierNodes
+                      << "\"  NumberOfCells=\"" << numElemFine
+                      << "\">" << std::endl;
+
+            // WRITE NODAL COORDINATES
+            output_vf << "    <Points>" << std::endl
+                      << "      <DataArray type=\"Float64\" "
+                      << "NumberOfComponents=\"3\" format=\"ascii\">" << std::endl;
+
+            // Bezier Extraction
+            double VelFine[numBezierNodes][DIM], realVelFine[numBezierNodes][DIM], CoordFine[numBezierNodes][DIM], LagFine[numBezierNodes][DIM];
+            double PressFine[numBezierNodes], realPressFine[numBezierNodes], DistanceFine[numBezierNodes], EnergyWFine[numBezierNodes];
+            
+            for (int iElem = 0; iElem < numElemFine; iElem++)
+            {
+
+                int *Bconnec = elementsFine_[iElem]->getBezierConnectivity();
+                int *connec = elementsFine_[iElem]->getConnectivity();
+
+                double coord_[LNN][DIM], vel_[LNN][DIM], realvel_[LNN][DIM], lag_[LNN][DIM];
+                double press_[LNN], realpress_[LNN], distance_[LNN], energyW_[LNN];
+
+                // Data in the NURBS control points
+                for (int i = 0; i < LNN; i++)
+                {
+
+                    double *x = nodesFine_[connec[i]]->getCoordinates();
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        coord_[i][j] = x[j];
+                        vel_[i][j] = nodesFine_[connec[i]]->getVelocity(j);
+                        realvel_[i][j] = nodesFine_[connec[i]]->getVelocityArlequin(j);
+                        lag_[i][j] = nodesFine_[connec[i]]->getLagrangeMultiplier(j);
+                    };
+
+                    press_[i] = nodesFine_[connec[i]]->getPressure();
+                    realpress_[i] = nodesFine_[connec[i]]->getPressureArlequin();
+                    distance_[i] = nodesFine_[connec[i]]->getDistFunction();
+                    energyW_[i] = nodesFine_[connec[i]]->getWeightFunction();
+                };
+
+                // interpolated values (Bézier variables)
+                double Bcoord_[LNN][DIM] = {};
+                double Bvel_[LNN][DIM] = {};
+                double Brealvel_[LNN][DIM] = {};
+                double Blag_[LNN][DIM] = {};
+                double Bpress_[LNN] = {};
+                double Brealpress_[LNN] = {};
+                double Bdistance_[LNN] = {};
+                double BenergyW_[LNN] = {};
+
+                for (int i = 0; i < LNN; i++)
+                {
+
+                    QuadShapeFunction<DIM> shapeQuad;
+                    double phi_[LNN], wpc[LNN], xsi[DIM];
+                    for (int k = 0; k < LNN; k++) wpc[k] = nodesFine_[connec[k]]->getWeightPC();
+                    int *inc_ = nodesFine_[connec[LNNC - 1]]->getINC();
+                    int patch = elementsFine_[iElem]->getPatch();
+                    for (int j = 0; j < DIM; j++) xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
+                    shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, IsoParFine, patch);
+
+                    for (int j = 0; j < LNN; j++)
+                    {
+                        for (int k = 0; k < DIM; k++)
+                        {
+                            Bcoord_[i][k] += phi_[j] * coord_[j][k];
+                            Bvel_[i][k] += phi_[j] * vel_[j][k];
+                            Brealvel_[i][k] += phi_[j] * realvel_[j][k];
+                            Blag_[i][k] += phi_[j] * lag_[j][k];
+                        };
+                        Bpress_[i] += phi_[j] * press_[j];
+                        Brealpress_[i] += phi_[j] * realpress_[j];
+                        Bdistance_[i] += phi_[j] * distance_[j];
+                        BenergyW_[i] += phi_[j] * energyW_[j];
+                    };
+                };
+
+                for (int i = 0; i < LNN; i++)
+                {
+                    for (int j = 0; j < DIM; j++)
+                    {
+                        CoordFine[Bconnec[i]][j] = Bcoord_[i][j];
+                        VelFine[Bconnec[i]][j] = Bvel_[i][j];
+                        realVelFine[Bconnec[i]][j] = Brealvel_[i][j];
+                        LagFine[Bconnec[i]][j] = Blag_[i][j];
+                    };
+                    PressFine[Bconnec[i]] = Bpress_[i];
+                    realPressFine[Bconnec[i]] = Brealpress_[i];
+                    DistanceFine[Bconnec[i]] = Bdistance_[i];
+                    EnergyWFine[Bconnec[i]] = BenergyW_[i];
+                };
+
+            }; // iElem
+
+            
+             for (int i = 0; i < numBezierNodes; i++)
+            {
+                output_vf << CoordFine[i][0] << " " << CoordFine[i][1] << " " << CoordFine[i][2]+0.1 << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Points>" << std::endl;
+
+            // WRITE ELEMENT CONNECTIVITY
+            output_vf << "    <Cells>" << std::endl
+                      << "      <DataArray type=\"Int32\" "
+                      << "Name=\"connectivity\" format=\"ascii\">" << std::endl;
+
+            for (int iElem = 0; iElem < numElemFine; iElem++)
+            {
+                int *Bconnec_ = elementsFine_[iElem]->getBezierConnectivity();
+                int Bconnec[LNNC];
+                for (int i = 0; i < LNNC; i++) Bconnec[i] = Bconnec_[i];
+                
+                output_vf << Bconnec[0] << " " << Bconnec[2] << " " << Bconnec[20] << " "
+                         << Bconnec[18] << " " << Bconnec[6] << " " << Bconnec[8] << " "
+                         << Bconnec[26] << " " << Bconnec[24] << " " << Bconnec[1] << " "
+                         << Bconnec[11] << " " << Bconnec[19] << " " << Bconnec[9] << " "
+                         << Bconnec[7] << " " << Bconnec[17] << " " << Bconnec[25] << " "
+                         << Bconnec[15] << " " << Bconnec[3] << " " << Bconnec[5] << " "
+                         << Bconnec[23] << " " << Bconnec[21] << std::endl;
+
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE OFFSETS IN DATA ARRAY
+            output_vf << "      <DataArray type=\"Int32\""
+                      << " Name=\"offsets\" format=\"ascii\">" << std::endl;
+
+            aux = 0;
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << aux + 20 << std::endl;
+                aux += 20;
+            };
+            output_vf << "      </DataArray>" << std::endl;
+
+            // WRITE ELEMENT TYPES
+            output_vf << "      <DataArray type=\"UInt8\" Name=\"types\" "
+                      << "format=\"ascii\">" << std::endl;
+
+            for (int i = 0; i < numElemFine; i++)
+            {
+                output_vf << 25 << std::endl;
+            };
+
+            output_vf << "      </DataArray>" << std::endl
+                      << "    </Cells>" << std::endl;
+
+            // WRITE NODAL RESULTS
+            output_vf << "    <PointData>" << std::endl;
+
+            if (fineModel.printVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Velocity\" format=\"ascii\">" << std::endl;
+                  for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << VelFine[i][0] << " "
+                             << VelFine[i][1] << " "
+                             << VelFine[i][2] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealVelocity)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Velocity\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << realVelFine[i][0] << " "
+                             << realVelFine[i][1] << " "
+                             << realVelFine[i][2] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Pressure\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                             << PressFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printRealPressure)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Real Pressure\" format=\"ascii\">" << std::endl;
+                 for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << 0. << " " << 0. << " "
+                             << realPressFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printLagrangeMultipliers)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                          << "Name=\"Lagrange Multipliers\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << LagFine[i][0] << " "
+                              << LagFine[i][1] << " "
+                              << LagFine[i][2] << " " << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            if (fineModel.printDistFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"printDistFunction\" format=\"ascii\">" << std::endl;
+                 for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << DistanceFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+          
+
+            if (fineModel.printEnergyWeightFunction)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"EnergyWeightFunction\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numBezierNodes; i++)
+                {
+                    output_vf << EnergyWFine[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </PointData>" << std::endl;
+
+            // WRITE ELEMENT RESULTS
+            output_vf << "    <CellData>" << std::endl;
+
+            if (fineModel.printProcess)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Process\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    output_vf << domDecompFine.first[i] << std::endl;
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            int cont = 0;
+            if (fineModel.printGlueZone)
+            {
+                output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+                          << "Name=\"Glue Zone\" format=\"ascii\">" << std::endl;
+                cont = 0;
+                for (int i = 0; i < numElemFine; i++)
+                {
+                    if (elementsGlueZoneFine_[cont] == i)
+                    {
+                        output_vf << 1.0 << std::endl;
+                        cont++;
+                    }
+                    else
+                    {
+                        output_vf << 0.0 << std::endl;
+                    };
+                };
+                output_vf << "      </DataArray> " << std::endl;
+            };
+
+            output_vf << "    </CellData>" << std::endl;
+
+            // FINALIZE OUTPUT FILE
+
+            output_vf << "  </Piece>" << std::endl
+                      << "  </UnstructuredGrid>" << std::endl
+                      << "</VTKFile>" << std::endl;
+
+        }; // rank == 0
+    };     // printfreq
+};
+
 template <>
 void Arlequin<3>::printResults_FEM_ISO(int step)
 {
@@ -4605,6 +6300,18 @@ void Arlequin<2>::printResults_FEM_FEM(int step)
                 output_v << "      </DataArray> " << std::endl;
             };
 
+              {
+                output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Analytic\" format=\"ascii\">" << std::endl;
+                for (int i = 0; i < numNodesCoarse; i++)
+                {
+                    output_v << nodesCoarse_[i]->getAnalSol(0) << " "
+                             << nodesCoarse_[i]->getAnalSol(1) << " "
+                             << 0.0 << std::endl;
+                };
+                output_v << "      </DataArray> " << std::endl;
+            };
+
             if (coarseModel.printRealVelocity)
             {
                 output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
@@ -4642,6 +6349,15 @@ void Arlequin<2>::printResults_FEM_FEM(int step)
                 output_v << "      </DataArray> " << std::endl;
             };
 
+            output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                         << "Name=\"Analitic Pressure\" format=\"ascii\">" << std::endl;
+            for (int i = 0; i < numNodesCoarse; i++)
+            {
+                output_v << 0. << " " << 0. << " "
+                            << nodesCoarse_[i]->getAnalPress() << std::endl;
+            };
+            output_v << "      </DataArray> " << std::endl;
+
             if (coarseModel.printDistFunction)
             {
                 output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
@@ -4663,6 +6379,22 @@ void Arlequin<2>::printResults_FEM_FEM(int step)
                 };
                 output_v << "      </DataArray> " << std::endl;
             };
+
+
+            // //Print Force Field
+            // {
+            //     output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"1\" "
+            //              << "Name=\"Force Field\" format=\"ascii\">" << std::endl;
+            //     for (int i = 0; i < numNodesCoarse; i++)
+            //     {
+            //         double *x_ = nodesCoarse_[i] -> getCoordinates();
+
+            //         double force = std::exp(x_[0])*(-1. + x_[0]) * x_[0] * (-1. + x_[1]) * x_[1];
+            //         output_v << force << std::endl;
+            //     };
+
+            //     output_v << "      </DataArray> " << std::endl;
+            // };
 
             output_v << "    </PointData>" << std::endl;
 
@@ -4729,7 +6461,7 @@ void Arlequin<2>::printResults_FEM_FEM(int step)
             for (int i = 0; i < numNodesFine; i++)
             {
                 double *x = nodesFine_[i]->getCoordinates();
-                output_vf << x[0] << " " << x[1] << " " << 0.0 << std::endl;
+                output_vf << x[0] << " " << x[1] << " " << 0.1 << std::endl;
             };
 
             output_vf << "      </DataArray>" << std::endl
@@ -9181,6 +10913,10 @@ void Arlequin<DIM>::setFluidModels_FEM_ISO(FluidMesh &coarse, FluidMesh &fine)
     setWeightFunction_FEM_ISO();
 
     printResults_FEM_ISO(-10);
+
+    // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
+    setCorrespondenceFine_FEM_ISO();
+    printResultsIP_FEM_ISO(0);
 };
 
 
@@ -9258,7 +10994,7 @@ void Arlequin<DIM>::setFluidModels_ISO_ISO(FluidMesh &coarse, FluidMesh &fine)
     // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
     setCorrespondenceFine_ISO_ISO();
 
-    printResultsLaplace_ISO_ISO(-10);
+    printResults_ISO_ISO(-10);
     printResultsIP_ISO_ISO(0);
 
 };
@@ -9338,55 +11074,10 @@ void Arlequin<DIM>::setFluidModels_FEM_FEM(FluidMesh &coarse, FluidMesh &fine)
     setCorrespondenceFine_FEM_FEM();
 
     printResultsIP_FEM_FEM(0);
+
+    
 };
 
-
-template <int DIM>
-void Arlequin<DIM>::setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp)
-{
-
-// Coarse mesh (IGA elements)
-    int LNNC = 18 * DIM - 27;
-    for (int ielem = 0; ielem < numElemCoarse; ielem++)
-    {
-        int *connec = elementsCoarse_[ielem]->getConnectivity();
-        for (int i = 0; i < LNNC; i++)
-        {
-            int newconi = nodesCoarse_[connec[i]]->getnewcon();
-            // velocity constrain
-            for (int j = 0; j < DIM; j++)
-            {
-                int constrain = nodesCoarse_[connec[i]]->getConstrains(j);
-                if (constrain == 1)
-                {
-                    dofTemp.push_back(newconi * DIM + j);
-                };
-            };
-        };
-    };
-
-    //dofTemp.push_back(431*DIM + DIM);
-
-    // Fine mesh (FEM elements)
-    int LNN = 4*DIM-2;
-    for (int ielem = 0; ielem < numElemFine; ielem++)
-    {
-        int *connec = elementsFine_[ielem]->getConnectivity();
-        for (int i = 0; i < LNN; i++)
-        {
-            // velocity constrain
-            for (int j = 0; j < DIM; j++)
-            {
-                int constrain = nodesFine_[connec[i]]->getConstrains(j);
-                if (constrain == 1)
-                {
-                    dofTemp.push_back(connec[i] * DIM + DIM * NCNumberNodesC + j);
-                };
-            };
-        };
-    };
-
-};
 
 template <int DIM>
 void Arlequin<DIM>::setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp,std::vector<double> &dofValue)
@@ -9433,47 +11124,130 @@ void Arlequin<DIM>::setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTe
 };
 
 
-
 template <int DIM>
-void Arlequin<DIM>::setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp){
+void Arlequin<DIM>::setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp,std::vector<double> &dofValue){
 
-    // Coarse mesh (FEM elements)
-    int LNNC = 4*DIM-2;;
+
+    double &dTime = parametersFine->getTimeStep();
+
+       // Coarse mesh (FEM elements)
+    int LNNC = 4*DIM-2;
     for (int ielem = 0; ielem < numElemCoarse; ielem++)
     {
         int *connec = elementsCoarse_[ielem]->getConnectivity();
+        
         for (int i = 0; i < LNNC; i++)
         {
-            // velocity constrain
             for (int j = 0; j < DIM; j++)
             {
+                // velocity constrain
                 int constrain = nodesCoarse_[connec[i]]->getConstrains(j);
-                if (constrain == 1)
+               
+                if ((constrain == 4) || (constrain == 5) || (constrain == 1))
                 {
-                    dofTemp.push_back(connec[i]*DIM + j);
+                    if (constrain == 4){
+                        double zero = 0.0;
+                        nodesCoarse_[connec[i]] -> setConstrains(0,constrain,zero);
+                        nodesCoarse_[connec[i]] -> setConstrains(1,constrain,
+                                                                 sin(2*pi*nodesCoarse_[connec[i]]->getCoordinateValue(0)) * exp(-iTimeStep*dTime));
+                    };
+
+                    if (constrain == 5){
+                        double zero = 0.0;
+                        nodesCoarse_[connec[i]] -> setConstrains(0,constrain,zero);
+                        nodesCoarse_[connec[i]] -> setConstrains(1,constrain,
+                                                                 -cos(2*pi*nodesCoarse_[connec[i]]->getCoordinateValue(1)) * exp(-iTimeStep*dTime));
+                    };
+                    
+                    
+                    dofTemp.push_back(DIM*connec[i]+j);
+                    dofValue.push_back(nodesCoarse_[connec[i]]->getConstrainValue(j));
                 };
+                
             };
         };
     };
+
+    // dofTemp.push_back(DIM*NCNumberNodesC+125);
+
 
     // Fine mesh (FEM elements)
     int LNN = 4*DIM-2;
     for (int ielem = 0; ielem < numElemFine; ielem++)
     {
         int *connec = elementsFine_[ielem]->getConnectivity();
+        
         for (int i = 0; i < LNN; i++)
         {
-            // velocity constrain
             for (int j = 0; j < DIM; j++)
             {
                 int constrain = nodesFine_[connec[i]]->getConstrains(j);
-                if (constrain == 1)
-                {
-                    dofTemp.push_back((DIM+1)*NCNumberNodesC + connec[i]*DIM + j);
+                if ((constrain == 4) || (constrain == 5) || (constrain == 1))
+                {   
+                    if (constrain == 4){
+                        double zero = 0.0;
+                        nodesFine_[connec[i]] -> setConstrains(0,constrain,zero);
+                        nodesFine_[connec[i]] -> setConstrains(1,constrain,
+                                                               sin(2*pi*nodesFine_[connec[i]]->getCoordinateValue(0)) * exp(-iTimeStep*dTime));
+                    };
+
+                    if (constrain == 5){
+                        double zero = 0.0;
+                        nodesFine_[connec[i]] -> setConstrains(0,constrain,zero);
+                        nodesFine_[connec[i]] -> setConstrains(1,constrain,
+                                                               -cos(2*pi*nodesFine_[connec[i]]->getCoordinateValue(1)) * exp(-iTimeStep*dTime));
+                    };
+                   
+                    dofTemp.push_back((DIM+1)*NCNumberNodesC + DIM*connec[i] + j);
+                    dofValue.push_back(nodesFine_[connec[i]]->getConstrainValue(j));
                 };
             };
         };
     };
+
+    // // Coarse mesh (FEM elements)
+    // int LNNC = 4*DIM-2;
+    // for (int ielem = 0; ielem < numElemCoarse; ielem++)
+    // {
+    //     int *connec = elementsCoarse_[ielem]->getConnectivity();
+        
+    //     for (int i = 0; i < LNNC; i++)
+    //     {
+    //         for (int j = 0; j < DIM; j++)
+    //         {
+    //             // velocity constrain
+    //             int constrain = nodesCoarse_[connec[i]]->getConstrains(j);
+    //             if ((constrain == 1) || (constrain == 3))
+    //             {
+    //                 dofTemp.push_back(DIM*connec[i]+j);
+    //                 dofValue.push_back(nodesCoarse_[connec[i]]->getConstrainValue(j));
+    //             };
+    //         };
+    //     };
+    // };
+
+    // dofTemp.push_back(DIM*NCNumberNodesC+1);
+
+
+    // // Fine mesh (FEM elements)
+    // int LNN = 4*DIM-2;
+    // for (int ielem = 0; ielem < numElemFine; ielem++)
+    // {
+    //     int *connec = elementsFine_[ielem]->getConnectivity();
+        
+    //     for (int i = 0; i < LNN; i++)
+    //     {
+    //         for (int j = 0; j < DIM; j++)
+    //         {
+    //             int constrain = nodesFine_[connec[i]]->getConstrains(j);
+    //             if ((constrain == 1) || (constrain == 3))
+    //             {
+    //                 dofTemp.push_back((DIM+1)*NCNumberNodesC + DIM*connec[i] + j);
+    //                 dofValue.push_back(nodesFine_[connec[i]]->getConstrainValue(j));
+    //             };
+    //         };
+    //     };
+    // };
 
 };
 
@@ -9532,6 +11306,55 @@ void Arlequin<DIM>::setDirichletConstrain_ISO_ISO(std::vector<int> &dofTemp,std:
         
         for (int i = 0; i < LNNC; i++)
         {
+            for (int j = 0; j < DIM; j++){
+                // velocity constrain
+                int constrain = nodesCoarse_[connec[i]]->getConstrains(j);
+                if ((constrain == 1) || (constrain == 3))
+                {
+                    int newconi = nodesCoarse_[connec[i]]->getnewcon();
+
+                    dofTemp.push_back(DIM*newconi+j);
+                    dofValue.push_back(nodesCoarse_[connec[i]]->getConstrainValue(j));
+                };
+            };
+        };
+    };
+
+
+    // Fine mesh (IGA elements)
+    int LNN = 18 * DIM - 27;
+    for (int ielem = 0; ielem < numElemFine; ielem++)
+    {
+        int *connec = elementsFine_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNN; i++)
+        {   
+            for (int j = 0; j < DIM; j++){
+                int constrain = nodesFine_[connec[i]]->getConstrains(j);
+                if ((constrain == 1) || (constrain == 3))
+                {   
+                    int newconi = nodesFine_[connec[i]]->getnewcon();
+                    dofTemp.push_back((DIM+1)*+NCNumberNodesC + DIM*newconi + j);
+                    dofValue.push_back(nodesFine_[connec[i]]->getConstrainValue(j));
+                };
+            };
+        };
+    };
+
+}
+
+template <int DIM>
+void Arlequin<DIM>::setDirichletConstrainLaplace_ISO_ISO(std::vector<int> &dofTemp,std::vector<double> &dofValue){
+
+    
+    // Coarse mesh (IGA elements)
+    int LNNC = 18 * DIM - 27;
+    for (int ielem = 0; ielem < numElemCoarse; ielem++)
+    {
+        int *connec = elementsCoarse_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNNC; i++)
+        {
             // velocity constrain
             int constrain = nodesCoarse_[connec[i]]->getConstrains(0);
             if ((constrain == 1) || (constrain == 3))
@@ -9566,6 +11389,53 @@ void Arlequin<DIM>::setDirichletConstrain_ISO_ISO(std::vector<int> &dofTemp,std:
 
 }
 
+template <int DIM>
+void Arlequin<DIM>::setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp,std::vector<double> &dofValue)
+{
+
+    // Coarse mesh (IGA elements)
+    int LNNC = 18 * DIM - 27;
+    for (int ielem = 0; ielem < numElemCoarse; ielem++)
+    {
+        int *connec = elementsCoarse_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNNC; i++)
+        {
+            for (int j = 0; j < DIM; j++){
+                // velocity constrain
+                int constrain = nodesCoarse_[connec[i]]->getConstrains(j);
+                if ((constrain == 1) || (constrain == 3))
+                {
+                    int newconi = nodesCoarse_[connec[i]]->getnewcon();
+
+                    dofTemp.push_back(DIM*newconi+j);
+                    dofValue.push_back(nodesCoarse_[connec[i]]->getConstrainValue(j));
+                };
+            };
+        };
+    };
+
+     // Fine mesh (FEM elements)
+    int LNN = 4*DIM-2;
+    for (int ielem = 0; ielem < numElemFine; ielem++)
+    {
+        int *connec = elementsFine_[ielem]->getConnectivity();
+        
+        for (int i = 0; i < LNN; i++)
+        {
+            for (int j = 0; j < DIM; j++)
+            {
+                int constrain = nodesFine_[connec[i]]->getConstrains(j);
+                if ((constrain == 1) || (constrain == 3))
+                {
+                    dofTemp.push_back((DIM+1)*NCNumberNodesC + DIM*connec[i] + j);
+                    dofValue.push_back(nodesFine_[connec[i]]->getConstrainValue(j));
+                };
+            };
+        };
+    };
+
+};
 
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesCoarse_ISO()
@@ -9582,21 +11452,19 @@ void Arlequin<DIM>::setMatVecValuesCoarse_ISO()
             int *connec = elementsCoarse_[jel]->getConnectivity();
 
             double **elemMatrix;
-            elemMatrix = new double *[LNNC * (DIM + 1)]();
-            for (int i = 0; i < LNNC * (DIM + 1); ++i)
-                elemMatrix[i] = new double[LNNC * (DIM + 1)]();
-            double elemVector[LNNC * (DIM + 1)] = {};
+            elemMatrix = new double *[LNNC*(DIM+1)]();
+            for (int i = 0; i < LNNC*(DIM+1); ++i) elemMatrix[i] = new double[LNNC*(DIM+1)]();
+            
+            double elemVector[LNNC*(DIM+1)] = {};
 
-            elementsCoarse_[jel]->getTransientNavierStokes_ISO(elemMatrix, elemVector);
+            elementsCoarse_[jel]->getTNS_ISO(iTimeStep,elemMatrix, elemVector);
 
             for (int i = 0; i < LNNC; i++)
             {
-
                 int newconi = nodesCoarse_[connec[i]]->getnewcon();
 
                 for (int j = 0; j < LNNC; j++)
                 {
-
                     int newconj = nodesCoarse_[connec[j]]->getnewcon();
 
                     for (int k = 0; k < DIM; k++)
@@ -9714,6 +11582,88 @@ void Arlequin<DIM>::setMatVecValuesCoarseLaplace_ISO()
     };
 };
 
+
+template <int DIM>
+void Arlequin<DIM>::setMatVecValuesCoarse_FEM()
+{
+
+    int LNNC = 4*DIM-2;
+
+    for (int jel = 0; jel < numElemCoarse; jel++)
+    {
+
+        if (domDecompCoarse.first[jel] == rank)
+        {
+
+            int *connec = elementsCoarse_[jel]->getConnectivity();
+
+            double **elemMatrix;
+            elemMatrix = new double *[(DIM+1)*LNNC]();
+            for (int i = 0; i < (DIM+1)*LNNC; ++i)
+                elemMatrix[i] = new double[(DIM+1)*LNNC]();
+            
+            double elemVector[(DIM+1)*LNNC] = {};
+
+            elementsCoarse_[jel]->getTNS_FEM(iTimeStep,elemMatrix, elemVector);
+
+            for (int i = 0; i < LNNC; i++)
+            {
+
+                for (int j = 0; j < LNNC; j++)
+                {
+
+                    for (int k = 0; k < DIM; k++){
+
+                        for (int l = 0; l < DIM; l++){
+                            
+                            //Matrix K and C
+                            int dof_i = DIM*connec[i]+k;
+                            int dof_j = DIM*connec[j]+l;
+                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                &elemMatrix[DIM*i+k][DIM*j+l],ADD_VALUES);
+                        };
+
+                        //Matrix G and Gt
+                        int dof_i = DIM*NCNumberNodesC + connec[i];
+                        int dof_j = DIM*connec[j] + k;
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*LNNC+i][DIM*j+k],ADD_VALUES);
+                        
+                        dof_i = DIM*connec[i] + k;
+                        dof_j = DIM*NCNumberNodesC + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*i+k][DIM*LNNC+j],ADD_VALUES); 
+                    };
+
+                    int dof_i = DIM * NCNumberNodesC + connec[i];
+                    int dof_j = DIM * NCNumberNodesC + connec[j];
+                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                        &elemMatrix[DIM * LNNC + i][DIM * LNNC + j],
+                                        ADD_VALUES);
+
+                }; // loop j
+
+                // Rhs vector
+                for (int k = 0; k < DIM; k++)
+                {
+                    int dof_i = DIM*connec[i]+k;
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM*i+k],
+                                        ADD_VALUES);
+                };
+
+                int dof_i = DIM * NCNumberNodesC + connec[i];
+                ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM * LNNC + i],
+                                    ADD_VALUES);
+
+            }; // loop i
+
+            for (int i = 0; i < (DIM+1)*LNNC; ++i)
+                delete[] elemMatrix[i];
+            delete[] elemMatrix;
+        };
+    };
+};
+
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesCoarseLaplace_FEM()
 {
@@ -9767,72 +11717,12 @@ void Arlequin<DIM>::setMatVecValuesCoarseLaplace_FEM()
     };
 };
 
-
-template <int DIM>
-void Arlequin<DIM>::setMatVecValuesCoarse_FEM()
-{
-
-    int LNNC = 4*DIM-2;
-
-    for (int jel = 0; jel < numElemCoarse; jel++)
-    {
-
-        if (domDecompCoarse.first[jel] == rank)
-        {
-
-            int *connec = elementsCoarse_[jel]->getConnectivity();
-
-            double **elemMatrix;
-            elemMatrix = new double *[LNNC]();
-            for (int i = 0; i < LNNC; ++i)
-                elemMatrix[i] = new double[LNNC]();
-            double elemVector[LNNC] = {};
-
-            elementsCoarse_[jel]->getLaplace_FEM(elemMatrix, elemVector);
-         
-
-            for (int i = 0; i < LNNC; i++)
-            {
-
-                for (int j = 0; j < LNNC; j++)
-                {
-
-                    for (int k = 0; k < DIM; k++)
-                    {
-                        
-                        int dof_i = connec[i]*DIM + k;
-                        int dof_j = connec[j]*DIM + k;
-                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemMatrix[i][j],
-                                        ADD_VALUES);
-                    }
-                    
-
-                }; // loop j
-
-                // Rhs vector
-                for (int k = 0; k < DIM; k++)
-                {
-                    int dof_i = connec[i]*DIM+k;
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVector[i],
-                                        ADD_VALUES);
-                }
-
-            }; // loop i
-
-            for (int i = 0; i < LNNC; ++i)
-                delete[] elemMatrix[i];
-            delete[] elemMatrix;
-        };
-    };
-};
-
-
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesFine_FEM()
 {
 
     int LNN = 4*DIM-2;
+    
     for (int jel = 0; jel < numElemFine; jel++)
     {
 
@@ -9842,12 +11732,13 @@ void Arlequin<DIM>::setMatVecValuesFine_FEM()
             int *connec = elementsFine_[jel]->getConnectivity();
 
             double **elemMatrix;
-            elemMatrix = new double *[LNN]();
-            for (int i = 0; i < LNN; ++i)
-                elemMatrix[i] = new double[LNN]();
-            double elemVector[LNN] = {};
+            elemMatrix = new double *[(DIM+1)*LNN]();
+            for (int i = 0; i < (DIM+1)*LNN; ++i)
+                elemMatrix[i] = new double[(DIM+1)*LNN]();
+            
+            double elemVector[(DIM+1)*LNN] = {};
 
-            elementsFine_[jel]->getLaplace_FEM(elemMatrix, elemVector);
+            elementsFine_[jel]->getTNS_FEM(iTimeStep,elemMatrix, elemVector);
 
             // Disperse local contributions into the global matrix
             // Matrix K and C
@@ -9855,29 +11746,53 @@ void Arlequin<DIM>::setMatVecValuesFine_FEM()
             {
                 for (int j = 0; j < LNN; j++)
                 {
-                    for (int k = 0; k < DIM; k++)
-                    {
-                        
-                        int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                    for (int k = 0; k < DIM; k++){
+
+                        for (int l = 0; l < DIM; l++){
+                            
+                            //Matrix C and K
+                            int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                            int dof_j = (DIM+1)*NCNumberNodesC + DIM*connec[j] + l;
+                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*i+k][DIM*j+l],
+                                            ADD_VALUES);
+                        };
+
+                        //Matrix G and Gt
+                        int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
                         int dof_j = (DIM+1)*NCNumberNodesC + DIM*connec[j] + k;
                         ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemMatrix[i][j],
-                                        ADD_VALUES);
-                    }
+                                            &elemMatrix[DIM*LNN+i][DIM*j+k],ADD_VALUES);
+                        
+                        dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                        dof_j = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*i+k][DIM*LNN+j],ADD_VALUES); 
 
+                    };
+                    
+                    //Matrix Q
+                    int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
+                    int dof_j = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[j];
+                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                        &elemMatrix[DIM * LNN + i][DIM * LNN + j],
+                                        ADD_VALUES);
+                    
                 }; // loop j
 
                 // Rhs vector
-                for (int k = 0; k < DIM; k++)
-                {
+                for (int k = 0; k < DIM;k++){
                     int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVector[i],
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM*i+k],
                                     ADD_VALUES);
-                };
+                }
+
+                int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
+                ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM * LNN + i],
+                                    ADD_VALUES);
 
             }; // loop i
-            
-            for (int i = 0; i < LNN; ++i)
+            for (int i = 0; i < DIM*LNN; ++i)
                 delete[] elemMatrix[i];
             delete[] elemMatrix;
 
@@ -9961,6 +11876,93 @@ void Arlequin<DIM>::setMatVecValuesFine_FEM()
 
     //     }; // domain decomposition
     // };     // Elements Fine
+};
+
+
+
+
+template <int DIM>
+void Arlequin<DIM>::setMatVecValuesFine_ISO()
+{
+
+    int LNN = 18*DIM-27;
+    
+    for (int jel = 0; jel < numElemFine; jel++)
+    {
+
+        if (domDecompFine.first[jel] == rank)
+        {
+
+            int *connec = elementsFine_[jel]->getConnectivity();
+
+            double **elemMatrix;
+            elemMatrix = new double *[(DIM+1)*LNN]();
+            for (int i = 0; i < (DIM+1)*LNN; ++i)
+                elemMatrix[i] = new double[(DIM+1)*LNN]();
+            
+            double elemVector[(DIM+1)*LNN] = {};
+
+            elementsFine_[jel]->getTNS_ISO(iTimeStep,elemMatrix, elemVector);
+
+            // Disperse local contributions into the global matrix
+            // Matrix K and C
+            for (int i = 0; i < LNN; i++)
+            {
+                for (int j = 0; j < LNN; j++)
+                {
+                    for (int k = 0; k < DIM; k++){
+
+                        for (int l = 0; l < DIM; l++){
+                            
+                            //Matrix C and K
+                            int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                            int dof_j = (DIM+1)*NCNumberNodesC + DIM*connec[j] + l;
+                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*i+k][DIM*j+l],
+                                            ADD_VALUES);
+                        };
+
+                        //Matrix G and Gt
+                        int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
+                        int dof_j = (DIM+1)*NCNumberNodesC + DIM*connec[j] + k;
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*LNN+i][DIM*j+k],ADD_VALUES);
+                        
+                        dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                        dof_j = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrix[DIM*i+k][DIM*LNN+j],ADD_VALUES); 
+
+                    };
+                    
+                    //Matrix Q
+                    int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
+                    int dof_j = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[j];
+                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                        &elemMatrix[DIM * LNN + i][DIM * LNN + j],
+                                        ADD_VALUES);
+                    
+                }; // loop j
+
+                // Rhs vector
+                for (int k = 0; k < DIM;k++){
+                    int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM*i+k],
+                                    ADD_VALUES);
+                };
+
+                int dof_i = (DIM+1)*NCNumberNodesC + DIM*NCNumberNodesF + connec[i];
+                ierr = VecSetValues(b, 1, &dof_i, &elemVector[DIM * LNN + i],
+                                    ADD_VALUES);
+
+            }; // loop i
+            for (int i = 0; i < DIM*LNN; ++i)
+                delete[] elemMatrix[i];
+            delete[] elemMatrix;
+
+        }; // domain decomposition
+    };     // Elements Fine
+
 };
 
 
@@ -10092,14 +12094,14 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_ISO()
             int *connec = elementsFine_[jel]->getConnectivity();
             int *connecL = glueZoneFine_[l]->getConnectivity();
 
-            int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
+            // int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
 
-            for (int ip = 0; ip < numberIntPoints; ip++)
-            {
+            // for (int ip = 0; ip < numberIntPoints; ip++)
+            // {
 
-                int iElemCoarse = elementsFine_[jel]->getIntegPointCorrespondenceElement_FEM(ip);
-                int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
-                int patch = elementsCoarse_[iElemCoarse]->getPatch();
+                // int iElemCoarse = elementsFine_[jel]->getIntegPointCorrespondenceElement_FEM(ip);
+                // int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
+                // int patch = elementsCoarse_[iElemCoarse]->getPatch();
 
                 // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
                 double **elemMatrixLag1;
@@ -10110,49 +12112,33 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_ISO()
                 double elemVectorLag1_1[DIM*LNN] = {};
                 double elemVectorLag1_2[DIM*LNN] = {};
 
-                // tSUPG and tPSPG STABILIZATION
-                double **jacobianNRMatrix;
-                jacobianNRMatrix = new double *[(DIM+1)*LNN]();
-                for (int i = 0; i < (DIM+1)*LNN; ++i)
-                    jacobianNRMatrix[i] = new double[DIM*LNN]();
-                double rhsVector[(DIM+1)*LNN] = {};
+                // // tSUPG and tPSPG STABILIZATION
+                // double **jacobianNRMatrix;
+                // jacobianNRMatrix = new double *[(DIM+1)*LNN]();
+                // for (int i = 0; i < (DIM+1)*LNN; ++i)
+                //     jacobianNRMatrix[i] = new double[DIM*LNN]();
+                // double rhsVector[(DIM+1)*LNN] = {};
 
-                //ARLEQUIN STABILIZATION MATRIXES
-                double **elemStabMatrixD;
-                elemStabMatrixD = new double *[DIM*LNN]();
-                for (int i = 0; i < DIM*LNN; ++i)
-                    elemStabMatrixD[i] = new double[DIM*LNN]();
+                // //ARLEQUIN STABILIZATION MATRIXES
+                // double **elemStabMatrixD;
+                // elemStabMatrixD = new double *[DIM*LNN]();
+                // for (int i = 0; i < DIM*LNN; ++i)
+                //     elemStabMatrixD[i] = new double[DIM*LNN]();
 
-                double **elemStabMatrix1;
-                elemStabMatrix1 = new double *[DIM*LNN]();
-                for (int i = 0; i < DIM*LNN; ++i)
-                    elemStabMatrix1[i] = new double[(DIM+1)*LNN]();
+                // double **elemStabMatrix1;
+                // elemStabMatrix1 = new double *[DIM*LNN]();
+                // for (int i = 0; i < DIM*LNN; ++i)
+                //     elemStabMatrix1[i] = new double[(DIM+1)*LNN]();
 
-                double elemStabVectorD[DIM*LNN] = {};
-                double elemStabVector1[DIM*LNN] = {};
+                // double elemStabVectorD[DIM*LNN] = {};
+                // double elemStabVector1[DIM*LNN] = {};
 
+                int ip=0;
                 elementsFine_[jel]->getLagrangeMultipliersSameMesh_FEM(ip, elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
                 // elementsFine_[jel] -> getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(ip,jacobianNRMatrix,rhsVector);
-                elementsFine_[jel]->getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(ip, patch, nodesCoarse_, connecC, IsoParCoarse,
-                                                                                   elemStabMatrixD, elemStabVectorD,
-                                                                                   elemStabMatrix1, elemStabVector1);
-
-                //  for (int i = 0; i < DIM*LNN; i++)
-                // {
-                //     // std::cout << elemVectorLag1_2[i] << std::endl;
-                //     for (int j = 0; j < DIM*LNN; j++)
-                //     {
-                //         std::cout << elemMatrixLag1[i][j] << " ";
-                //     }
-
-                //     std::cout << std::endl;
-                // }
-
-                // for (int i = 0; i < DIM*LNN; i++)
-                // {
-                //     std::cout << elemVectorLag1_1[i] << std::endl;
-                // };
-
+                // elementsFine_[jel]->getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(ip, patch, nodesCoarse_, connecC, IsoParCoarse,
+                //                                                                    elemStabMatrixD, elemStabVectorD,
+                //                                                                    elemStabMatrix1, elemStabVector1);
 
                 for (int i = 0; i < LNN; i++)
                 {
@@ -10163,7 +12149,6 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_ISO()
                         {
                             for (int l = 0; l < DIM; l++)
                             {
-
                                 // Lagrange Multipliers
                                 int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
                                 int dof_j = (DIM + 1) * NCNumberNodesC + DIM * connec[j] + l;
@@ -10174,37 +12159,37 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_ISO()
                                                     &elemMatrixLag1[DIM * i + k][DIM * j + l],
                                                     ADD_VALUES);
 
-                                // tSUPG
-                                dof_i = (DIM + 1) * NCNumberNodesC + DIM * connec[i] + k;
-                                dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &jacobianNRMatrix[DIM * i + k][DIM * j + l], ADD_VALUES);
+                                // // tSUPG
+                                // dof_i = (DIM + 1) * NCNumberNodesC + DIM * connec[i] + k;
+                                // dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
+                                // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                //                     &jacobianNRMatrix[DIM * i + k][DIM * j + l], ADD_VALUES);
 
-                                //Arlequin Stabilization from diagonal matrix
-                                dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                                dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &elemStabMatrixD[DIM*i+k][DIM*j+l],
-                                                    ADD_VALUES);
+                                // //Arlequin Stabilization from diagonal matrix
+                                // dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                                // dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
+                                // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                //                     &elemStabMatrixD[DIM*i+k][DIM*j+l],
+                                //                     ADD_VALUES);
 
-                                // Stabilization Arlequin terms from fine mesh matrix
-                                dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                                dof_j = (DIM + 1) * NCNumberNodesC + DIM * connec[j] + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &elemStabMatrix1[DIM * i + k][DIM * j + l],
-                                                    ADD_VALUES);
+                                // // Stabilization Arlequin terms from fine mesh matrix
+                                // dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                                // dof_j = (DIM + 1) * NCNumberNodesC + DIM * connec[j] + l;
+                                // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                //                     &elemStabMatrix1[DIM * i + k][DIM * j + l],
+                                //                     ADD_VALUES);
                             };
 
-                            // tPSPG
-                            int dof_i = (DIM + 1) * NCNumberNodesC + DIM * NCNumberNodesF + connec[i];
-                            int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + k;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &jacobianNRMatrix[DIM * LNN + i][DIM * j + k], ADD_VALUES);
+                            // // tPSPG
+                            // int dof_i = (DIM + 1) * NCNumberNodesC + DIM * NCNumberNodesF + connec[i];
+                            // int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + k;
+                            // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                            //                     &jacobianNRMatrix[DIM * LNN + i][DIM * j + k], ADD_VALUES);
 
-                            dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                            dof_j = (DIM + 1) * NCNumberNodesC +  DIM * NCNumberNodesF + connec[j];
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemStabMatrix1[DIM * i + k][DIM * LNN + j], ADD_VALUES);
+                            // dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                            // dof_j = (DIM + 1) * NCNumberNodesC +  DIM * NCNumberNodesF + connec[j];
+                            // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                            //                     &elemStabMatrix1[DIM * i + k][DIM * LNN + j], ADD_VALUES);
 
 
                         };
@@ -10221,42 +12206,42 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_ISO()
                         dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
                         ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[DIM*i+k], ADD_VALUES);
 
-                        // tSUPG
-                        dof_i = (DIM + 1) * NCNumberNodesC + DIM * connec[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * i + k], ADD_VALUES);
+                    //     // tSUPG
+                    //     dof_i = (DIM + 1) * NCNumberNodesC + DIM * connec[i] + k;
+                    //     ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * i + k], ADD_VALUES);
 
-                       // Arlequin stabilization term from diagonal
-                        dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[DIM * i + k], ADD_VALUES);
+                    //    // Arlequin stabilization term from diagonal
+                    //     dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                    //     ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[DIM * i + k], ADD_VALUES);
 
-                        // Arlequin stabilization term from fine mesh
-                        dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[DIM * i + k], ADD_VALUES);
+                    //     // Arlequin stabilization term from fine mesh
+                    //     dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                    //     ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[DIM * i + k], ADD_VALUES);
                     };
 
-                    //tPSPG
-                    int dof_i = (DIM + 1) * NCNumberNodesC + DIM * NCNumberNodesF + connec[i];
-                    ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * LNN + i], ADD_VALUES);
+                    // //tPSPG
+                    // int dof_i = (DIM + 1) * NCNumberNodesC + DIM * NCNumberNodesF + connec[i];
+                    // ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * LNN + i], ADD_VALUES);
 
                 }; // i
 
                 for (int i = 0; i < DIM*LNN; ++i)
                 {
                     delete[] elemMatrixLag1[i];
-                    delete[] elemStabMatrixD[i];
-                    delete[] elemStabMatrix1[i];
+                    // delete[] elemStabMatrixD[i];
+                    // delete[] elemStabMatrix1[i];
                 };
                 delete[] elemMatrixLag1;
-                delete[] elemStabMatrixD;
-                delete[] elemStabMatrix1;
+                // delete[] elemStabMatrixD;
+                // delete[] elemStabMatrix1;
 
-                for (int i = 0; i < (DIM+1)*LNN; ++i)
-                {
-                    delete[] jacobianNRMatrix[i];
-                };
-                delete[] jacobianNRMatrix;
+                // for (int i = 0; i < (DIM+1)*LNN; ++i)
+                // {
+                //     delete[] jacobianNRMatrix[i];
+                // };
+                // delete[] jacobianNRMatrix;
 
-            }; // integration points
+            // }; // integration points
 
         }; // decomposition
 
@@ -10282,61 +12267,74 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFineLaplace_FEM_ISO()
             int *connec = elementsFine_[jel]->getConnectivity();
             int *connecL = glueZoneFine_[l]->getConnectivity();
 
+            int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
 
-            // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
-            double **elemMatrixLag1;
-            elemMatrixLag1 = new double *[LNN]();
-            for (int i = 0; i < LNN; ++i)
-                elemMatrixLag1[i] = new double[LNN]();
-
-            double elemVectorLag1_1[LNN] = {};
-            double elemVectorLag1_2[LNN] = {};
-
-            elementsFine_[jel]->getLagrangeMultipliersSameMeshLaplace_FEM(elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
-
-
-            for (int i = 0; i < LNN; i++)
+            for (int ip = 0; ip < numberIntPoints; ip++)
             {
-                for (int j = 0; j < LNN; j++)
+
+                // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+                double **elemMatrixLag1;
+                elemMatrixLag1 = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemMatrixLag1[i] = new double[LNN]();
+
+                double elemVectorLag1_1[LNN] = {};
+                double elemVectorLag1_2[LNN] = {};
+
+                elementsFine_[jel]->getLagrangeMultipliersSameMeshLaplace_FEM(ip,elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
+
+
+                for (int i = 0; i < LNN; i++)
                 {
+                    for (int j = 0; j < LNN; j++)
+                    {
 
-                    // Lagrange Multipliers
-                    int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                    int dof_j = NCNumberNodesC + connec[j];
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemMatrixLag1[i][j], ADD_VALUES);
-                    ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[i][j],
-                                        ADD_VALUES);
+                        // Lagrange Multipliers
+                        int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        int dof_j = NCNumberNodesC + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrixLag1[i][j], ADD_VALUES);
+                        ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                            &elemMatrixLag1[i][j],
+                                            ADD_VALUES);
 
-                }; // j
+                    }; // j
 
-                // // Lagrange Multipliers
-                // int dof_i = NCNumberNodesC + connec[i];
-                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
+                    // // Lagrange Multipliers
+                    // int dof_i = NCNumberNodesC + connec[i];
+                    // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
 
-                // dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
+                    // dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
 
 
-            }; // i
+                }; // i
 
-            for (int i = 0; i < LNN; ++i)
-            {
-                delete[] elemMatrixLag1[i];
-            };
-            delete[] elemMatrixLag1;
+                for (int i = 0; i < LNN; ++i)
+                {
+                    delete[] elemMatrixLag1[i];
+                };
+                delete[] elemMatrixLag1;
+            }; //ip
 
         }; // decomposition
 
     }; // gluezonefine
 };
 
+
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_FEM()
 {
 
     int LNN = 4*DIM-2;
+
+    double &alpha_f = parametersFine->getAlphaF();
+    double &gamma = parametersFine->getGamma();
+    double &dTime = parametersFine->getTimeStep();
+    
+    double integ = alpha_f * gamma * dTime;
+
 
     for (int l = 0; l < numElemGlueZoneFine; l++)
     {
@@ -10348,61 +12346,169 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_FEM()
 
             int *connec = elementsFine_[jel]->getConnectivity();
             int *connecL = glueZoneFine_[l]->getConnectivity();
-
+            
 
             // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
             double **elemMatrixLag1;
-            elemMatrixLag1 = new double *[LNN]();
-            for (int i = 0; i < LNN; ++i)
-                elemMatrixLag1[i] = new double[LNN]();
+            elemMatrixLag1 = new double *[DIM*LNN]();
+            for (int i = 0; i < DIM*LNN; ++i)
+                elemMatrixLag1[i] = new double[DIM*LNN]();
 
-            double elemVectorLag1_1[LNN] = {};
-            double elemVectorLag1_2[LNN] = {};
+            double elemVectorLag1_1[DIM*LNN] = {};
+            double elemVectorLag1_2[DIM*LNN] = {};
 
-            elementsFine_[jel]->getLagrangeMultipliersSameMeshLaplace_FEM(elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
+            // double **elemStabMatrixD;
+    		// elemStabMatrixD = new double*[12]();
+    		// for (int i = 0; i < 12; ++i)  elemStabMatrixD[i] = new double[12]();
 
+            // double elemStabVectorD[12] = {};
+
+            int ip = 0;
+            elementsFine_[jel]->getLagrangeMultipliersSameMesh_FEM(ip,elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
+            // elementsFine_[jel]->getLagrangeMultipliersSameMeshArlqStab_FEM(elemStabMatrixD,elemStabVectorD);
 
             for (int i = 0; i < LNN; i++)
             {
                 for (int j = 0; j < LNN; j++)
                 {
 
-                    // Lagrange Multipliers
                     for (int k = 0; k < DIM; k++)
-                    {
-                        int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
-                        int dof_j = (DIM+1)*NCNumberNodesC + DIM*connec[j] + k;
-                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemMatrixLag1[i][j], ADD_VALUES);
-                        ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[i][j],
-                                        ADD_VALUES);
+                    {   
+                        for (int l = 0; l < DIM; l++){
+                            // Lagrange Multipliers
+                            int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                            int dof_j = (DIM+1)*NCNumberNodesC + (DIM)*connec[j] + l;
+                            double value = integ * elemMatrixLag1[DIM*i+k][DIM*j+l];
+                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                               &value,ADD_VALUES);
+                            ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                &elemMatrixLag1[DIM*i+k][DIM*j+l],ADD_VALUES);
+                            
+                        };
+
+                        // //tARLQ Matrix E
+                        // int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                        // int dof_j = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[j] + k;
+                        // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                        //                 &elemStabMatrixD[DIM*i+k][DIM*j+k],
+                        //                 ADD_VALUES);
                     };
+                    
+
                 }; // j
 
                 // Lagrange Multipliers
-                for (int k = 0; k < DIM; k++)
-                {
+                for (int k = 0; k < DIM; k++){
+                    
                     int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[DIM*i+k], ADD_VALUES);
 
                     dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
-                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[DIM*i+k], ADD_VALUES);
+
+                    // //tARLQ Vector 
+                    // dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+	    			// ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[DIM*i +k],ADD_VALUES);
                 };
 
+
+                
             }; // i
 
-            for (int i = 0; i < LNN; ++i)
+            for (int i = 0; i < DIM*LNN; ++i)
             {
                 delete[] elemMatrixLag1[i];
             };
             delete[] elemMatrixLag1;
 
+
         }; // decomposition
 
     }; // gluezonefine
+
 };
 
+
+template <int DIM>
+void Arlequin<DIM>::setMatVecValuesLagrangeFine_ISO_ISO()
+{
+
+    int LNN = 18*DIM-27;
+
+    double &alpha_f = parametersFine->getAlphaF();
+    double &gamma = parametersFine->getGamma();
+    double &dTime = parametersFine->getTimeStep();
+    double integ = alpha_f * gamma * dTime;
+
+    for (int l = 0; l < numElemGlueZoneFine; l++)
+    {
+
+        int jel = elementsGlueZoneFine_[l];
+
+        if (domDecompFine.first[jel] == rank)
+        {
+
+            int *connec = elementsFine_[jel]->getConnectivity();
+            int *connecL = glueZoneFine_[l]->getConnectivity();
+            
+
+            // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+            double **elemMatrixLag1;
+            elemMatrixLag1 = new double *[DIM*LNN]();
+            for (int i = 0; i < DIM*LNN; ++i)
+                elemMatrixLag1[i] = new double[DIM*LNN]();
+
+            double elemVectorLag1_1[DIM*LNN] = {};
+            double elemVectorLag1_2[DIM*LNN] = {};
+
+            int ip = 0;
+            elementsFine_[jel]->getLagrangeMultipliersSameMesh_ISO(ip,elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
+
+            for (int i = 0; i < LNN; i++)
+            {
+                for (int j = 0; j < LNN; j++)
+                {
+                    for (int k = 0; k < DIM; k++)
+                    {   
+                        for (int l = 0; l < DIM; l++){
+                            // Lagrange Multipliers
+                            int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                            int dof_j = (DIM+1)*NCNumberNodesC + (DIM)*connec[j] + l;
+                            double value = integ * elemMatrixLag1[DIM*i+k][DIM*j+l];
+                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                               &value,ADD_VALUES);
+                            ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                &elemMatrixLag1[DIM*i+k][DIM*j+l],ADD_VALUES);
+                            
+                        };
+                    };
+                }; // j
+
+                // Lagrange Multipliers
+                for (int k = 0; k < DIM; k++){
+                    
+                    int dof_i = (DIM+1)*NCNumberNodesC + DIM*connec[i] + k;
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[DIM*i+k], ADD_VALUES);
+
+                    dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[DIM*i+k], ADD_VALUES);
+
+                };
+                
+            }; // i
+
+            for (int i = 0; i < DIM*LNN; ++i)
+            {
+                delete[] elemMatrixLag1[i];
+            };
+            delete[] elemMatrixLag1;
+
+
+        }; // decomposition
+
+    }; // gluezonefine
+
+};
 
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesLagrangeFineLaplace_FEM_FEM()
@@ -10421,50 +12527,109 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFineLaplace_FEM_FEM()
             int *connec = elementsFine_[jel]->getConnectivity();
             int *connecL = glueZoneFine_[l]->getConnectivity();
 
+            int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
 
-            // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
-            double **elemMatrixLag1;
-            elemMatrixLag1 = new double *[LNN]();
-            for (int i = 0; i < LNN; ++i)
-                elemMatrixLag1[i] = new double[LNN]();
-
-            double elemVectorLag1_1[LNN] = {};
-            double elemVectorLag1_2[LNN] = {};
-
-            elementsFine_[jel]->getLagrangeMultipliersSameMeshLaplace_FEM(elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
-
-
-            for (int i = 0; i < LNN; i++)
+            for (int ip = 0; ip < numberIntPoints; ip++)
             {
-                for (int j = 0; j < LNN; j++)
+                int iElemCoarse = elementsFine_[jel]->getIntegPointCorrespondenceElement_FEM(ip);
+                int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
+
+                // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+                double **elemMatrixLag1;
+                elemMatrixLag1 = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemMatrixLag1[i] = new double[LNN]();
+
+                double elemVectorLag1_1[LNN] = {};
+                double elemVectorLag1_2[LNN] = {};
+
+                //ARLEQUIN STABILIZATION MATRIXES
+                double **elemStabMatrixD;
+                elemStabMatrixD = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemStabMatrixD[i] = new double[LNN]();
+
+                 double elemStabVectorD[LNN] = {};
+
+                double **elemStabMatrix1;
+                elemStabMatrix1 = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemStabMatrix1[i] = new double[LNN]();
+
+                double elemStabVector1[LNN] = {};
+                
+                elementsFine_[jel]->getLagrangeMultipliersSameMeshLaplace_FEM(ip,elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
+                elementsFine_[jel]->getLagrangeMultipliersSameMeshArlqStabLaplace_FEM_FEM(ip, nodesCoarse_, connecC,
+                                                                                          elemStabMatrixD, elemStabVectorD, 
+                                                                                          elemStabMatrix1, elemStabVector1); 
+
+                for (int i = 0; i < LNN; i++)
                 {
+                    for (int j = 0; j < LNN; j++)
+                    {
+
+                        // Lagrange Multipliers
+                        int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        int dof_j = NCNumberNodesC + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemMatrixLag1[i][j], ADD_VALUES);
+                        ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                            &elemMatrixLag1[i][j],
+                                            ADD_VALUES);
+
+                        //Arlequin Stabilization from diagonal matrix
+                        dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        dof_j = NCNumberNodesC + NCNumberNodesF + connecL[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemStabMatrixD[i][j],
+                                            ADD_VALUES);
+                        
+                        //Arlequin Stabilization from fine mesh
+                        dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        dof_j = NCNumberNodesC + connec[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemStabMatrix1[i][j], ADD_VALUES);
+
+                    }; // j
 
                     // Lagrange Multipliers
-                    int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                    int dof_j = NCNumberNodesC + connec[j];
-                    ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                        &elemMatrixLag1[i][j], ADD_VALUES);
-                    ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                        &elemMatrixLag1[i][j],
-                                        ADD_VALUES);
+                    int dof_i = NCNumberNodesC + connec[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
 
-                }; // j
+                    dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
 
-                // // Lagrange Multipliers
-                // int dof_i = NCNumberNodesC + connec[i];
-                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_1[i], ADD_VALUES);
+                    // Arlequin stabilization vectors
+                    dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[i], ADD_VALUES);
 
-                // dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag1_2[i], ADD_VALUES);
+                    dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemStabVector1[i], ADD_VALUES);
 
+                }; // i
 
-            }; // i
+                for (int i = 0; i < LNN; ++i)
+                {
+                    delete[] elemMatrixLag1[i];
+                };
+                delete[] elemMatrixLag1;
 
-            for (int i = 0; i < LNN; ++i)
-            {
-                delete[] elemMatrixLag1[i];
-            };
-            delete[] elemMatrixLag1;
+                
+                for (int i = 0; i < LNN; ++i)
+                {
+                    delete[] elemStabMatrixD[i];
+                };
+                delete[] elemStabMatrixD;
+
+                 for (int i = 0; i < LNN; ++i)
+                {
+                    delete[] elemStabMatrix1[i];
+                };
+                delete[] elemStabMatrix1;
+
+                
+
+            };//integration points
 
         }; // decomposition
 
@@ -10614,28 +12779,27 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
                 double elemVectorLag0_1[DIM * LNNC] = {};
                 double elemVectorLag0_2[DIM * LNN] = {};
 
-                // tSUPG and tPSPG STABILIZATION
-                double **jacobianNRMatrix;
-                jacobianNRMatrix = new double *[(DIM + 1) * LNNC]();
-                for (int i = 0; i < (DIM + 1) * LNNC; ++i)
-                    jacobianNRMatrix[i] = new double[DIM * LNN]();
-                double rhsVector[(DIM + 1) * LNNC] = {};
+                // // tSUPG and tPSPG STABILIZATION
+                // double **jacobianNRMatrix;
+                // jacobianNRMatrix = new double *[(DIM + 1) * LNNC]();
+                // for (int i = 0; i < (DIM + 1) * LNNC; ++i)
+                //     jacobianNRMatrix[i] = new double[DIM * LNN]();
+                // double rhsVector[(DIM + 1) * LNNC] = {};
 
-                //ARLEQUIN STABILIZATION MATRIX AND VECTOR
-                double **elemStabMatrixD;
-                elemStabMatrixD = new double *[DIM * LNN]();
-                for (int i = 0; i < DIM * LNN; ++i)
-                    elemStabMatrixD[i] = new double[DIM * LNN]();
-                double elemStabVectorD[DIM * LNN] = {};
+                // //ARLEQUIN STABILIZATION MATRIX AND VECTOR
+                // double **elemStabMatrixD;
+                // elemStabMatrixD = new double *[DIM * LNN]();
+                // for (int i = 0; i < DIM * LNN; ++i)
+                //     elemStabMatrixD[i] = new double[DIM * LNN]();
+                // double elemStabVectorD[DIM * LNN] = {};
 
-                double **elemStabMatrix0;
-                elemStabMatrix0 = new double *[DIM * LNN]();
-                for (int i = 0; i < DIM * LNN; ++i)
-                    elemStabMatrix0[i] = new double[(DIM + 1) * LNNC]();
-                double elemStabVector0[DIM * LNN] = {};
+                // double **elemStabMatrix0;
+                // elemStabMatrix0 = new double *[DIM * LNN]();
+                // for (int i = 0; i < DIM * LNN; ++i)
+                //     elemStabMatrix0[i] = new double[(DIM + 1) * LNNC]();
+                // double elemStabVector0[DIM * LNN] = {};
 
                 int iElemCoarse = diffElem[ielem];
-
                 int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
                 int patch = elementsCoarse_[iElemCoarse]->getPatch();
 
@@ -10643,9 +12807,9 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
                                                                                 elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);
                 // elementsFine_[jel] -> getLagrangeMultipliersDifferentMesh_tSUPG_tPSPG_FEM_ISO(patch,nodesCoarse_,connecC,IsoParCoarse,
                 //  																			  iElemCoarse, jacobianNRMatrix,rhsVector);
-                elementsFine_[jel]->getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch, nodesCoarse_, connecC, IsoParCoarse, iElemCoarse,
-                                                                                        elemStabMatrixD, elemStabVectorD, elemStabMatrix0,
-                                                                                        elemStabVector0);
+                // elementsFine_[jel]->getLagrangeMultipliersDifferentMeshArlqStab_FEM_ISO(patch, nodesCoarse_, connecC, IsoParCoarse, iElemCoarse,
+                //                                                                         elemStabMatrixD, elemStabVectorD, elemStabMatrix0,
+                //                                                                         elemStabVector0);
 
             
                 for (int i = 0; i < LNN; i++)
@@ -10671,19 +12835,19 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
                                                     &elemMatrixLag0[DIM * i + k][DIM * j + l],
                                                     ADD_VALUES);
 
-                                // Arlequin Stabilization terms coarse mesh
-                                dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                                dof_j = DIM * newconj + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &elemStabMatrix0[DIM * i + k][DIM * j + l],
-                                                    ADD_VALUES);
+                                // // Arlequin Stabilization terms coarse mesh
+                                // dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                                // dof_j = DIM * newconj + l;
+                                // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                //                     &elemStabMatrix0[DIM * i + k][DIM * j + l],
+                                //                     ADD_VALUES);
                             };
 
-                            int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                            int dof_j = DIM * NCNumberNodesC + newconj;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemStabMatrix0[DIM * i + k][DIM * LNNC + j],
-                                                ADD_VALUES);
+                            // int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                            // int dof_j = DIM * NCNumberNodesC + newconj;
+                            // ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                            //                     &elemStabMatrix0[DIM * i + k][DIM * LNNC + j],
+                            //                     ADD_VALUES);
                         };
 
                     }; // j
@@ -10695,9 +12859,9 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
                         int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
                         ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[DIM * i + k], ADD_VALUES);
 
-                        // Arlequin Stabilization terms coarse mesh
-                        dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemStabVector0[DIM * i + k], ADD_VALUES);
+                        // // Arlequin Stabilization terms coarse mesh
+                        // dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                        // ierr = VecSetValues(b, 1, &dof_i, &elemStabVector0[DIM * i + k], ADD_VALUES);
                     };
 
                 }; // j
@@ -10707,32 +12871,32 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
 
                     int newconi = nodesCoarse_[connecC[i]]->getnewcon();
 
-                    for (int j = 0; j < LNN; j++)
-                    {
+                    // for (int j = 0; j < LNN; j++)
+                    // {
 
-                        for (int k = 0; k < DIM; k++)
-                        {
+                    //     for (int k = 0; k < DIM; k++)
+                    //     {
 
-                            for (int l = 0; l < DIM; l++)
-                            {
+                    //         for (int l = 0; l < DIM; l++)
+                    //         {
 
-                                // tSUPG stabilization
-                                int dof_i = DIM * newconi + k;
-                                int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &jacobianNRMatrix[DIM * i + k][DIM * j + l],
-                                                    ADD_VALUES);
-                            };
+                    //             // tSUPG stabilization
+                    //             int dof_i = DIM * newconi + k;
+                    //             int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
+                    //             ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                    //                                 &jacobianNRMatrix[DIM * i + k][DIM * j + l],
+                    //                                 ADD_VALUES);
+                    //         };
 
-                            // tPSPG stabilization
-                            int dof_i = DIM * NCNumberNodesC + newconi;
-                            int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + k;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &jacobianNRMatrix[DIM * LNNC + i][DIM * j + k],
-                                                ADD_VALUES);
-                        };
+                    //         // tPSPG stabilization
+                    //         int dof_i = DIM * NCNumberNodesC + newconi;
+                    //         int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + k;
+                    //         ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                    //                             &jacobianNRMatrix[DIM * LNNC + i][DIM * j + k],
+                    //                             ADD_VALUES);
+                    //     };
 
-                    }; // j
+                    // }; // j
 
                     for (int k = 0; k < DIM; k++)
                     {
@@ -10741,58 +12905,58 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_ISO()
                         int dof_i = DIM * newconi + k;
                         ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[DIM * i + k], ADD_VALUES);
 
-                        // tSUPG stabilization
-                        dof_i = DIM * newconi + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * i + k], ADD_VALUES);
+                        // // tSUPG stabilization
+                        // dof_i = DIM * newconi + k;
+                        // ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * i + k], ADD_VALUES);
                     };
 
-                    // tPSPG stabilization
-                    int dof_i = DIM * NCNumberNodesC + newconi;
-                    ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * LNNC + i], ADD_VALUES);
+                    // // tPSPG stabilization
+                    // int dof_i = DIM * NCNumberNodesC + newconi;
+                    // ierr = VecSetValues(b, 1, &dof_i, &rhsVector[DIM * LNNC + i], ADD_VALUES);
 
                 }; // i
 
-                //Lagrange stabilization terms (Lagrange multipliers defined in the fine mesh)
-                for (int i = 0; i < LNN; i++)
-                {
-                    for (int j = 0; j < LNN; j++)
-                    {
+                // //Lagrange stabilization terms (Lagrange multipliers defined in the fine mesh)
+                // for (int i = 0; i < LNN; i++)
+                // {
+                //     for (int j = 0; j < LNN; j++)
+                //     {
 
-                        for (int k = 0; k < DIM; k++)
-                        {
-                            for (int l = 0; l < DIM; l++)
-                            {
+                //         for (int k = 0; k < DIM; k++)
+                //         {
+                //             for (int l = 0; l < DIM; l++)
+                //             {
 
-                                int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                                int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
-                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                    &elemStabMatrixD[DIM * i + k][DIM * j + l],
-                                                    ADD_VALUES);
-                            };
-                        };
-                    };
+                //                 int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                //                 int dof_j = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[j] + l;
+                //                 ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                //                                     &elemStabMatrixD[DIM * i + k][DIM * j + l],
+                //                                     ADD_VALUES);
+                //             };
+                //         };
+                //     };
 
-                    for (int k = 0; k < DIM; k++)
-                    {
+                //     for (int k = 0; k < DIM; k++)
+                //     {
 
-                        int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[DIM * i + k], ADD_VALUES);
-                    };
-                };
+                //         int dof_i = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * connecL[i] + k;
+                //         ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[DIM * i + k], ADD_VALUES);
+                //     };
+                // };
 
                 for (int i = 0; i < DIM * LNN; ++i)
                 {
                     delete[] elemMatrixLag0[i];
-                    delete[] elemStabMatrixD[i];
-                    delete[] elemStabMatrix0[i];
+                    // delete[] elemStabMatrixD[i];
+                    // delete[] elemStabMatrix0[i];
                 }
                 delete[] elemMatrixLag0;
-                delete[] elemStabMatrixD;
-                delete[] elemStabMatrix0;
+                // delete[] elemStabMatrixD;
+                // delete[] elemStabMatrix0;
 
-                for (int i = 0; i < (DIM + 1) * LNNC; ++i)
-                    delete[] jacobianNRMatrix[i];
-                delete[] jacobianNRMatrix;
+                // for (int i = 0; i < (DIM + 1) * LNNC; ++i)
+                //     delete[] jacobianNRMatrix[i];
+                // delete[] jacobianNRMatrix;
 
             }; // intersect
 
@@ -10891,6 +13055,8 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_ISO()
                                             &elemMatrixLag0[i][j],
                                             ADD_VALUES);
 
+                       
+
                     }; // j
 
 
@@ -10930,6 +13096,12 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_FEM()
 {
     int LNN = 4*DIM-2;
     int LNNC = 4*DIM-2;
+
+    double &alpha_f = parametersFine->getAlphaF();
+    double &gamma = parametersFine->getGamma();
+    double &dTime = parametersFine->getTimeStep();
+
+    double integ = alpha_f * gamma * dTime;
 
     // Coarse mesh
     for (int l = 0; l < numElemGlueZoneFine; l++)
@@ -10984,62 +13156,61 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_FEM()
 
                 // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
                 double **elemMatrixLag0;
-                elemMatrixLag0 = new double *[LNN]();
-                for (int i = 0; i < LNN; ++i)
-                    elemMatrixLag0[i] = new double[LNNC]();
-                double elemVectorLag0_1[LNNC] = {};
-                double elemVectorLag0_2[LNN] = {};
+                elemMatrixLag0 = new double *[DIM*LNN]();
+                for (int i = 0; i < DIM*LNN; ++i)
+                    elemMatrixLag0[i] = new double[DIM*LNNC]();
+                double elemVectorLag0_1[DIM*LNNC] = {};
+                double elemVectorLag0_2[DIM*LNN] = {};
 
                 int iElemCoarse = diffElem[ielem];
 
                 int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
 
 
-                elementsFine_[jel]->getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(nodesCoarse_, connecC, iElemCoarse,
-                                                                                       elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);              
+                elementsFine_[jel]->getLagrangeMultipliersDifferentMesh_FEM_FEM(nodesCoarse_, connecC, iElemCoarse,
+                                                                                elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);              
 
 
                 for (int i = 0; i < LNN; i++)
                 {
                     for (int j = 0; j < LNNC; j++)
                     {
+                        for (int k = 0; k < DIM; k++){
 
-                        // Lagrange multipliers matrixes
-                        for (int k = 0; k < DIM; k++)
-                        {
-                            int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
-                            int dof_j =  DIM*connecC[j]+k;
-                            ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
-                                                &elemMatrixLag0[i][j], ADD_VALUES);
-                            ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
-                                                &elemMatrixLag0[i][j],
-                                                ADD_VALUES);
+                            for (int l = 0; l < DIM; l++){
+                                // Lagrange multipliers matrixes
+                                int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                                int dof_j = DIM*connecC[j] + l;
+                                double value = integ * elemMatrixLag0[DIM*i+k][DIM*j+l];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value, ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[DIM*i+k][DIM*j+l],ADD_VALUES);
+                            };
                         };
+
                     }; // j
 
-
-                    // Lagrange multipliers vector
-                    for (int k = 0; k < DIM; k++)
-                    {
+                    for (int k = 0; k < DIM; k++){
+                        // Lagrange multipliers vector
                         int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[i], ADD_VALUES);
+                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[DIM*i+k], ADD_VALUES);
                     };
 
                 }; // j
 
+
                 for (int i = 0; i < LNNC; i++)
-                {
-                    // Lagrange multipliers vector
-                    for (int k = 0; k < DIM; k++)
-                    {
-                        int dof_i = DIM*connecC[i] + k;
-                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[i], ADD_VALUES);
+                {   
+                    for (int k = 0; k < DIM; k++){
+                        // Lagrange multipliers vector
+                        int dof_i = DIM*connecC[i]+k;
+                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[DIM*i+k], ADD_VALUES);
                     };
-               
                 }; // i
 
 
-                for (int i = 0; i < LNN; ++i)
+                for (int i = 0; i < DIM*LNN; ++i)
                 {
                     delete[] elemMatrixLag0[i];
                 }
@@ -11051,6 +13222,140 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_FEM_FEM()
 
     }; // gluezonefine
 };
+
+
+
+template <int DIM>
+void Arlequin<DIM>::setMatVecValuesLagrangeCoarse_ISO_ISO()
+{
+    int LNN = 18*DIM-27;
+    int LNNC = 18*DIM-27;
+
+    double &alpha_f = parametersFine->getAlphaF();
+    double &gamma = parametersFine->getGamma();
+    double &dTime = parametersFine->getTimeStep();
+    double integ = alpha_f * gamma * dTime;
+
+    //Coarse mesh
+    for (int l = 0; l < numElemGlueZoneFine; l++)
+    {
+        int jel = elementsGlueZoneFine_[l];
+
+        if (domDecompFine.first[jel] == rank)
+        {
+
+            int *connecL = glueZoneFine_[l]->getConnectivity();
+
+            int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_ISO();
+
+            std::vector<int> ele, diffElem;
+            ele.clear();
+            diffElem.clear();
+
+            // Finding coarse elements
+            for (int i = 0; i < numberIntPoints; i++)
+            {
+                int aux = elementsFine_[jel]->getIntegPointCorrespondenceElement_ISO(i);
+                ele.push_back(aux);
+            };
+
+            int numElemIntersect = 1;
+            int flag = 0;
+            diffElem.push_back(ele[0]);
+
+            for (int i = 1; i < numberIntPoints; i++)
+            {
+                flag = 0;
+                for (int j = 0; j < numElemIntersect; j++)
+                {
+                    if (ele[i] == diffElem[j])
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        flag++;
+                    };
+                    if (flag == numElemIntersect)
+                    {
+                        numElemIntersect++;
+                        diffElem.push_back(ele[i]);
+                    };
+                };
+            };
+
+            for (int ielem = 0; ielem < numElemIntersect; ielem++)
+            {
+
+                // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
+                double **elemMatrixLag0;
+                elemMatrixLag0 = new double *[DIM*LNN]();
+                for (int i = 0; i < DIM*LNN; ++i)
+                    elemMatrixLag0[i] = new double[DIM*LNNC]();
+                double elemVectorLag0_1[DIM*LNNC] = {};
+                double elemVectorLag0_2[DIM*LNN] = {};
+
+                int iElemCoarse = diffElem[ielem];
+
+                int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
+                int patch = elementsCoarse_[iElemCoarse]->getPatch();
+
+                elementsFine_[jel]->getLagrangeMultipliersDifferentMesh_ISO_ISO(patch, nodesCoarse_, connecC, IsoParCoarse, iElemCoarse,
+                                                                                elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);              
+
+
+                for (int i = 0; i < LNN; i++)
+                {
+                    for (int j = 0; j < LNNC; j++)
+                    {
+                        for (int k = 0; k < DIM; k++){
+
+                            for (int l = 0; l < DIM; l++){
+                                // Lagrange multipliers matrixes
+                                int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                                int dof_j = DIM*connecC[j] + l;
+                                double value = integ * elemMatrixLag0[DIM*i+k][DIM*j+l];
+                                ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                                    &value, ADD_VALUES);
+                                ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
+                                                    &elemMatrixLag0[DIM*i+k][DIM*j+l],ADD_VALUES);
+                            };
+                        };
+
+                    }; // j
+
+                    for (int k = 0; k < DIM; k++){
+                        // Lagrange multipliers vector
+                        int dof_i = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*connecL[i] + k;
+                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[DIM*i+k], ADD_VALUES);
+                    };
+
+                }; // j
+
+
+                for (int i = 0; i < LNNC; i++)
+                {   
+                    for (int k = 0; k < DIM; k++){
+                        // Lagrange multipliers vector
+                        int dof_i = DIM*connecC[i]+k;
+                        ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[DIM*i+k], ADD_VALUES);
+                    };
+                }; // i
+
+
+                for (int i = 0; i < DIM*LNN; ++i)
+                {
+                    delete[] elemMatrixLag0[i];
+                }
+                delete[] elemMatrixLag0;
+
+            }; // intersect
+
+        }; // decomposition
+
+    }; // gluezonefine
+};
+
 
 template <int DIM>
 void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_FEM()
@@ -11117,13 +13422,33 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_FEM()
                 double elemVectorLag0_1[LNNC] = {};
                 double elemVectorLag0_2[LNN] = {};
 
+                //ARLEQUIN STABILIZATION MATRIXES
+                double **elemStabMatrixD;
+                elemStabMatrixD = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemStabMatrixD[i] = new double[LNN]();
+
+                 double elemStabVectorD[LNN] = {};
+
+                double **elemStabMatrix0;
+                elemStabMatrix0 = new double *[LNN]();
+                for (int i = 0; i < LNN; ++i)
+                    elemStabMatrix0[i] = new double[LNNC]();
+
+                double elemStabVector0[LNNC] = {};
+
                 int iElemCoarse = diffElem[ielem];
 
                 int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
 
 
                 elementsFine_[jel]->getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(nodesCoarse_, connecC, iElemCoarse,
-                                                                                       elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);              
+                                                                                       elemMatrixLag0, elemVectorLag0_1, elemVectorLag0_2);    
+                elementsFine_[jel]->getLagrangeMultipliersDifferentMeshArlqStabLaplace_FEM_FEM(nodesCoarse_,connecC,ielem, 
+                                                                                               elemStabMatrixD, elemStabVectorD,
+                                                                                               elemStabMatrix0, elemStabVector0);       
+
+
 
 
                 for (int i = 0; i < LNN; i++)
@@ -11139,21 +13464,42 @@ void Arlequin<DIM>::setMatVecValuesLagrangeCoarseLaplace_FEM_FEM()
                         ierr = MatSetValues(A, 1, &dof_j, 1, &dof_i,
                                             &elemMatrixLag0[i][j],
                                             ADD_VALUES);
+
+                        //Arlequin Stabilization from diagonal matrix
+                        dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        dof_j = NCNumberNodesC + NCNumberNodesF + connecL[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemStabMatrixD[i][j],
+                                            ADD_VALUES);
+
+                        //Arlequin Stabilization from coarse mesh
+                        dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                        dof_j = connecC[j];
+                        ierr = MatSetValues(A, 1, &dof_i, 1, &dof_j,
+                                            &elemStabMatrix0[i][j], ADD_VALUES);
+
+
                     }; // j
 
 
-                    // // Lagrange multipliers vector
-                    // int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
-                    // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[i], ADD_VALUES);
+                    // Lagrange multipliers vector
+                    int dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_2[i], ADD_VALUES);
+
+
+                    // Stabilization vectors
+                    dof_i = NCNumberNodesC + NCNumberNodesF + connecL[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemStabVectorD[i], ADD_VALUES);
+                    ierr = VecSetValues(b, 1, &dof_i, &elemStabVector0[i], ADD_VALUES);
 
                 }; // j
 
-                // for (int i = 0; i < LNNC; i++)
-                // {
-                //     // // Lagrange multipliers vector
-                //     // int dof_i = connecC[i];
-                //     // ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[i], ADD_VALUES);
-                // }; // i
+                for (int i = 0; i < LNNC; i++)
+                {
+                    // Lagrange multipliers vector
+                    int dof_i = connecC[i];
+                    ierr = VecSetValues(b, 1, &dof_i, &elemVectorLag0_1[i], ADD_VALUES);
+                }; // i
 
 
                 for (int i = 0; i < LNN; ++i)
@@ -11297,41 +13643,28 @@ template <int DIM>
 int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance)
 {
     
-    std::ofstream dragLift;
-    dragLift.open("dragLift.dat", std::ofstream::out | std::ofstream::app);
-    if (rank == 0)
-    {
-        dragLift << "Time   Pressure Drag   Pressure Lift "
-                 << "Friction Drag  Friction Lift Drag    Lift "
-                 << std::endl;
-    };
-
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-    // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
-    setCorrespondenceFine_FEM_ISO();
-
-    printResultsIP_FEM_ISO(-10);
-
-    // Set the degre of freedom index with boundary condition
-    std::vector<int> dofTemp;
-    setDirichletConstrain_FEM_ISO(dofTemp);
-    PetscMalloc1(dofTemp.size(), &dof);
-    for (size_t i = 0; i < dofTemp.size(); i++)
-    {
-        dof[i] = dofTemp[i];
-    };
-
-    int sysSize = (DIM + 1) * NCNumberNodesC + (DIM + 1) * NCNumberNodesF + DIM * NCnumNodesGlueZoneFine;
-
-    double sumtime = 0;
+    int sysSize = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*NCnumNodesGlueZoneFine;
 
     int numTimeSteps = fineModel.numTimeSteps;
     double &dTime = parametersFine->getTimeStep();
-    int iTimeStep;
+    double &visc_ = parametersFine->getViscosity();
+    double &dens_ = parametersFine->getDensity();
+    double &gamma = parametersFine->getGamma();
 
     for (iTimeStep = 0; iTimeStep < numTimeSteps; iTimeStep++)
     {
+
+        std::vector<int> dofTemp;
+        std::vector<double>dofValue;
+        setDirichletConstrain_FEM_ISO(dofTemp,dofValue);
+        
+        PetscMalloc1(dofTemp.size(), &dof);
+        for (size_t i = 0; i < dofTemp.size(); i++)
+        {
+            dof[i] = dofTemp[i];
+        };
 
         if (rank == 0)
         {
@@ -11346,22 +13679,20 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             parametersFine->setSpectralRadius(integScheme);
         };
 
-        double &gamma = parametersCoarse->getGamma();
 
         for (int i = 0; i < numNodesCoarse; i++)
         {
-
+            
+            double *coord = nodesCoarse_[i]->getCoordinates();
             double accel[DIM], u[DIM];
 
-            for (int j = 0; j < DIM; j++)
-                u[j] = nodesCoarse_[i]->getVelocity(j);
+            for (int j = 0; j < DIM; j++) u[j] = nodesCoarse_[i]->getVelocity(j);
             nodesCoarse_[i]->setPreviousVelocity(u);
 
-            for (int j = 0; j < DIM; j++)
-                accel[j] = nodesCoarse_[i]->getAcceleration(j);
+            for (int j = 0; j < DIM; j++) accel[j] = nodesCoarse_[i]->getAcceleration(j);
             nodesCoarse_[i]->setPreviousAcceleration(accel);
-            for (int j = 0; j < DIM; j++)
-                accel[j] *= (gamma - 1.) / gamma;
+            
+            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
             nodesCoarse_[i]->setAcceleration(accel);
         };
 
@@ -11370,32 +13701,29 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
 
             double accel[DIM], u[DIM];
 
-            for (int j = 0; j < DIM; j++)
-                u[j] = nodesFine_[i]->getVelocity(j);
+            for (int j = 0; j < DIM; j++) u[j] = nodesFine_[i]->getVelocity(j);
             nodesFine_[i]->setPreviousVelocity(u);
-            for (int j = 0; j < DIM; j++)
-                accel[j] = nodesFine_[i]->getAcceleration(j);
-
+            
+            for (int j = 0; j < DIM; j++) accel[j] = nodesFine_[i]->getAcceleration(j);
             nodesFine_[i]->setPreviousAcceleration(accel);
-            for (int j = 0; j < DIM; j++)
-                accel[j] *= (gamma - 1.) / gamma;
+           
+            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
             nodesFine_[i]->setAcceleration(accel);
+        
         };
 
         double duNorm = 100.;
-
-        for (int inewton = 0; inewton < iterNumber; inewton++)
-        {
-
+    
+        for (int inewton = 0; inewton < iterNumber; inewton++){
+        
             std::clock_t t1 = std::clock();
-
-            ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
-                                sysSize,sysSize,100000,NULL,100000,NULL,&A);CHKERRQ(ierr);
+            
+            ierr = MatCreateSeqAIJ(PETSC_COMM_WORLD, sysSize, sysSize, 1000,NULL,&A);CHKERRQ(ierr);
 
             for (int i=0; i<sysSize; i++){
                 double valu = 1.e-20;
                 ierr = MatSetValues(A,1,&i,1,&i,&valu,ADD_VALUES);
-            }
+            };
 
             // Divides the matrix between the processes
             ierr = MatGetOwnershipRange(A, &Istart, &Iend);CHKERRQ(ierr);
@@ -11404,19 +13732,22 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             ierr = VecCreate(PETSC_COMM_WORLD,&b);CHKERRQ(ierr);
             ierr = VecSetSizes(b,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
             ierr = VecSetFromOptions(b);CHKERRQ(ierr);
+
+            // ierr = VecCreate(PETSC_COMM_WORLD,&b2);CHKERRQ(ierr);
+            // ierr = VecSetSizes(b2,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
+            // ierr = VecSetFromOptions(b2);CHKERRQ(ierr);
+            
             ierr = VecDuplicate(b,&u);CHKERRQ(ierr);
             ierr = VecDuplicate(b,&All);CHKERRQ(ierr);
-
+        
             //Matrix and vectors - COARSE MESH - IGA mesh
             setMatVecValuesCoarse_ISO();
             //Matrix and vectors - Lagrange multiplieres - COARSE MESH
-            // setMatVecValuesLagrangeCoarse_FEM_ISO();
-
-            // //Matrix and vectors -FINE MESH  - FEM mesh
-            // setMatVecValuesFine_FEM();
-            // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
-            // setMatVecValuesLagrangeFine_FEM_ISO();
-
+            setMatVecValuesLagrangeCoarse_FEM_ISO();
+            //Matrix and vectors -FINE MESH  - FEM mesh
+            setMatVecValuesFine_FEM();
+            //Matrix and vectors - Lagrange multiplieres - FINE MESH
+            setMatVecValuesLagrangeFine_FEM_ISO();
 
             //Assemble matrices and vectors
             ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
@@ -11424,11 +13755,11 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
 
             ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
             ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
-
-            //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-            //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-
+        
             MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
+
+            // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
             //Create KSP context to solve the linear system
             ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
@@ -11441,22 +13772,29 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             // ierr = KSPSetType(ksp,KSPDGMRES); CHKERRQ(ierr);
             // ierr = KSPGMRESSetRestart(ksp, 500); CHKERRQ(ierr);
 
-            // //Solve using Mumps
-            #if defined(PETSC_HAVE_MUMPS)
-            ierr = KSPSetType(ksp,KSPPREONLY);
-            ierr = KSPGetPC(ksp,&pc);
-            ierr = PCSetType(pc, PCLU);
-            #endif
+            //Solve using Mumps
+            // #if defined(PETSC_HAVE_MUMPS)
+            // ierr = KSPSetType(ksp,KSPPREONLY);
+            // ierr = KSPGetPC(ksp,&pc);
+            // ierr = PCSetType(pc, PCLU);
+            // #endif
+            // ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+            // ierr = KSPSetUp(ksp);
+
+            //Solve with Suite sparse
+            KSPGetPC(ksp, &pc);
+            PCSetType(pc, PCLU);
+            PCFactorSetMatSolverType(pc, MATSOLVERUMFPACK);
             ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-            ierr = KSPSetUp(ksp);
+            ierr = KSPSetUp(ksp);           
 
             //Solve Linear System
             ierr = KSPSolve(ksp,b,u);CHKERRQ(ierr);
             ierr = KSPGetTotalIterations(ksp, &iterations);
 
-                //MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-            //VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-            //VecView(u,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(u,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
             //Gathers the solution vector to the master process
             ierr = VecScatterCreateToAll(u, &ctx, &All);CHKERRQ(ierr);
@@ -11464,27 +13802,26 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             ierr = VecScatterEnd(ctx, u, All, INSERT_VALUES, SCATTER_FORWARD);CHKERRQ(ierr);
             ierr = VecScatterDestroy(&ctx);CHKERRQ(ierr);
 
-            //Updates nodal values
+            // //Updates nodal values
 
             double u_;
             double p_;
             double lag_;
             double normU = 0.;
-            double normP = 0.;
             double normL = 0.;
+            double normP = 0.;
             Ione = 1;
 
             for (int i = 0; i < numNodesCoarse; ++i){
-                int newconi = nodesCoarse_[i] -> getnewcon();
-                for (int j = 0; j < DIM; j++){
-                    Ii = DIM*newconi+j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i+k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
                     u_ = val;
-                    nodesCoarse_[i] -> incrementAcceleration(j,u_);
-                    nodesCoarse_[i] -> incrementVelocity(j,u_*gamma*dTime);
+                    nodesCoarse_[i] -> incrementAcceleration(k,u_);
+                    nodesCoarse_[i] -> incrementVelocity(k,u_*gamma*dTime);
                     normU += val*val;
                 };
-                Ii = DIM*NCNumberNodesC + newconi;
+                Ii = DIM*NCNumberNodesC + i;
                 ierr = VecGetValues(All,Ione,&Ii,&val);CHKERRQ(ierr);
                 p_ = val;
                 normP += val*val;
@@ -11492,12 +13829,12 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             };
 
             for (int i = 0; i < numNodesFine; ++i){
-                for (int j = 0; j < DIM; j++){
-                    Ii = DIM*i + (DIM+1)*NCNumberNodesC + j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i + (DIM+1)*NCNumberNodesC + k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);
                     u_ = val;
-                    nodesFine_[i] -> incrementAcceleration(j,u_);
-                    nodesFine_[i] -> incrementVelocity(j,u_*gamma*dTime);
+                    nodesFine_[i] -> incrementAcceleration(k,u_);
+                    nodesFine_[i] -> incrementVelocity(k,u_*gamma*dTime);
                     normU += val*val;
                 };
                 Ii = DIM*NCNumberNodesF + i + (DIM+1)*NCNumberNodesC;
@@ -11508,19 +13845,18 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             };
 
             for (int i = 0; i < NCnumNodesGlueZoneFine; ++i){
-                for (int j = 0; j < DIM; j++){
-                    Ii = (DIM+1)*NCNumberNodesF + (DIM+1)*NCNumberNodesC + DIM*i + j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = (DIM+1)*NCNumberNodesF + (DIM+1)*NCNumberNodesC + DIM*i + k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);
                     lag_ = val;
                     normL += val * val;
-                    nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(j,lag_);
+                    nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(k,lag_);
                 };
             };
 
             std::clock_t t2 = std::clock();
-            sumtime += 1000.*(t2-t1)/CLOCKS_PER_SEC/1000.;
 
-            if(rank == 0){
+             if(rank == 0){
 
                 std::cout << "Iteration = " << inewton
                             << " (" << iterations << ")"
@@ -11535,34 +13871,36 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             ierr = VecDestroy(&u); CHKERRQ(ierr);
             ierr = VecDestroy(&All); CHKERRQ(ierr);
             ierr = MatDestroy(&A); CHKERRQ(ierr);
-            // if(iTimeStep<5){normU=0.;}
-            // if(iTimeStep<100){if(inewton>1)normU=0.;}
+
             if (sqrt(normU) <= tolerance) {
-                break;
+                    break;
             };
+        
+        }; //Newton iteration
 
-        }; // Newton-Raphson
-
-        if(rank == 0){
-            std::cout << "Accumulated time = " << sumtime << std::endl;
-        };
 
         //Computes the real velocity
         QuadShapeFunction<DIM> shapeQuad;
 
         for (int i = 0; i < numNodesFine; i++){
             for (int k = 0; k < DIM; k++) nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
-            nodesFine_[i] -> setPressureArlequin(nodesFine_[i] ->getPressure());
+            nodesFine_[i] -> setPressureArlequin(nodesFine_[i] -> getPressure());
         };
 
-        int LNNC = 18*DIM - 27;
+        for (int i = 0; i < numNodesCoarse; i++){
+            for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
+            nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
+        };
 
-        for (int i = 0; i<numNodesGlueZoneFine; i++){
+        int LNNC = 18*DIM-27;
+
+        for (int i = 0; i < numNodesGlueZoneFine; i++){
 
             int elCoarse = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalElemCorrespondence();
             double* xsiC = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalXsiCorrespondence();
 
             int *connecCoarse = elementsCoarse_[elCoarse] -> getConnectivity();
+
 
             int patchC = elementsCoarse_[elCoarse] -> getPatch();
             int *incC = nodesCoarse_[connecCoarse[LNNC-1]] -> getINC();
@@ -11571,38 +13909,30 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             shapeQuad.evaluateIso(xsiC,phiC_,wpcC,incC,IsoParCoarse,patchC);
 
             double u[DIM] = {};
-            double p = 0;
+            double press = 0.;
             for (int j=0; j<LNNC; j++){
+                    press += nodesCoarse_[connecCoarse[j]] -> getPressure() * phiC_[j];
                 for (int k = 0 ; k < DIM; k++){
                     u[k] += nodesCoarse_[connecCoarse[j]] -> getVelocity(k) * phiC_[j];
                 };
-                p += nodesCoarse_[connecCoarse[j]] -> getPressure() * phiC_[j];
             };
-
+                
             double wFunc = nodesFine_[nodesGlueZoneFine_[i]] -> getWeightFunction();
-
+            double press_int = nodesFine_[nodesGlueZoneFine_[i]] -> getPressure() * wFunc + press * (1. - wFunc);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(press_int);
+            
             for (int k = 0; k < DIM; k++){
                 double u_int = nodesFine_[nodesGlueZoneFine_[i]] -> getVelocity(k) * wFunc + u[k] * (1. - wFunc);
                 nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(k,u_int);
             };
 
-            double p_int = nodesFine_[nodesGlueZoneFine_[i]] -> getPressure() * wFunc + p * (1. - wFunc);
-            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(p_int);
-
-            for (int i=0; i<numNodesCoarse; i++){
-                for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
-                nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
-            };
         };
 
-        //Compute and print drag and lift coefficients
-        if (fineModel.computeDragAndLift){
-            dragAndLiftCoefficients_FEM(dragLift,iTimeStep);
-        };
-
+        
         // Printing results
         printResults_FEM_ISO(iTimeStep);
-    };
+    
+    }; //iTimeStep
 
     PetscFree(dof);
     return 0;
@@ -11825,31 +14155,35 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_ISO(int iterNumber, double to
 };
 
 
+
+
 template <int DIM>
 int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance)
 {
     
     MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
-    std::vector<int> dofTemp;
-    
-    setDirichletConstrain_FEM_FEM(dofTemp);
-    PetscMalloc1(dofTemp.size(), &dof);
-    for (size_t i = 0; i < dofTemp.size(); i++)
-    {
-        dof[i] = dofTemp[i];
-    };
 
     int sysSize = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*NCnumNodesGlueZoneFine;
 
-    double sumtime = 0;
-
     int numTimeSteps = fineModel.numTimeSteps;
     double &dTime = parametersFine->getTimeStep();
-    int iTimeStep;
+    double &visc_ = parametersFine->getViscosity();
+    double &dens_ = parametersFine->getDensity();
+    double &gamma = parametersFine->getGamma();
 
     for (iTimeStep = 0; iTimeStep < numTimeSteps; iTimeStep++)
     {
+
+        std::vector<int> dofTemp;
+        std::vector<double>dofValue;
+        setDirichletConstrain_FEM_FEM(dofTemp,dofValue);
+        
+        PetscMalloc1(dofTemp.size(), &dof);
+        for (size_t i = 0; i < dofTemp.size(); i++)
+        {
+            dof[i] = dofTemp[i];
+        };
 
         if (rank == 0)
         {
@@ -11858,19 +14192,35 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
                       << std::endl;
         }
 
-        double &gamma = parametersCoarse->getGamma();
+        if (iTimeStep == 10)
+        {
+            parametersCoarse->setSpectralRadius(integScheme);
+            parametersFine->setSpectralRadius(integScheme);
+        };
+
 
         for (int i = 0; i < numNodesCoarse; i++)
         {
+            
+            double *coord = nodesCoarse_[i]->getCoordinates();
+            
+            // double ua[DIM] = {};
+            // ua[0] =  cos(2.*pi*coord[0])*sin(2.*pi*coord[1])*exp(-iTimeStep*dTime);
+            // ua[1] = -sin(2.*pi*coord[0])*cos(2.*pi*coord[1])*exp(-iTimeStep*dTime);
+            // double pa = (1.-8.*pi*pi*(visc_/dens_))*cos(2.*pi*coord[0])*sin(2.*pi*coord[1])*exp(-iTimeStep*dTime);
+            // nodesCoarse_[i]->setAnalSol(ua,pa);
+
             double accel[DIM], u[DIM];
 
-            for (int j = 0; j < DIM; j++) u[j] = nodesCoarse_[i]->getVelocity(j);
+            for (int j = 0; j < DIM; j++)
+                u[j] = nodesCoarse_[i]->getVelocity(j);
             nodesCoarse_[i]->setPreviousVelocity(u);
 
-            for (int j = 0; j < DIM; j++) accel[j] = nodesCoarse_[i]->getAcceleration(j);
+            for (int j = 0; j < DIM; j++)
+                accel[j] = nodesCoarse_[i]->getAcceleration(j);
             nodesCoarse_[i]->setPreviousAcceleration(accel);
-            
-            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
+            for (int j = 0; j < DIM; j++)
+                accel[j] *= (gamma - 1.) / gamma;
             nodesCoarse_[i]->setAcceleration(accel);
         };
 
@@ -11878,31 +14228,33 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
         {
 
             double accel[DIM], u[DIM];
-            
-            for (int j = 0; j < DIM; j++) u[j] = nodesFine_[i]->getVelocity(j);
+
+            for (int j = 0; j < DIM; j++)
+                u[j] = nodesFine_[i]->getVelocity(j);
             nodesFine_[i]->setPreviousVelocity(u);
-            
-            for (int j = 0; j < DIM; j++) accel[j] = nodesFine_[i]->getAcceleration(j);
+            for (int j = 0; j < DIM; j++)
+                accel[j] = nodesFine_[i]->getAcceleration(j);
+
             nodesFine_[i]->setPreviousAcceleration(accel);
-            
-            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
+            for (int j = 0; j < DIM; j++)
+                accel[j] *= (gamma - 1.) / gamma;
             nodesFine_[i]->setAcceleration(accel);
         };
 
         double duNorm = 100.;
-
-        for (int inewton = 0; inewton < iterNumber; inewton++)
-        {
-
+    
+        for (int inewton = 0; inewton < iterNumber; inewton++){
+        
             std::clock_t t1 = std::clock();
-
-            ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
-                                sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
+            
+            // ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
+            //                     sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
+            ierr = MatCreateSeqAIJ(PETSC_COMM_WORLD, sysSize, sysSize, 1000,NULL,&A);CHKERRQ(ierr);
 
             for (int i=0; i<sysSize; i++){
                 double valu = 1.e-20;
                 ierr = MatSetValues(A,1,&i,1,&i,&valu,ADD_VALUES);
-            }
+            };
 
             // Divides the matrix between the processes
             ierr = MatGetOwnershipRange(A, &Istart, &Iend);CHKERRQ(ierr);
@@ -11912,18 +14264,23 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
             ierr = VecSetSizes(b,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
             ierr = VecSetFromOptions(b);CHKERRQ(ierr);
 
+            // ierr = VecCreate(PETSC_COMM_WORLD,&b2);CHKERRQ(ierr);
+            // ierr = VecSetSizes(b2,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
+            // ierr = VecSetFromOptions(b2);CHKERRQ(ierr);
+            
             ierr = VecDuplicate(b,&u);CHKERRQ(ierr);
             ierr = VecDuplicate(b,&All);CHKERRQ(ierr);
+
         
             //Matrix and vectors - COARSE MESH - IGA mesh
             setMatVecValuesCoarse_FEM();
-            // // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
-            // setMatVecValuesLagrangeCoarse_FEM_FEM();
+            // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+            setMatVecValuesLagrangeCoarse_FEM_FEM();
 
-            // // // // //Matrix and vectors -FINE MESH  - FEM mesh
-            // setMatVecValuesFine_FEM();
-            // // // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
-            // setMatVecValuesLagrangeFine_FEM_FEM();
+            //Matrix and vectors -FINE MESH  - FEM mesh
+            setMatVecValuesFine_FEM();
+            //Matrix and vectors - Lagrange multiplieres - FINE MESH
+            setMatVecValuesLagrangeFine_FEM_FEM();
 
             //Assemble matrices and vectors
             ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
@@ -11931,12 +14288,12 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
 
             ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
             ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
+        
+            MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
 
             // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
             // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
-            
-            MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
-            
+
             //Create KSP context to solve the linear system
             ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
             ierr = KSPSetOperators(ksp,A,A);CHKERRQ(ierr);
@@ -11948,14 +14305,21 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
             // ierr = KSPSetType(ksp,KSPDGMRES); CHKERRQ(ierr);
             // ierr = KSPGMRESSetRestart(ksp, 500); CHKERRQ(ierr);
 
-            // //Solve using Mumps
-            #if defined(PETSC_HAVE_MUMPS)
-            ierr = KSPSetType(ksp,KSPPREONLY);
-            ierr = KSPGetPC(ksp,&pc);
-            ierr = PCSetType(pc, PCLU);
-            #endif
+            //Solve using Mumps
+            // #if defined(PETSC_HAVE_MUMPS)
+            // ierr = KSPSetType(ksp,KSPPREONLY);
+            // ierr = KSPGetPC(ksp,&pc);
+            // ierr = PCSetType(pc, PCLU);
+            // #endif
+            // ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+            // ierr = KSPSetUp(ksp);
+
+            //Solve with Suite sparse
+            KSPGetPC(ksp, &pc);
+            PCSetType(pc, PCLU);
+            PCFactorSetMatSolverType(pc, MATSOLVERUMFPACK);
             ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-            ierr = KSPSetUp(ksp);
+            ierr = KSPSetUp(ksp);           
 
             //Solve Linear System
             ierr = KSPSolve(ksp,b,u);CHKERRQ(ierr);
@@ -11974,50 +14338,58 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
             // //Updates nodal values
 
             double u_;
+            double p_;
             double lag_;
             double normU = 0.;
-            double normP = 0.;
             double normL = 0.;
+            double normP = 0.;
             Ione = 1;
 
             for (int i = 0; i < numNodesCoarse; ++i){
-                
-                for (int j = 0; j < DIM; j++)
-                {
-                    Ii = DIM*i + j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i+k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
                     u_ = val;
-                    nodesCoarse_[i] -> incrementVelocity(j,u_);
+                    nodesCoarse_[i] -> incrementAcceleration(k,u_);
+                    nodesCoarse_[i] -> incrementVelocity(k,u_*gamma*dTime);
                     normU += val*val;
                 };
+                Ii = DIM*NCNumberNodesC + i;
+                ierr = VecGetValues(All,Ione,&Ii,&val);CHKERRQ(ierr);
+                p_ = val;
+                normP += val*val;
+                nodesCoarse_[i] -> incrementPressure(p_);
             };
 
             for (int i = 0; i < numNodesFine; ++i){
-                for (int j = 0; j < DIM; j++)
-                {
-                    Ii =  (DIM+1)*NCNumberNodesC + DIM*i + j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i + (DIM+1)*NCNumberNodesC + k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);
                     u_ = val;
-                    nodesFine_[i] -> incrementVelocity(j,u_);
+                    nodesFine_[i] -> incrementAcceleration(k,u_);
+                    nodesFine_[i] -> incrementVelocity(k,u_*gamma*dTime);
                     normU += val*val;
                 };
+                Ii = DIM*NCNumberNodesF + i + (DIM+1)*NCNumberNodesC;
+                ierr = VecGetValues(All,Ione,&Ii,&val);
+                p_ = val;
+                nodesFine_[i] -> incrementPressure(p_);
+                normP += val*val;
             };
 
             for (int i = 0; i < NCnumNodesGlueZoneFine; ++i){
-                for (int j = 0; j < DIM; j++)
-                {
-                    Ii = (DIM+1)*NCNumberNodesF + (DIM+1)*NCNumberNodesC + DIM*i + j;
+                for (int k = 0; k < DIM; k++){
+                    Ii = (DIM+1)*NCNumberNodesF + (DIM+1)*NCNumberNodesC + DIM*i + k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);
                     lag_ = val;
                     normL += val * val;
-                    nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(j,lag_);
+                    nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(k,lag_);
                 };
             };
 
             std::clock_t t2 = std::clock();
-            sumtime += 1000.*(t2-t1)/CLOCKS_PER_SEC/1000.;
 
-            if(rank == 0){
+             if(rank == 0){
 
                 std::cout << "Iteration = " << inewton
                             << " (" << iterations << ")"
@@ -12032,17 +14404,12 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
             ierr = VecDestroy(&u); CHKERRQ(ierr);
             ierr = VecDestroy(&All); CHKERRQ(ierr);
             ierr = MatDestroy(&A); CHKERRQ(ierr);
-            // if(iTimeStep<5){normU=0.;}
-            // if(iTimeStep<100){if(inewton>1)normU=0.;}
+
             if (sqrt(normU) <= tolerance) {
-                break;
+                    break;
             };
-
-        }; //Newton-Raphson
-
-        if(rank == 0){
-            std::cout << "Accumulated time = " << sumtime << std::endl;
-        };
+        
+        }; //Newton iteration
 
 
         //Computes the real velocity
@@ -12050,11 +14417,17 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
 
         for (int i = 0; i < numNodesFine; i++){
             for (int k = 0; k < DIM; k++) nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
+            nodesFine_[i] -> setPressureArlequin(nodesFine_[i] -> getPressure());
+        };
+
+        for (int i = 0; i < numNodesCoarse; i++){
+            for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
+            nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
         };
 
         int LNNC = 4*DIM-2;
 
-        for (int i = 0; i<numNodesGlueZoneFine; i++){
+        for (int i = 0; i < numNodesGlueZoneFine; i++){
 
             int elCoarse = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalElemCorrespondence();
             double* xsiC = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalXsiCorrespondence();
@@ -12065,13 +14438,18 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
             shapeQuad.evaluateFem(xsiC,phiC_);
 
             double u[DIM] = {};
-            for (int j=0; j<LNNC; j++)
-                for (int k = 0 ; k < DIM; k++)
+            double press = 0.;
+            for (int j=0; j<LNNC; j++){
+                    press += nodesCoarse_[connecCoarse[j]] -> getPressure() * phiC_[j];
+                for (int k = 0 ; k < DIM; k++){
                     u[k] += nodesCoarse_[connecCoarse[j]] -> getVelocity(k) * phiC_[j];
-        
-
+                };
+            };
+                
             double wFunc = nodesFine_[nodesGlueZoneFine_[i]] -> getWeightFunction();
-
+            double press_int = nodesFine_[nodesGlueZoneFine_[i]] -> getPressure() * wFunc + press * (1. - wFunc);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(press_int);
+            
             for (int k = 0; k < DIM; k++){
                 double u_int = nodesFine_[nodesGlueZoneFine_[i]] -> getVelocity(k) * wFunc + u[k] * (1. - wFunc);
                 nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(k,u_int);
@@ -12079,16 +14457,51 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_FEM(int iterNumber, double tolerance
 
         };
 
+        
+        // double maxErroru = 0.0;
+        // double maxErrorp = 0.0;
+        
+        // for (int iel = 0; iel < numElemCoarse; iel++){
+            
+        //     if (elementsCoarse_[iel] -> getGlueZone() == false){
+                
+        //         double erroru;
+        //         double errorp;
+        //         elementsCoarse_[iel] -> computeNormError_FEM(erroru,errorp);
+
+        //         if (erroru >= maxErroru) maxErroru = erroru;
+        //         if (errorp >= maxErrorp) maxErrorp = errorp;
+
+        //     };
+
+        // };
+
+        // std::cout << maxErroru << " " << maxErrorp << std::endl;
+        
+        // for (int iel = 0; iel < numElemCoarse; iel++){
+            
+        //     double erroru;
+        //     double errorp;
+        //     elementsCoarse_[iel] -> computeNormError_FEM(erroru,errorp);
+
+
+        //     maxErroru += erroru;
+        //     maxErrorp += errorp;
+
+        //     // if (erroru >= maxErroru) maxErroru = erroru;
+        //     // if (errorp >= maxErrorp) maxErrorp = errorp;
+        // };
+        // std::cout << sqrt(maxErroru) << " " << sqrt(maxErrorp) << std::endl;
+
+
         // Printing results
         printResults_FEM_FEM(iTimeStep);
-
-    };
+    
+    }; //iTimeStep
 
     PetscFree(dof);
     return 0;
 };
-
-
 
 
 template <int DIM>
@@ -12106,13 +14519,14 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
         dof[i] = dofTemp[i];
     };
 
-
     std::clock_t t1 = std::clock();
 
     int sysSize = NCNumberNodesC + NCNumberNodesF + NCnumNodesGlueZoneFine;
 
-    ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
-                        sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
+    // ierr = MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE,
+    //                     sysSize,sysSize,10000,NULL,10000,NULL,&A);CHKERRQ(ierr);
+    ierr = MatCreateSeqAIJ(PETSC_COMM_WORLD, sysSize, sysSize, 1000,NULL,&A);CHKERRQ(ierr);
+
 
     for (int i=0; i<sysSize; i++){
         double valu = 1.e-20;
@@ -12146,12 +14560,12 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
   
     //Matrix and vectors - COARSE MESH - IGA mesh
     setMatVecValuesCoarseLaplace_FEM();
-    // // // //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+    //Matrix and vectors - Lagrange multiplieres - COARSE MESH
     setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
-    // // // // //Matrix and vectors -FINE MESH  - FEM mesh
+    //Matrix and vectors -FINE MESH  - FEM mesh
     setMatVecValuesFineLaplace_FEM();
-    // // // // // //Matrix and vectors - Lagrange multiplieres - FINE MESH
+    //Matrix and vectors - Lagrange multiplieres - FINE MESH
     setMatVecValuesLagrangeFineLaplace_FEM_FEM();
 
     //Assemble matrices and vectors
@@ -12177,14 +14591,21 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
     // ierr = KSPSetType(ksp,KSPDGMRES); CHKERRQ(ierr);
     // ierr = KSPGMRESSetRestart(ksp, 500); CHKERRQ(ierr);
 
-    // //Solve using Mumps
-    #if defined(PETSC_HAVE_MUMPS)
-    ierr = KSPSetType(ksp,KSPPREONLY);
-    ierr = KSPGetPC(ksp,&pc);
-    ierr = PCSetType(pc, PCLU);
-    #endif
+    //Solve using Mumps
+    // #if defined(PETSC_HAVE_MUMPS)
+    // ierr = KSPSetType(ksp,KSPPREONLY);
+    // ierr = KSPGetPC(ksp,&pc);
+    // ierr = PCSetType(pc, PCLU);
+    // #endif
+    // ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+    // ierr = KSPSetUp(ksp);
+
+    //Solve with Suite sparse
+    KSPGetPC(ksp, &pc);
+    PCSetType(pc, PCLU);
+    PCFactorSetMatSolverType(pc, MATSOLVERUMFPACK);
     ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
-    ierr = KSPSetUp(ksp);
+    ierr = KSPSetUp(ksp);           
 
     //Solve Linear System
     ierr = KSPSolve(ksp,b,u);CHKERRQ(ierr);
@@ -12256,6 +14677,10 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
         for (int k = 0; k < DIM; k++) nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
     };
 
+    for (int i = 0; i < numNodesCoarse; i++){
+        for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
+    };
+
     int LNNC = 4*DIM-2;
 
     for (int i = 0; i<numNodesGlueZoneFine; i++){
@@ -12283,6 +14708,30 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_FEM_FEM(int iterNumber, double to
 
     };
 
+    double errorTot = 0.0;
+    for (int iel = 0; iel < numElemCoarse; iel++){
+        
+        if (elementsCoarse_[iel] -> getGlueZone() == false){
+            
+            double error;
+            elementsCoarse_[iel] -> computeNormErrorLaplace_FEM(error);
+
+            errorTot += error;
+        };
+
+    };
+
+    for (int iel = 0; iel < numElemFine; iel++){
+                        
+        double error;
+        elementsFine_[iel] -> computeNormErrorLaplace_FEM(error);
+
+        errorTot += error;
+    };
+
+    std::cout << "Norm Error " << errorTot << std::endl;
+
+
     // Printing results
     printResults_FEM_FEM(0);
 
@@ -12300,7 +14749,7 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_ISO_ISO(int iterNumber, double to
 
     std::vector<int> dofTemp;
     std::vector<double>dofValue;
-    setDirichletConstrain_ISO_ISO(dofTemp,dofValue);
+    setDirichletConstrainLaplace_ISO_ISO(dofTemp,dofValue);
     PetscMalloc1(dofTemp.size(), &dof);
     for (size_t i = 0; i < dofTemp.size(); i++)
     {
@@ -12494,6 +14943,309 @@ int Arlequin<DIM>::solveArlequinProblemLaplace_ISO_ISO(int iterNumber, double to
     printResultsLaplace_ISO_ISO(0);
 
     return 0;
+};
+
+
+template <int DIM>
+int Arlequin<DIM>::solveArlequinProblem_ISO_ISO(int iterNumber, double tolerance)
+{
+    
+    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
+
+    int sysSize = (DIM+1)*NCNumberNodesC + (DIM+1)*NCNumberNodesF + DIM*NCnumNodesGlueZoneFine;
+
+    int numTimeSteps = fineModel.numTimeSteps;
+    double &dTime = parametersFine->getTimeStep();
+    double &visc_ = parametersFine->getViscosity();
+    double &dens_ = parametersFine->getDensity();
+    double &gamma = parametersFine->getGamma();
+
+    for (iTimeStep = 0; iTimeStep < numTimeSteps; iTimeStep++)
+    {
+
+        std::vector<int> dofTemp;
+        std::vector<double>dofValue;
+        setDirichletConstrain_ISO_ISO(dofTemp,dofValue);
+        
+        PetscMalloc1(dofTemp.size(), &dof);
+        for (size_t i = 0; i < dofTemp.size(); i++)
+        {
+            dof[i] = dofTemp[i];
+        };
+
+        if (rank == 0)
+        {
+            std::cout << "------------------------- TIME STEP = "
+                      << iTimeStep << " -------------------------"
+                      << std::endl;
+        }
+
+        if (iTimeStep == 10)
+        {
+            parametersCoarse->setSpectralRadius(integScheme);
+            parametersFine->setSpectralRadius(integScheme);
+        };
+
+
+        for (int i = 0; i < numNodesCoarse; i++)
+        {
+            
+            double *coord = nodesCoarse_[i]->getCoordinates();
+            double accel[DIM], u[DIM];
+
+            for (int j = 0; j < DIM; j++) u[j] = nodesCoarse_[i]->getVelocity(j);
+            nodesCoarse_[i]->setPreviousVelocity(u);
+
+            for (int j = 0; j < DIM; j++) accel[j] = nodesCoarse_[i]->getAcceleration(j);
+            nodesCoarse_[i]->setPreviousAcceleration(accel);
+            
+            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
+            nodesCoarse_[i]->setAcceleration(accel);
+        };
+
+        for (int i = 0; i < numNodesFine; i++)
+        {
+
+            double accel[DIM], u[DIM];
+
+            for (int j = 0; j < DIM; j++) u[j] = nodesFine_[i]->getVelocity(j);
+            nodesFine_[i]->setPreviousVelocity(u);
+            
+            for (int j = 0; j < DIM; j++) accel[j] = nodesFine_[i]->getAcceleration(j);
+            nodesFine_[i]->setPreviousAcceleration(accel);
+           
+            for (int j = 0; j < DIM; j++) accel[j] *= (gamma - 1.) / gamma;
+            nodesFine_[i]->setAcceleration(accel);
+        
+        };
+
+        double duNorm = 100.;
+    
+        for (int inewton = 0; inewton < iterNumber; inewton++){
+        
+            std::clock_t t1 = std::clock();
+            
+            ierr = MatCreateSeqAIJ(PETSC_COMM_WORLD, sysSize, sysSize, 1000,NULL,&A);CHKERRQ(ierr);
+
+            for (int i=0; i<sysSize; i++){
+                double valu = 1.e-20;
+                ierr = MatSetValues(A,1,&i,1,&i,&valu,ADD_VALUES);
+            };
+
+            // Divides the matrix between the processes
+            ierr = MatGetOwnershipRange(A, &Istart, &Iend);CHKERRQ(ierr);
+
+            //Create PETSc vectors
+            ierr = VecCreate(PETSC_COMM_WORLD,&b);CHKERRQ(ierr);
+            ierr = VecSetSizes(b,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
+            ierr = VecSetFromOptions(b);CHKERRQ(ierr);
+
+            // ierr = VecCreate(PETSC_COMM_WORLD,&b2);CHKERRQ(ierr);
+            // ierr = VecSetSizes(b2,PETSC_DECIDE,sysSize);CHKERRQ(ierr);
+            // ierr = VecSetFromOptions(b2);CHKERRQ(ierr);
+            
+            ierr = VecDuplicate(b,&u);CHKERRQ(ierr);
+            ierr = VecDuplicate(b,&All);CHKERRQ(ierr);
+        
+            //Matrix and vectors - COARSE MESH - IGA mesh
+            setMatVecValuesCoarse_ISO();
+            
+            //Matrix and vectors - Lagrange multiplieres - COARSE MESH
+            setMatVecValuesLagrangeCoarse_ISO_ISO();
+
+            //Matrix and vectors -FINE MESH  - IGA mesh
+            setMatVecValuesFine_ISO();
+            //Matrix and vectors - Lagrange multiplieres - FINE MESH
+            setMatVecValuesLagrangeFine_ISO_ISO();
+
+            //Assemble matrices and vectors
+            ierr = MatAssemblyBegin(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+            ierr = MatAssemblyEnd(A,MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+
+            ierr = VecAssemblyBegin(b);CHKERRQ(ierr);
+            ierr = VecAssemblyEnd(b);CHKERRQ(ierr);
+        
+            MatZeroRowsColumns(A,dofTemp.size(),dof,1.0,u,b);
+
+            // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+
+            //Create KSP context to solve the linear system
+            ierr = KSPCreate(PETSC_COMM_WORLD,&ksp);CHKERRQ(ierr);
+            ierr = KSPSetOperators(ksp,A,A);CHKERRQ(ierr);
+
+            //Solve using GMRES
+            // ierr = KSPSetTolerances(ksp,1.e-10,PETSC_DEFAULT,PETSC_DEFAULT,500); CHKERRQ(ierr);
+            // ierr = KSPGetPC(ksp,&pc);
+            // ierr = PCSetType(pc,PCNONE);
+            // ierr = KSPSetType(ksp,KSPDGMRES); CHKERRQ(ierr);
+            // ierr = KSPGMRESSetRestart(ksp, 500); CHKERRQ(ierr);
+
+            //Solve using Mumps
+            // #if defined(PETSC_HAVE_MUMPS)
+            // ierr = KSPSetType(ksp,KSPPREONLY);
+            // ierr = KSPGetPC(ksp,&pc);
+            // ierr = PCSetType(pc, PCLU);
+            // #endif
+            // ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+            // ierr = KSPSetUp(ksp);
+
+            //Solve with Suite sparse
+            KSPGetPC(ksp, &pc);
+            PCSetType(pc, PCLU);
+            PCFactorSetMatSolverType(pc, MATSOLVERUMFPACK);
+            ierr = KSPSetFromOptions(ksp);CHKERRQ(ierr);
+            ierr = KSPSetUp(ksp);           
+
+            //Solve Linear System
+            ierr = KSPSolve(ksp,b,u);CHKERRQ(ierr);
+            ierr = KSPGetTotalIterations(ksp, &iterations);
+
+            // MatView(A,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(b,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+            // VecView(u,PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+
+            //Gathers the solution vector to the master process
+            ierr = VecScatterCreateToAll(u, &ctx, &All);CHKERRQ(ierr);
+            ierr = VecScatterBegin(ctx, u, All, INSERT_VALUES, SCATTER_FORWARD);CHKERRQ(ierr);
+            ierr = VecScatterEnd(ctx, u, All, INSERT_VALUES, SCATTER_FORWARD);CHKERRQ(ierr);
+            ierr = VecScatterDestroy(&ctx);CHKERRQ(ierr);
+
+            // //Updates nodal values
+
+            double u_;
+            double p_;
+            double lag_;
+            double normU = 0.;
+            double normL = 0.;
+            double normP = 0.;
+            Ione = 1;
+
+            for (int i = 0; i < numNodesCoarse; ++i){
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i+k;
+                    ierr = VecGetValues(All, Ione, &Ii, &val);CHKERRQ(ierr);
+                    u_ = val;
+                    nodesCoarse_[i] -> incrementAcceleration(k,u_);
+                    nodesCoarse_[i] -> incrementVelocity(k,u_*gamma*dTime);
+                    normU += val*val;
+                };
+                Ii = DIM*NCNumberNodesC + i;
+                ierr = VecGetValues(All,Ione,&Ii,&val);CHKERRQ(ierr);
+                p_ = val;
+                normP += val*val;
+                nodesCoarse_[i] -> incrementPressure(p_);
+            };
+
+            for (int i = 0; i < numNodesFine; ++i){
+                for (int k = 0; k < DIM; k++){
+                    Ii = DIM*i + (DIM+1)*NCNumberNodesC + k;
+                    ierr = VecGetValues(All, Ione, &Ii, &val);
+                    u_ = val;
+                    nodesFine_[i] -> incrementAcceleration(k,u_);
+                    nodesFine_[i] -> incrementVelocity(k,u_*gamma*dTime);
+                    normU += val*val;
+                };
+                Ii = DIM*NCNumberNodesF + i + (DIM+1)*NCNumberNodesC;
+                ierr = VecGetValues(All,Ione,&Ii,&val);
+                p_ = val;
+                nodesFine_[i] -> incrementPressure(p_);
+                normP += val*val;
+            };
+
+            for (int i = 0; i < NCnumNodesGlueZoneFine; ++i){
+                for (int k = 0; k < DIM; k++){
+                    Ii = (DIM+1)*NCNumberNodesF + (DIM+1)*NCNumberNodesC + DIM*i + k;
+                    ierr = VecGetValues(All, Ione, &Ii, &val);
+                    lag_ = val;
+                    normL += val * val;
+                    nodesFine_[nodesGlueZoneFine_[i]] -> incrementLagrangeMultiplier(k,lag_);
+                };
+            };
+
+            std::clock_t t2 = std::clock();
+
+             if(rank == 0){
+
+                std::cout << "Iteration = " << inewton
+                            << " (" << iterations << ")"
+                            << "   Du Norm = " << std::scientific << sqrt(normU)
+                            << " " << sqrt(normP)  << " " << sqrt(normL)
+                            << "  Time (s) = " << std::fixed
+                            << 1000.*(t2-t1)/CLOCKS_PER_SEC/1000. << std::endl;
+            };
+
+            ierr = KSPDestroy(&ksp); CHKERRQ(ierr);
+            ierr = VecDestroy(&b); CHKERRQ(ierr);
+            ierr = VecDestroy(&u); CHKERRQ(ierr);
+            ierr = VecDestroy(&All); CHKERRQ(ierr);
+            ierr = MatDestroy(&A); CHKERRQ(ierr);
+
+            if (sqrt(normU) <= tolerance) {
+                    break;
+            };
+        
+        }; //Newton iteration
+
+
+        //Computes the real velocity
+        QuadShapeFunction<DIM> shapeQuad;
+
+        for (int i = 0; i < numNodesFine; i++){
+            for (int k = 0; k < DIM; k++) nodesFine_[i] -> setVelocityArlequin(k,nodesFine_[i] -> getVelocity(k));
+            nodesFine_[i] -> setPressureArlequin(nodesFine_[i] -> getPressure());
+        };
+
+        for (int i = 0; i < numNodesCoarse; i++){
+            for (int k = 0; k < DIM; k++) nodesCoarse_[i] -> setVelocityArlequin(k,nodesCoarse_[i] -> getVelocity(k));
+            nodesCoarse_[i] -> setPressureArlequin(nodesCoarse_[i] -> getPressure());
+        };
+
+        int LNNC = 18*DIM-27;
+
+        for (int i = 0; i < numNodesGlueZoneFine; i++){
+
+            int elCoarse = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalElemCorrespondence();
+            double* xsiC = nodesFine_[nodesGlueZoneFine_[i]] -> getNodalXsiCorrespondence();
+
+            int *connecCoarse = elementsCoarse_[elCoarse] -> getConnectivity();
+
+
+            int patchC = elementsCoarse_[elCoarse] -> getPatch();
+            int *incC = nodesCoarse_[connecCoarse[LNNC-1]] -> getINC();
+            double wpcC[LNNC],phiC_[LNNC];
+            for (int k = 0; k < LNNC; k++) wpcC[k] = nodesCoarse_[connecCoarse[k]] -> getWeightPC();
+            shapeQuad.evaluateIso(xsiC,phiC_,wpcC,incC,IsoParCoarse,patchC);
+
+            double u[DIM] = {};
+            double press = 0.;
+            for (int j=0; j<LNNC; j++){
+                    press += nodesCoarse_[connecCoarse[j]] -> getPressure() * phiC_[j];
+                for (int k = 0 ; k < DIM; k++){
+                    u[k] += nodesCoarse_[connecCoarse[j]] -> getVelocity(k) * phiC_[j];
+                };
+            };
+                
+            double wFunc = nodesFine_[nodesGlueZoneFine_[i]] -> getWeightFunction();
+            double press_int = nodesFine_[nodesGlueZoneFine_[i]] -> getPressure() * wFunc + press * (1. - wFunc);
+            nodesFine_[nodesGlueZoneFine_[i]] -> setPressureArlequin(press_int);
+            
+            for (int k = 0; k < DIM; k++){
+                double u_int = nodesFine_[nodesGlueZoneFine_[i]] -> getVelocity(k) * wFunc + u[k] * (1. - wFunc);
+                nodesFine_[nodesGlueZoneFine_[i]] -> setVelocityArlequin(k,u_int);
+            };
+
+        };
+
+        
+        // Printing results
+        printResults_ISO_ISO(iTimeStep);
+    
+    }; //iTimeStep
+
+    PetscFree(dof);
+    return 0;
+
 };
 
 

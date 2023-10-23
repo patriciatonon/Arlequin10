@@ -74,12 +74,12 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d1.msh","mirror_fine.txt",0);
 
     // //2D Laplace - FEM/ISO
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
-    ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
-    ArlequinProblem.solveArlequinProblem_FEM_ISO(10, 1.e-6);
-    //ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
+    // ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
+    // ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
+    // ArlequinProblem.solveArlequinProblem_FEM_ISO(10, 1.e-6);
 
     //ISO/ISO
 
@@ -87,26 +87,42 @@ int main(int argc, char **args) {
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/coarse_iso2.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/fine_iso.msh","mirror_fine.txt",0);
 
-
     //3d
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/LaplaceFine_iso3d.msh","mirror_fine.txt",0);
 
     // ArlequinProblem.setFluidModels_ISO_ISO(coarseModel,fineModel);
     // ArlequinProblem.solveArlequinProblemLaplace_ISO_ISO(10, 1.e-6);
+    // ArlequinProblem.solveArlequinProblem_ISO_ISO(10, 1.e-6);
 
 
     //FEM/FEM
     //2D
-    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJ_fem.msh","mirror_fine.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
 
+    // cavidade faixa ao redor
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseT_fem.msh","mirror_fine.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineT_fem.msh","mirror_fine.txt",0);
+
+    //cavidade faixa embaixo
+    coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJ_fem.msh","mirror_fine.txt",0);
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
+    
+    //Stokes problem with analytic resolution
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJT_fem.msh","mirror_fine.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJT_fem.msh","mirror_fine.txt",0);
+
+    
     //3D
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d.msh","mirror_fine.txt",0);
-    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceC_fem3d.msh","mirror_coarse.txt",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d1.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceCoarse_fem3d1.msh","mirror_coarse.txt",0);
 
-    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
-    // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
+    //Stokes problem with analytic resolution
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceT_fem3d1.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceCoarseT_fem3d1.msh","mirror_coarse.txt",0);
+
+    
+    ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
     // ArlequinProblem.solveArlequinProblem_FEM_FEM(10, 1.e-6);
 
 

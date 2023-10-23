@@ -818,6 +818,8 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
             connectB[0] -= 1;
             connectB[1] -= 1;
             connectB[2] -= 1;
+            
+
             Boundaries *bound = new Boundaries(connectB, index++,  
                                                constrain, value, ibound);
             boundary_.push_back(bound);
@@ -825,8 +827,31 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     };     
      	
 
-    //Sets boundary constrains
+    // //Sets boundary constrains
+    // for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+    //     int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
+    //     int no1 = connectB[0];
+    //     int no2 = connectB[1];
+    //     int no3 = connectB[2];
+
+    //     for (int i = 0; i < dim; i++){
+           
+    //         if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+    //             (boundary_[ibound] -> getConstrain(i) == 3)){
+    //             nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //         };
+    //     };
+          
+    // };
+
+
     for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+        
         int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
         int no1 = connectB[0];
         int no2 = connectB[1];
@@ -844,8 +869,58 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
                                              boundary_[ibound] -> getConstrainValue(i));
             };
         };
+
+
+        if (boundary_[ibound] -> getConstrain(0) == 4){
+
+            double constrainvalue1 = sin(2*pi*nodes_[no1]->getCoordinateValue(0));
+            double constrainvalue2 = sin(2*pi*nodes_[no2]->getCoordinateValue(0));
+            double constrainvalue3 = sin(2*pi*nodes_[no3]->getCoordinateValue(0));
+
+            double zero = 0.;
+            
+            nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                        zero);
+            nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                        constrainvalue1);
+            nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                        zero);
+            nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                         constrainvalue2);
+            nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                         zero);
+            nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                         constrainvalue3);
+
+
+
+        };
+
+        if (boundary_[ibound] -> getConstrain(0) == 5){
+
+            double constrainvalue1 = -cos(2*pi*nodes_[no1]->getCoordinateValue(1));
+            double constrainvalue2 = -cos(2*pi*nodes_[no2]->getCoordinateValue(1));
+            double constrainvalue3 = -cos(2*pi*nodes_[no3]->getCoordinateValue(1));
+            double zero = 0.;
+            
+            nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                         zero);
+            nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                         constrainvalue1);
+            nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                         zero);
+            nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                         constrainvalue2);
+            nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                         zero);
+            nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                         constrainvalue3);
+
+        };
+
           
     };
+
 
     //Print nodal constrains
     for (int i=0; i< numFemNodes; i++){
@@ -1228,7 +1303,39 @@ void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::strin
     };     
      	
 
-    //Sets boundary constrains
+    // //Sets boundary constrains
+    // for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+        
+    //     int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
+    //     int no1 = connectB[0];
+    //     int no2 = connectB[1];
+    //     int no3 = connectB[2];
+    //     int no4 = connectB[3];
+    //     int no5 = connectB[4];
+    //     int no6 = connectB[5];
+
+    //     for (int i = 0; i < DIM; i++){
+           
+    //         if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+    //             (boundary_[ibound] -> getConstrain(i) == 3)){
+    //             nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no4] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no5] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //             nodes_[no6] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+    //                                          boundary_[ibound] -> getConstrainValue(i));
+    //         };
+    //     };
+          
+    // };
+
+
     for (int ibound = 0; ibound < numFemBoundElem; ibound++){
         
         int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
@@ -1238,6 +1345,7 @@ void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::strin
         int no4 = connectB[3];
         int no5 = connectB[4];
         int no6 = connectB[5];
+
 
         for (int i = 0; i < DIM; i++){
            
@@ -1257,6 +1365,122 @@ void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::strin
                                              boundary_[ibound] -> getConstrainValue(i));
             };
         };
+        
+        
+        // for (int i = 0; i < dim; i++){
+           
+            if (boundary_[ibound] -> getConstrain(0) == 4){
+
+                double constrainvalue1 = sin(2*pi*nodes_[no1]->getCoordinateValue(0));
+                double constrainvalue2 = sin(2*pi*nodes_[no2]->getCoordinateValue(0));
+                double constrainvalue3 = sin(2*pi*nodes_[no3]->getCoordinateValue(0));
+                double constrainvalue4 = sin(2*pi*nodes_[no4]->getCoordinateValue(0));
+                double constrainvalue5 = sin(2*pi*nodes_[no5]->getCoordinateValue(0));
+                double constrainvalue6 = sin(2*pi*nodes_[no6]->getCoordinateValue(0));
+                double zero = 0.;
+                
+                nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue1);
+                nodes_[no1] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue2);
+                nodes_[no2] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue3);
+                nodes_[no3] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no4] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no4] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue4);
+                nodes_[no4] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+
+                nodes_[no5] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no5] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue5);
+                nodes_[no5] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+
+                nodes_[no6] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no6] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue6);
+                nodes_[no6] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+
+
+
+            };
+
+            if (boundary_[ibound] -> getConstrain(0) == 5){
+
+                double constrainvalue1 = -cos(2*pi*nodes_[no1]->getCoordinateValue(1));
+                double constrainvalue2 = -cos(2*pi*nodes_[no2]->getCoordinateValue(1));
+                double constrainvalue3 = -cos(2*pi*nodes_[no3]->getCoordinateValue(1));
+                double constrainvalue4 = -cos(2*pi*nodes_[no4]->getCoordinateValue(1));
+                double constrainvalue5 = -cos(2*pi*nodes_[no5]->getCoordinateValue(1));
+                double constrainvalue6 = -cos(2*pi*nodes_[no6]->getCoordinateValue(1));
+                double zero = 0.;
+                
+                nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue1);
+                nodes_[no1] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue2);
+                nodes_[no2] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue3);
+                nodes_[no3] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+                
+                nodes_[no4] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no4] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue4);
+                nodes_[no4] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+
+                nodes_[no5] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no5] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue5);
+                nodes_[no5] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+
+                nodes_[no6] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+                                             zero);
+                nodes_[no6] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+                                             constrainvalue6);
+                nodes_[no6] -> setConstrains(2,boundary_[ibound] -> getConstrain(2),
+                                             zero);
+               
+            };
+
+
+        // };
           
     };
 
@@ -1799,7 +2023,6 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
   
     //Read each boundary information  
     index = 0;
-
     for (int ibound=0; ibound< numBoundariesIso; ibound++){
 
         getline(file2,line);getline(file2,line);getline(file2,line);
@@ -1823,7 +2046,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         for (int i = 0; i < numGroup; i++){
           file2 >> Icpbc[i][0] >> Icpbc[i][1] >> Icpbc[i][2] >> Icpbc[i][3];    
         };
-       
+        
         //any of the control points belong to the same patch
         int ncp[dim],deg[dim]; 
         deg[0] = IsoPar_[Icpbc[0][3]] -> getDegree(0);
@@ -1868,30 +2091,30 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         };
     };  
 
-    if (rank == 0) std::cout << index << std::endl;
-
     
     //Sets nodal boundary constrains
     numBoundElemIso = index;
-    
-    for (int ibound = 0; ibound < numBoundElemIso; ibound++){        
+
+
+    for (int ibound = 0; ibound < numBoundElemIso; ibound++){
+        
         int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
         int no1 = connectB[0];
         int no2 = connectB[1];
         int no3 = connectB[2];
-        
+
         for (int i = 0; i < dim; i++){
-           
             if ((boundary_[ibound] -> getConstrain(i) == 1) || 
                 (boundary_[ibound] -> getConstrain(i) == 3)){
                 nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
+                                            boundary_[ibound] -> getConstrainValue(i));
                 nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
+                                            boundary_[ibound] -> getConstrainValue(i));
                 nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
+                                            boundary_[ibound] -> getConstrainValue(i));
             };
         }; 
+    
     };
 
     //Print nodal constrains

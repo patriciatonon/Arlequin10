@@ -105,6 +105,7 @@ private:
     PetscViewer       viewer;
     
     int NumBezierNodesLagrange;   
+    int iTimeStep;
 
 public:
     // Sets the coarse and fine mesh models
@@ -140,14 +141,17 @@ public:
     void setCorrespondenceFine_FEM_FEM();
 
    	//Sets the Dirichelet Constrains in the domain
-   	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp);
+   	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
     void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
-    void setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp);
+    void setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
     void setDirichletConstrainLaplace_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
     void setDirichletConstrain_ISO_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
+    void setDirichletConstrainLaplace_ISO_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
+    //Sets the Dirichelet Constrains in the domain
+   	void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp);
    
     // Searchs point correspondence in the coarse mesh
     void searchPointCorrespondence_ISO(double *x,std::vector<Nodes *> nodes,
@@ -161,21 +165,33 @@ public:
     
     //Solves the Arlequin Problem
     int solveArlequinProblem_FEM_ISO(int iterNumber,double tolerance);
-     int solveArlequinProblem_FEM_FEM(int iterNumber,double tolerance);
-
     int solveArlequinProblemLaplace_FEM_ISO(int iterNumber,double tolerance);
+    
     int solveArlequinProblemLaplace_ISO_ISO(int iterNumber,double tolerance);
+    int solveArlequinProblem_ISO_ISO(int iterNumber,double tolerance);
+    
     int solveArlequinProblemLaplace_FEM_FEM(int iterNumber,double tolerance);
+    int solveArlequinProblem_FEM_FEM(int iterNumber,double tolerance);
 
     //Assemble system
     void setMatVecValuesCoarse_ISO();
     void setMatVecValuesCoarse_FEM();
+    
     void setMatVecValuesFine_FEM();
+    void setMatVecValuesFine_ISO();
+
     void setMatVecValuesLagrangeFine_FEM_ISO();
     void setMatVecValuesLagrangeCoarse_FEM_ISO();
+    
+    void setMatVecValuesLagrangeFine_FEM_FEM();
+    void setMatVecValuesLagrangeCoarse_FEM_FEM();
+
+    void setMatVecValuesLagrangeFine_ISO_ISO();
+    void setMatVecValuesLagrangeCoarse_ISO_ISO();
 
     void setMatVecValuesCoarseLaplace_ISO();
     void setMatVecValuesCoarseLaplace_FEM();
+
     void setMatVecValuesFineLaplace_FEM();
     void setMatVecValuesFineLaplace_ISO();
     void setMatVecValuesLagrangeFineLaplace_FEM_ISO();
@@ -186,8 +202,9 @@ public:
 
     void setMatVecValuesLagrangeFineLaplace_FEM_FEM();
     void setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
-    void setMatVecValuesLagrangeCoarse_FEM_FEM();
-    void setMatVecValuesLagrangeFine_FEM_FEM();
+
+
+
 
     // Compute and print drag and lift coefficients
     void dragAndLiftCoefficients_FEM(std::ofstream& dragLift, int &iTimeStep);
@@ -195,6 +212,7 @@ public:
 
     //Prints the results for Paraview post-processing
     void printResults_FEM_ISO(int step);
+    void printResults_ISO_ISO(int step);
     void printResults_FEM_FEM(int step);
 
     void printResultsLaplace_FEM_ISO(int step);

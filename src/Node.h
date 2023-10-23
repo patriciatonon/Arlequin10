@@ -38,6 +38,7 @@ private:
     double           pressure_;                     //Nodal pressure 
     double           meshVelocity_[DIM];            //Nodal mesh velocity
     double           previousMeshVelocity_[DIM];    //Previous time step mesh velocity  
+    double           Force_[DIM];                   //Nodal force in Nodes
              
     int              constrainType[3];              //Constrain direction
     double           constrainValue[3];             //Nodal prescribed velocity
@@ -63,6 +64,9 @@ private:
     double           velArlequin_[DIM];             //Glue zone velocity
     double           globalVelocity_[DIM];          //Global velocity for Arlequin stabilization problem
 
+    double           analsol_[DIM];
+    double           analpress_;
+
 public:
     // Constructor - Defines a node with index,coordinates,weight and beloging patch
     Node(double *coor, int index, double wei){
@@ -87,8 +91,9 @@ public:
         	
         	constrainType[i] = 0;
         	constrainValue[i] = 0.0;
+            Force_[i] = 0.0;
         
-        } 
+        };
 
         pressure_ = 0.;
         invIncidence.clear();
@@ -165,6 +170,14 @@ public:
     
     //............................Velocity functions............................
     // Sets the velocity vector
+    void setAnalSol(double *analsol, double &analpress) {
+        for (int i=0; i < DIM; i++) analsol_[i] = analsol[i];
+        analpress_ = analpress;
+    };
+
+    double getAnalSol(int dir) {return analsol_[dir];};
+    double getAnalPress() {return analpress_;};
+
     void setVelocity(double *u) {for (int i=0; i < DIM; i++) velocity_[i] = u[i];};
     void setVelocityComponent(int dir, double val){velocity_[dir] = val;};
 
@@ -319,6 +332,11 @@ public:
 
     // Returns global velocity for the Arlequin stabilization paremeter computation
     double getGlobalVelocity(int dir) {return globalVelocity_[dir];}
+
+    //Nodal force
+    void setNodalForce(double *force) {for (int i=0; i < DIM; i++) Force_[i] = force[i];};
+    
+    double getNodalForce(int dir) {return Force_[dir];};
 
 };
 

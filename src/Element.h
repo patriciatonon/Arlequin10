@@ -109,6 +109,7 @@ private:
     //time integration data
     int iTimeStep;
     double integScheme;
+    double pi = M_PI;
 
     
 public:
@@ -271,6 +272,7 @@ public:
     //......................Jacobian Matrixes and Derivatives....................
     // Compute and store the spatial jacobian matrix
     void getJacobianMatrix_FEM(double &djac_, double *xsi, double **Jac, double **ainv_);
+    void getJacobianMatrix_COARSE_FEM(double *xsi,double **ainv_);
     void getJacobianMatrix_ISO(double &djac_, double *xsi, double **quadJacMat, double **ainv_);
     void getJacobianMatrix_COARSE_ISO(double *xsi, double **ainv_);
     
@@ -347,11 +349,12 @@ public:
 
 
     // Compute and stores the interpolated variables
+    void getInterpForce(int &LNN, double *phi_, double *f_);
     void getInterpCoord(int &LNN, double *phi_, double *x_, double *xPrevious_);
     void getInterpCoord_ISO(int &LNN, double *phi_, double *x_, double *xPrev_);
     void getInterpVel(int &LNN, double *phi_, double *u_, double *uPrev_);
-    void getInterpVelDer(int &LNN, double **dphi_dx, double **du_dx, double **duPrev_dx);
     void getInterpVelCoarse(int &LNN, double *phi_, double *u_, double *uPrev_);
+    void getInterpVelDer(int &LNN, double **dphi_dx, double **du_dx, double **duPrev_dx);
     void getInterpVelDerCoarse(int &LNN, double **dphi_dx, double **du_dx, double **duPrev_dx); 
     void getInterpSecondVelDer(int &LNN, double ***dphi_dx, double ***ddu_dxdx, double ***dduPrev_dxdx);
     void getInterpSecondVelDerCoarse(int &LNN, double ***dphi_dx, double ***ddu_dxdx, double ***dduPrev_dxdx);
@@ -375,6 +378,10 @@ public:
     void getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **quadJacMat, double *phi_, double **dphi_dx);
     void getParameterArlequinMN(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ_, 
                                 double *phi_, double *phiC_, double **dphi_dx, double ***ddphi_dx);
+    
+    void getParameterArlequinLaplaceMN(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ0_,double &tARLQ1_,
+                                       double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, double ***ddphi_dx, double ***ddphiC_dx);
+
     void getParameterArlequinMN_COARSE(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ_, 
                                        double *phi_, double *phiC_, double **dphi_dx, double **dphiC_dx, double ***ddphi_dx,
                                        double ***ddphiC_dx);
@@ -397,23 +404,46 @@ public:
 
     void getElemMatrixLaplace(int &LNN, double &wna_, double &djac_, double &weight_, 
                               double **dphi_dx, double **jacobianNRMatrix);
+    void getElemMatrixTNS(int &LNN, double &wna_, double &djac_, double &weight_, 
+                          double &tSUPG_, double &tPSPG_, double &tLSIC_,
+                          double *phi_,double **dphi_dx, double **jacobianNRMatrix);
 
-    void getResidualVectorLaplace(int &LNN,  double &wna_, double &djac_, double &weight_,
+    void getResidualVectorLaplace(int &LNN, double &wna_, double &djac_, 
+                                  double &weight_, double *phi_, 
                                   double **dphi_dx, double *rhsVector);
+    
+    void getResidualVectorTNS(int &iTime,int &LNN,double &wna_, double &djac_,double &weight_, 
+                              double &tSUPG_, double &tPSPG_, double &tLSIC_,
+                              double *phi_,double **dphi_dx,  double *rhsVector);
 
     //Arlequin Matrixes and Vectores
     void getMatrixAndVectorsSameMesh(int &LNN, double &djac_, double &weight_,double *phi_, double **dphi_dx, 
                                      double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
     void getMatrixAndVectorsSameMesh_tSUPG_tPSPG(int &LNN, double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,double *phi_, 
                                                  double **dphi_dx,double **jacobianNRMatrix,double *rhsVector);
+    
     void getMatrixAndVectorsSameMeshArlqStab(int &LNN, double &wna_, double &djac_, double &weight_,double &tARLQ_,
                                              double *phi_, double **dphi_dx, double ***ddphi_dx,
                                              double **arlequinStabD, double *arlequinStabVectorD,
                                              double **arlequinStab1, double *arlequinStabVector1);
+
+    void getMatrixAndVectorsSameMeshArlqStabLaplace(int &LNN, double &wna_, double &djac_, double &weight_,
+                                                    double &tARLQ0_,double &tARLQ1_, double *phi_, 
+                                                    double **dphi_dx, double ***ddphi_dx,
+                                                    double **arlequinStabD, double *arlequinStabVectorD,
+                                                    double **arlequinStab1, double *arlequinStabVector1);
+
+    void getMatrixAndVectorsDifferentMeshArlqStabLaplace(int &LNN, int &LNNC, double &wna_, double &djac_, 
+                                                        double &weight_,double &tARLQ0_,double &tARLQ1_, 
+                                                        double *phi_, double **dphi_dx, double **dphiC_dx, double ***ddphiC_dx,
+                                                        double **arlequinStabD, double *arlequinStabVectorD,
+                                                        double **arlequinStab0, double *arlequinStabVector0);
+
    
     void getMatrixAndVectorsDifferentMesh(double &djac_, double &weight_,int &na, double *phi_, 
                                           double **dphi_dx, int &naC, double *phiC_, double **dphiC_dx,
-                                          double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);   
+                                          double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);  
+
     void getMatrixAndVectorsDifferentMesh_tSUPG_tPSPG(double &djac_, double &weight_,double &tSUPG_, double &tPSPG_,
                                                       int &LNN, double *phi_, int &LNNC, double *phiC_, double **dphiC_dx,
                                                       double **jacobianNRMatrix,double *rhsVector);
@@ -426,6 +456,11 @@ public:
     void getMatrixAndVectorsSameMeshLaplace(int &LNN, double &djac_, double &weight_,double *phi_,
                                             double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);
 
+    // void getMatrixAndVectorsSameMeshArlqStabLaplace(int &LNN, double &wna_, double &djac_, double &weight_,double &tARLQ_,
+    //                                                 double *phi_, double **dphi_dx, double ***ddphi_dx,
+    //                                                 double **arlequinStabD, double *arlequinStabVectorD,
+    //                                                 double **arlequinStab1, double *arlequinStabVector1);
+
     void getMatrixAndVectorsDifferentMeshLaplace(double &djac_, double &weight_,int &LNN, double *phi_, 
                                                 int &LNNC, double *phiC_,
                                                 double **lagrMultMatrix, double *rhsVector1, double *rhsVector2);  
@@ -437,43 +472,71 @@ public:
     void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
 
     void getLaplace_FEM(double **jacobianNRMatrix, double *rhsVector);
+    void getTNS_FEM(int &iTime, double **jacobianNRMatrix, double *rhsVector);
+
     void getLaplace_ISO(double **jacobianNRMatrix, double *rhsVector);
+    void getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhsVector);
 
     // Compute and store the Lagrange multiplier operator when integrating the same mesh portion
+    void getLagrangeMultipliersSameMeshLaplace_FEM(int &ip, double **lagrMultMatrix, 
+                                                   double *lagrMultVector, double *rhsVector);
+                                                   
+    void getLagrangeMultipliersSameMeshLaplace_ISO(double **lagrMultMatrix, 
+                                                   double *lagrMultVector, double *rhsVector);
+   
     void getLagrangeMultipliersSameMesh_FEM(int &index, double **lagrMultMatrix, 
-                                               double *lagrMultVector, double *rhsVector);   
+                                           double *lagrMultVector, double *rhsVector);   
+    void getLagrangeMultipliersSameMesh_ISO(int &index, double **lagrMultMatrix, 
+                                            double *lagrMultVector, double *rhsVector);  
+
+
+    //Compute and store the Lagrange multiplier operator when integrationg the different mesh portion
+    void getLagrangeMultipliersDifferentMeshLaplace_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            std::vector<IParameters *> &iparamC, int &ielem, 
+                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    void getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            int &ielem, double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    void getLagrangeMultipliersDifferentMeshLaplace_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                            std::vector<IParameters *> &iparamC, int &ielem, 
+                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    
+    
+    void getLagrangeMultipliersDifferentMesh_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                    std::vector<IParameters *> &iparamC, int &ielem, 
+                                                    double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    void getLagrangeMultipliersDifferentMesh_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                     int &ielem, double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+    void getLagrangeMultipliersDifferentMesh_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                     std::vector<IParameters *> &iparamC, int &ielem, 
+                                                     double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
+
+
+
+    void getLagrangeMultipliersSameMeshArlqStabLaplace_FEM_FEM(int &index,std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                               double **arlequinStabD, double *arlequinStabVectorD, 
+                                                               double **arlequinStab1, double *arlequinStabVector1); 
+    
+    
+    void getLagrangeMultipliersDifferentMeshArlqStabLaplace_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,int &ielem, 
+                                                                    double **arlequinStabD, double *arlequinStabVectorD,
+                                                                    double **arlequinStab0, double *arlequinStabVector0);
+
 
     void getLagrangeMultipliersSameMesh_FEM_TESTE(double **lagrMultMatrix, 
                                                  double *lagrMultVector, double *rhsVector); 
 
-    void getLagrangeMultipliersSameMeshLaplace_FEM(double **lagrMultMatrix, 
-                                                   double *lagrMultVector, double *rhsVector);
-
-    void getLagrangeMultipliersSameMeshLaplace_ISO(double **lagrMultMatrix, 
-                                                   double *lagrMultVector, double *rhsVector);
 
     void getLagrangeMultipliersSameMesh_tSUPG_tPSPG_FEM(int &index, double **jacobianNRMatrix, double *rhsVector);
     void getLagrangeMultipliersSameMeshArlqStab_FEM_ISO(int &index, int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
                                                        std::vector<IParameters *> &iparamC, double **arlequinStabD, 
                                                        double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1);   
+    void getLagrangeMultipliersSameMeshArlqStab_FEM_FEM(int &index,std::vector<Nodes *> &nodesCoarse_,int *connecC,
+                                                        double **arlequinStabD, double *arlequinStabVectorD, double **arlequinStab1, double *arlequinStabVector1); 
+
+    //teste
+    void getLagrangeMultipliersSameMeshArlqStab_FEM(double **arlequinStabD, double *arlequinStabVectorD);
 
 
-    //Compute and store the Lagrange multiplier operator when integrationg the different mesh portion
-    void getLagrangeMultipliersDifferentMesh_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                                    std::vector<IParameters *> &iparamC, int &ielem, 
-                                                    double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
-
-
-    void getLagrangeMultipliersDifferentMeshLaplace_FEM_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                                            std::vector<IParameters *> &iparamC, int &ielem, 
-                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
-
-    void getLagrangeMultipliersDifferentMeshLaplace_FEM_FEM(std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                                            int &ielem, double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
-
-    void getLagrangeMultipliersDifferentMeshLaplace_ISO_ISO(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
-                                                            std::vector<IParameters *> &iparamC, int &ielem, 
-                                                            double **lagrMultMatrix,double *rhsVector1, double *rhsVector2);
 
 
     void getLagrangeMultipliersDifferentMesh_FEM_ISO_TESTE(int &ipatchC, std::vector<Nodes *> &nodesCoarse_,int *connecC,
@@ -502,6 +565,9 @@ public:
 
     void setDirichletConstrain(int &LNN, double **jacobianNRMatrix);
 
+    void computeNormErrorLaplace_FEM(double &error);
+
+    void computeNormError_FEM(double &errorU, double &errorP);
 
 
 };
