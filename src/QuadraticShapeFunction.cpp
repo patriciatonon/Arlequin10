@@ -616,6 +616,7 @@ void QuadShapeFunction<3>::evaluateHessianFem(double ***ddphi){
     ddphi[1][2][7] = 0.;
 
     ddphi[2][0][7] = -4.;
+    ddphi[2][1][7] = 0.;
     ddphi[2][2][7] = 0.;
 
 
@@ -631,18 +632,17 @@ void QuadShapeFunction<3>::evaluateHessianFem(double ***ddphi){
     ddphi[2][1][8] = -4.;
     ddphi[2][2][8] = -8.;
 
-
     ddphi[0][0][9] = 0.;
     ddphi[0][1][9] = -4.;
     ddphi[0][2][9] = 0.;
     
     ddphi[1][0][9] =-4.;
-    ddphi[1][0][9] = -8.;
-    ddphi[1][0][9] = -4.;
+    ddphi[1][1][9] = -8.;
+    ddphi[1][2][9] = -4.;
     
     ddphi[2][0][9] = -0.;
-    ddphi[2][0][9] = -4.;
-    ddphi[2][0][9] = 0.;
+    ddphi[2][1][9] = -4.;
+    ddphi[2][2][9] = 0.;
 
 };
 
@@ -760,7 +760,7 @@ void QuadShapeFunction<DIM>::evaluateHessianIso(double *xsi, double*** ddphi, do
             for (int k = 0; k < DIM; k++){
                 double ul_ = ddphit[j][k][i] * wpcs[i] * sumF + dphit[j][i] * wpcs[i] * sumDer[k] - 
                              dphit[k][i] * wpcs[i] * sumDer[j] - phit[i] * wpcs[i] * sumSecDer[j][k];;
-                double vl_ = 2 * sumF * sumDer[k];
+                double vl_ = 2. * sumF * sumDer[k];
                 ddphi[j][k][i] = ((ul_ * v_ - u_ * vl_)/ (v_ * v_));
             };
         };

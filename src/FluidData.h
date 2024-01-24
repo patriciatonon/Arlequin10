@@ -85,6 +85,9 @@ public:
     bool printLagrangeMultipliers;
     bool printEnergyWeightFunction;
     bool printNodalCorrespondence;
+
+    //Read fields
+    bool readFields;
     
     //Drag and Lift coefficients
     bool computeDragAndLift;			 //Check if is necessary compute Drag and Lift parameters
@@ -94,8 +97,10 @@ public:
     
 public:
     //Reads the input file 
-    void dataReading_FEM(const std::string& inputFile, const std::string& inputMesh, const std::string& mirror, const bool& deleteFiles);
-    void dataReading_ISO(const std::string& inputFile, const std::string& inputMeshIso, const std::string& mirror, const bool& deleteFiles);
+    void dataReading_FEM(const std::string& inputFile, const std::string& inputMesh, const std::string& mirror, 
+                         const std::string& InitialFields, const bool& deleteFiles);
+    void dataReading_ISO(const std::string& inputFile, const std::string& inputMeshIso, const std::string& mirror,
+                         const std::string& InitialFields,const bool& deleteFiles);
     
     //Performs the domain decomposition for parallel processing
     void domainDecompositionMETIS_FEM(std::vector<Elements *> &elem_, int &numFemElem, int &numFemNodes); 

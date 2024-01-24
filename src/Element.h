@@ -404,6 +404,10 @@ public:
 
     void getElemMatrixLaplace(int &LNN, double &wna_, double &djac_, double &weight_, 
                               double **dphi_dx, double **jacobianNRMatrix);
+
+    void getElemMatrixElas(int &LNN, double &djac_, double &weight_, double &meshMovPar, 
+                           double **dphi_dx, double **jacobianNRMatrix);
+    
     void getElemMatrixTNS(int &LNN, double &wna_, double &djac_, double &weight_, 
                           double &tSUPG_, double &tPSPG_, double &tLSIC_,
                           double *phi_,double **dphi_dx, double **jacobianNRMatrix);
@@ -467,12 +471,9 @@ public:
 
 
     //...............................Problem type...............................
-    // Compute the Transient Navier-Stokes problem matrices and vectors
-    void getTransientNavierStokes_FEM(double **jacobianNRMatrix, double *rhsVector);
-    void getTransientNavierStokes_ISO(double **jacobianNRMatrix, double *rhsVector);
-
     void getLaplace_FEM(double **jacobianNRMatrix, double *rhsVector);
     void getTNS_FEM(int &iTime, double **jacobianNRMatrix, double *rhsVector);
+    void getSteadyElasticity_FEM(double **jacobianNRMatrix);
 
     void getLaplace_ISO(double **jacobianNRMatrix, double *rhsVector);
     void getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhsVector);

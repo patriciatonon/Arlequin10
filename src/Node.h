@@ -29,6 +29,7 @@ class Node{
 private:
     //Main variables
     double           coord_[DIM];                   //Nodal coordinate vector
+    double           coordUpdated_[DIM];            //Updated nodal coordinate vector
     double           initialCoord_[DIM];            //Initial nodal coordinate vector
     double           previousCoord_[DIM];           //Previous nodal coordinate vector
     double           velocity_[DIM];                //Nodal velocity
@@ -74,6 +75,7 @@ public:
         for (int i = 0; i < DIM; i++) {
         	
             coord_[i] = coor[i];
+            coordUpdated_[i] = coor[i];
         	initialCoord_[i] = coor[i];
         	previousCoord_[i] = coor[i];
         	velocity_[i] = 0.0;
@@ -112,7 +114,8 @@ public:
 
     //............................Coordinates functions............................
     // Returns the node initial coordinate vector
-    double* getInitialCoordinates() {return initialCoord_;};
+    double*  getInitialCoordinates() {return initialCoord_;};
+    double   getInitialCoordinateValue(int dir) {return initialCoord_[dir];};
 
     // Returns the node coordinate vector
     double* getCoordinates() {return coord_;};
@@ -128,6 +131,11 @@ public:
     double* getPreviousCoordinates() {return previousCoord_;}
     double getPreviousCoordinateValue(int dir) {return previousCoord_[dir];};
 
+    // Sets the updated coordinate vector
+    void setUpdatedCoordinates(int dir, double &u) {coordUpdated_[dir] = u;};
+   
+    // Returns the node updated coordinate vector
+    double getUpdatedCoordinates(int dir) {return coordUpdated_[dir];};
 
     //............................IGA functions............................
     // Returns the weight of de control points
@@ -227,6 +235,7 @@ public:
     //.........................Mesh Velocity functions..........................
     // Sets the node mesh velocity
     void setMeshVelocity(double *u){for (int i=0; i < DIM; i++) meshVelocity_[i] = u[i];}
+    void setMeshVelocityValue(int dir, double &u){meshVelocity_[dir] = u;}
 
     // Gets the node mesh velocity
     double getMeshVelocity(int dir) {return meshVelocity_[dir];}

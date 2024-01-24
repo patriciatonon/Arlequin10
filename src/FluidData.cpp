@@ -522,7 +522,8 @@ void FluidData<3>::BezierConnectivity(int &numPatches) {
 //------------------------------------------------------------------------------
 template<>
 void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::string& inputMeshFem, 
-                                   const std::string& mirror,const bool& deleteFiles){
+                                   const std::string& mirror, const std::string& InitialFields,
+                                   const bool& deleteFiles){
 
     //variables
     //Fluid data
@@ -558,6 +559,7 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     //Defines input and output files
     std::ifstream inputData(inputFile.c_str());
     std::ifstream file(inputMeshFem);
+    std::ifstream initialField(InitialFields);
     std::ofstream mirrorData(mirror.c_str());
     std::string line;
     std::string remove2 = "rm ";
@@ -691,6 +693,14 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     mirrorData << "printLagrangeMultipliers   = " << printLagrangeMultipliers << std::endl;
     mirrorData << "printNodalCorrespondence   = " << printNodalCorrespondence << std::endl;
     mirrorData << "PrintProcess               = " << printProcess << std::endl << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read initial fields
+    inputData >> readFields;
+
+    mirrorData << "ReadFields              = " << readFields << std::endl << std::endl;
 
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     //++++++++++++++++++++++++++READING FEM MESH++++++++++++++++++++++++++++++
@@ -827,8 +837,32 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     };     
      	
 
-    // //Sets boundary constrains
+    //Sets boundary constrains
+    for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+        int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
+        int no1 = connectB[0];
+        int no2 = connectB[1];
+        int no3 = connectB[2];
+
+        for (int i = 0; i < dim; i++){
+           
+            if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+                (boundary_[ibound] -> getConstrain(i) == 2) || 
+                (boundary_[ibound] -> getConstrain(i) == 3)){
+                nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+                nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
+                                             boundary_[ibound] -> getConstrainValue(i));
+            };
+        };
+          
+    };
+
+
     // for (int ibound = 0; ibound < numFemBoundElem; ibound++){
+        
     //     int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
     //     int no1 = connectB[0];
     //     int no2 = connectB[1];
@@ -846,80 +880,57 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     //                                          boundary_[ibound] -> getConstrainValue(i));
     //         };
     //     };
+
+
+    //     if (boundary_[ibound] -> getConstrain(0) == 4){
+
+    //         double constrainvalue1 = sin(2*pi*nodes_[no1]->getCoordinateValue(0));
+    //         double constrainvalue2 = sin(2*pi*nodes_[no2]->getCoordinateValue(0));
+    //         double constrainvalue3 = sin(2*pi*nodes_[no3]->getCoordinateValue(0));
+
+    //         double zero = 0.;
+            
+    //         nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                     zero);
+    //         nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                     constrainvalue1);
+    //         nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                     zero);
+    //         nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                      constrainvalue2);
+    //         nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                      zero);
+    //         nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                      constrainvalue3);
+
+
+
+    //     };
+
+    //     if (boundary_[ibound] -> getConstrain(0) == 5){
+
+    //         double constrainvalue1 = -cos(2*pi*nodes_[no1]->getCoordinateValue(1));
+    //         double constrainvalue2 = -cos(2*pi*nodes_[no2]->getCoordinateValue(1));
+    //         double constrainvalue3 = -cos(2*pi*nodes_[no3]->getCoordinateValue(1));
+    //         double zero = 0.;
+            
+    //         nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                      zero);
+    //         nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                      constrainvalue1);
+    //         nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                      zero);
+    //         nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                      constrainvalue2);
+    //         nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
+    //                                      zero);
+    //         nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
+    //                                      constrainvalue3);
+
+    //     };
+
           
     // };
-
-
-    for (int ibound = 0; ibound < numFemBoundElem; ibound++){
-        
-        int *connectB = boundary_[ibound] -> getBoundaryConnectivity();
-        int no1 = connectB[0];
-        int no2 = connectB[1];
-        int no3 = connectB[2];
-
-        for (int i = 0; i < dim; i++){
-           
-            if ((boundary_[ibound] -> getConstrain(i) == 1) || 
-                (boundary_[ibound] -> getConstrain(i) == 3)){
-                nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
-                nodes_[no2] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
-                nodes_[no3] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
-                                             boundary_[ibound] -> getConstrainValue(i));
-            };
-        };
-
-
-        if (boundary_[ibound] -> getConstrain(0) == 4){
-
-            double constrainvalue1 = sin(2*pi*nodes_[no1]->getCoordinateValue(0));
-            double constrainvalue2 = sin(2*pi*nodes_[no2]->getCoordinateValue(0));
-            double constrainvalue3 = sin(2*pi*nodes_[no3]->getCoordinateValue(0));
-
-            double zero = 0.;
-            
-            nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                        zero);
-            nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                        constrainvalue1);
-            nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                        zero);
-            nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         constrainvalue2);
-            nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         zero);
-            nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         constrainvalue3);
-
-
-
-        };
-
-        if (boundary_[ibound] -> getConstrain(0) == 5){
-
-            double constrainvalue1 = -cos(2*pi*nodes_[no1]->getCoordinateValue(1));
-            double constrainvalue2 = -cos(2*pi*nodes_[no2]->getCoordinateValue(1));
-            double constrainvalue3 = -cos(2*pi*nodes_[no3]->getCoordinateValue(1));
-            double zero = 0.;
-            
-            nodes_[no1] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         zero);
-            nodes_[no1] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         constrainvalue1);
-            nodes_[no2] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         zero);
-            nodes_[no2] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         constrainvalue2);
-            nodes_[no3] -> setConstrains(0,boundary_[ibound] -> getConstrain(0),
-                                         zero);
-            nodes_[no3] -> setConstrains(1,boundary_[ibound] -> getConstrain(1),
-                                         constrainvalue3);
-
-        };
-
-          
-    };
 
 
     //Print nodal constrains
@@ -985,6 +996,27 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     };
 
 
+    if (readFields == true) {
+        for (int i = 0; i < numFemNodes; i++){
+
+            double vel[3], prevVel[3], accel[3], prevAccel[3], press;
+            
+            initialField >>  vel[0] >> vel[1] >> vel[2] >> 
+                             prevVel[0] >> prevVel[1] >> prevVel[2] >> 
+                             accel[0] >> accel[1] >> accel[2] >>
+                             prevAccel[0] >> prevAccel[1] >> prevAccel[2] >> press;
+
+            getline(initialField, line);
+
+            nodes_[i] -> setVelocity(vel);
+            nodes_[i] -> setPreviousVelocity(prevVel);
+            nodes_[i] -> setAcceleration(accel);
+            nodes_[i] -> setAcceleration(prevAccel);
+            nodes_[i] -> setPressure(press);
+        };
+    };
+
+
     domainDecompositionMETIS_FEM(elements_,numFemElem,numFemNodes);
 
     //  //Closing the file
@@ -997,7 +1029,8 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
 
 template<>
 void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::string& inputMeshFem, 
-                                   const std::string& mirror,const bool& deleteFiles){
+                                   const std::string& mirror, const std::string& InitialFields,
+                                   const bool& deleteFiles){
     
     int DIM = 3;
     //variables
@@ -1573,7 +1606,8 @@ void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::strin
 
 template<>
 void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::string& inputMeshIso,
-                                  const std::string& mirror,const bool& deleteFiles){
+                                   const std::string& mirror,const std::string& InitialFields,
+                                   const bool& deleteFiles){
 
     //Fluid data
     double pressInf;       			     //Undisturbed pressure 
@@ -1609,6 +1643,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     //Defines input and output files
     std::ifstream inputData(inputFile.c_str());
     std::ifstream file2(inputMeshIso);
+    std::ifstream initialField(InitialFields);
     std::ofstream mirrorData(mirror.c_str());
     std::string line;
     std::string remove2 = "rm ";
@@ -1742,6 +1777,14 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     mirrorData << "printLagrangeMultipliers   = " << printLagrangeMultipliers << std::endl;
     mirrorData << "printNodalCorrespondence   = " << printNodalCorrespondence << std::endl;
     mirrorData << "PrintProcess               = " << printProcess << std::endl << std::endl;
+
+    getline(inputData,line);getline(inputData,line);getline(inputData,line);
+    getline(inputData,line);getline(inputData,line);
+
+    //Read initial fields
+    inputData >> readFields;
+
+    mirrorData << "ReadFields              = " << readFields << std::endl << std::endl;
 
    
     //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2105,6 +2148,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
 
         for (int i = 0; i < dim; i++){
             if ((boundary_[ibound] -> getConstrain(i) == 1) || 
+                (boundary_[ibound] -> getConstrain(i) == 2) || 
                 (boundary_[ibound] -> getConstrain(i) == 3)){
                 nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
                                             boundary_[ibound] -> getConstrainValue(i));
@@ -2234,6 +2278,26 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
 
     BezierConnectivity(numPatches);
 
+    if (readFields == true) {
+        for (int i = 0; i < numCP; i++){
+
+            double vel[3], prevVel[3], accel[3], prevAccel[3], press;
+            
+            initialField >>  vel[0] >> vel[1] >> vel[2] >> 
+                             prevVel[0] >> prevVel[1] >> prevVel[2] >> 
+                             accel[0] >> accel[1] >> accel[2] >>
+                             prevAccel[0] >> prevAccel[1] >> prevAccel[2] >> press;
+
+            getline(initialField, line);
+
+            nodes_[i] -> setVelocity(vel);
+            nodes_[i] -> setPreviousVelocity(prevVel);
+            nodes_[i] -> setAcceleration(accel);
+            nodes_[i] -> setAcceleration(prevAccel);
+            nodes_[i] -> setPressure(press);
+        };
+    };
+
     domainDecompositionMETIS_ISO(elements_,numIsoElem,numCP);
 
     //  //Closing the file
@@ -2246,7 +2310,8 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
 
 template<>
 void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::string& inputMeshIso,
-                                  const std::string& mirror,const bool& deleteFiles){
+                                  const std::string& mirror,const std::string& InitialFields,
+                                  const bool& deleteFiles){
     
     int DIM = 3;                                
     

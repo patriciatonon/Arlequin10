@@ -97,12 +97,13 @@ private:
     Mat               A,F;
     Vec               b, b2, u, All;
     PetscErrorCode    ierr;
-    PetscInt          Istart, Iend, Ii, Ij, Ione, iterations, *dof;
+    PetscInt          Istart, Iend, Ii, Ij, Ione, iterations, *dof, *dof2;
     KSP               ksp;
     PC                pc;
     VecScatter        ctx;
     PetscScalar       val;
     PetscViewer       viewer;
+    PetscLogDouble bytes = 0;
     
     int NumBezierNodesLagrange;   
     int iTimeStep;
@@ -143,6 +144,7 @@ public:
    	//Sets the Dirichelet Constrains in the domain
    	void setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
     void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp, std::vector<double> &dofValue);
+    void setDirichletConstrainElasticity_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
 
     void setDirichletConstrain_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
     void setDirichletConstrainLaplace_FEM_FEM(std::vector<int> &dofTemp, std::vector<double> &dofValue);
@@ -165,6 +167,7 @@ public:
     
     //Solves the Arlequin Problem
     int solveArlequinProblem_FEM_ISO(int iterNumber,double tolerance);
+    int solveMeshMoving_FEM(int &iTimeStep);
     int solveArlequinProblemLaplace_FEM_ISO(int iterNumber,double tolerance);
     
     int solveArlequinProblemLaplace_ISO_ISO(int iterNumber,double tolerance);
@@ -203,12 +206,8 @@ public:
     void setMatVecValuesLagrangeFineLaplace_FEM_FEM();
     void setMatVecValuesLagrangeCoarseLaplace_FEM_FEM();
 
-
-
-
     // Compute and print drag and lift coefficients
     void dragAndLiftCoefficients_FEM(std::ofstream& dragLift, int &iTimeStep);
-
 
     //Prints the results for Paraview post-processing
     void printResults_FEM_ISO(int step);
@@ -221,6 +220,7 @@ public:
 
     //Print the results of the gluing in the integration points for Paraview post-processing
     void printResultsIP_FEM_ISO(int step);
+    void printNodesResults_FEM_ISO(int step);
     void printResultsIP_ISO_ISO(int step);
     void printResultsIP_FEM_FEM(int step);
 
