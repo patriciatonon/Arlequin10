@@ -69,12 +69,15 @@ int main(int argc, char **args) {
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
 
     //FEM/ISO
-    //2D - Airfoil - Multiplicar por -1 no set Signaled Distance 
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/aero1/coarse_iso.msh","mirror_coarse.txt",
+    //2D - Airfoil - Multiplicar por -1 no set Signaled Distance
+    // coarseModel.dataReading_ISO("../../mesh/degrau/degrau3d2_data.txt","../../mesh/degrau/degrau2d2_iso.msh","mirror_coarse.txt",
+    //                             "../../mesh/aero1/COARSECPOutput100032.dat",0);
+    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/aero1/coarse1_iso.msh","mirror_coarse.txt",
                                 "../../mesh/aero1/COARSECPOutput100032.dat",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/aero1/fine_fem.msh","mirror_fine.txt",
+    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/aero1/fineRef_fem.msh","mirror_fine.txt",
                                 "../../mesh/aero1/FineNodeOutput100032.dat",0);
     
+
     //Cylinder
     // coarseModel.dataReading_ISO("../../mesh/cylinder/meshcoarse_data.txt","../../mesh/cylinder/coarse_iso_cylinder.msh","mirror_coarse.txt", "nada",0);
     // fineModel.dataReading_FEM("../../mesh/cylinder/meshfine_data.txt","../../mesh/cylinder/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt","nada", 0);

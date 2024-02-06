@@ -847,7 +847,6 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
         for (int i = 0; i < dim; i++){
            
             if ((boundary_[ibound] -> getConstrain(i) == 1) || 
-                (boundary_[ibound] -> getConstrain(i) == 2) || 
                 (boundary_[ibound] -> getConstrain(i) == 3)){
                 nodes_[no1] -> setConstrains(i,boundary_[ibound] -> getConstrain(i),
                                              boundary_[ibound] -> getConstrainValue(i));
@@ -1831,6 +1830,8 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         for (int i = 0; i < numCPlocal; i++){
             double x[dim];
             file2 >> x[0] >> x[1] >> x3 >> wei;
+            x[0] /= wei;
+            x[1] /= wei;
             std::getline(file2, line);
             Node *node = new Node(x,index++,wei);
             nodes_.push_back(node);
@@ -2076,7 +2077,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         int numGroup;
                 
         file2 >> numGroup >> constrain[0] >> constrain[1] >> constrain[2] 
-                  >> value[0] >> value[1] >> value[2];
+                 >> value[0] >> value[1] >> value[2];
 
         getline(file2,line);getline(file2,line);getline(file2,line);
         getline(file2,line);getline(file2,line);
@@ -2146,7 +2147,23 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         int no2 = connectB[1];
         int no3 = connectB[2];
 
+        // if (boundary_[ibound] -> getConstrain(0) == 4){
+
+    	// 	double y_ = nodes_[no1] -> getCoordinateValue(1);
+    	// 	double constrainValueX = 10 * (1- (((y_-0.94)-0.5)/0.5)*(((y_-0.94)-0.5)/0.5));
+    	// 	nodes_[no1] -> setConstrains(0,1,constrainValueX);
+
+    	// 	y_ = nodes_[no2] -> getCoordinateValue(1);
+    	// 	constrainValueX = 10 * (1- (((y_-0.94)-0.5)/0.5)*(((y_-0.94)-0.5)/0.5));
+    	// 	nodes_[no2] -> setConstrains(0,1,constrainValueX);
+
+    	// 	y_ = nodes_[no3] -> getCoordinateValue(1);
+    	// 	constrainValueX = 10 * (1- (((y_-0.94)-0.5)/0.5)*(((y_-0.94)-0.5)/0.5));
+    	// 	nodes_[no3] -> setConstrains(0,1,constrainValueX);
+    	// };
+
         for (int i = 0; i < dim; i++){
+
             if ((boundary_[ibound] -> getConstrain(i) == 1) || 
                 (boundary_[ibound] -> getConstrain(i) == 2) || 
                 (boundary_[ibound] -> getConstrain(i) == 3)){
@@ -2216,7 +2233,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
     std::vector<int> elemBound;
     elemSide.clear();
     elemBound.clear();
-    for (int i =0; i <numIsoElem; i++){
+    for (int i =0; i < numIsoElem; i++){
         for (int j =0; j<numBoundElemIso; j++){ 
             if (boundElem[j] == i){
                 int side = boundary_[j] -> getElementSide();
@@ -2247,9 +2264,9 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         int sizeMcp = matchingCP_.size();
         int *matchingCP;
         matchingCP = new int[sizeMcp];
-        for (int i = 0; i<sizeMcp; i++) matchingCP[i] = matchingCP_[i];
-        nodes_[i]->setMatchingCP(matchingCP);
-        nodes_[i]->setSizeMcp(sizeMcp);
+        for (int i = 0; i< sizeMcp; i++) matchingCP[i] = matchingCP_[i];
+        nodes_[i] -> setMatchingCP(matchingCP);
+        nodes_[i] -> setSizeMcp(sizeMcp);
         matchingCP_.clear();   
     };
 

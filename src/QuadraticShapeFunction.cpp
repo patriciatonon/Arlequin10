@@ -238,7 +238,7 @@ void QuadShapeFunction<DIM>::evaluateIso(double *xsi, double *phi, double *wpcs,
     };
 
     for (int i = 0; i < numLocalBF; i++) {
-        for (int j = 0; j < DIM; j++) phi[i] = phit[i] * wpcs[i]/ (sumF * sumF); 
+        for (int j = 0; j < DIM; j++) phi[i] = phit[i] * wpcs[i]/ sumF; 
     };
 
     return;
@@ -330,6 +330,7 @@ void QuadShapeFunction<3>::evaluateGradientFem(double *xsi, double **dphi) const
 template<>
 void QuadShapeFunction<2>::evaluateGradientIso(double *xsi, double **dphi, double *wpcs, int *inc, std::vector<IParameters_ *> &iparameters ,int Npatch) {
 
+        
     const int DIM = 2;
     std::vector<IParameters_ *> *ipar_ = &iparameters;
 
@@ -391,7 +392,8 @@ void QuadShapeFunction<2>::evaluateGradientIso(double *xsi, double **dphi, doubl
     };
 
     for (int i = 0; i < numLocalBF; i++) {
-        for (int j = 0; j < DIM; j++) dphi[j][i] = ((dphit[j][i] * wpcs[i] * sumF - phit[i] * wpcs[i] * sumDer[j]) / (sumF * sumF)); 
+        for (int j = 0; j < DIM; j++) dphi[j][i] = ((dphit[j][i] * wpcs[i] * sumF -
+                                                     phit[i] * wpcs[i] * sumDer[j]) / (sumF * sumF)); 
     };
 
     return;

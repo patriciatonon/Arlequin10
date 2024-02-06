@@ -308,8 +308,7 @@ void Element<DIM>::getJacobianMatrix_FEM(double &djac_, double *xsi, double **Ja
         {
             xna[j] = alpha_f * (*nodes_)[connect_[i]]->getCoordinateValue(j) +
                      (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousCoordinateValue(j);
-            for (int k = 0; k < DIM; k++)
-                Jac[j][k] += xna[j] * dphi[k][i];
+            for (int k = 0; k < DIM; k++) Jac[j][k] += xna[j] * dphi[k][i];
         };
     };
 
@@ -405,8 +404,7 @@ void Element<DIM>::getJacobianMatrix_ISO(double &djac_, double *xsi, double **qu
         dphi[i] = new double[LNN];
 
     double wpc[LNN];
-    for (int i = 0; i < LNN; i++)
-        wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
+    for (int i = 0; i < LNN; i++) wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
     int *inc_ = (*nodes_)[connect_[LNN - 1]]->getINC();
 
     shapeQuad.evaluateGradientIso(xsi, dphi, wpc, inc_, (*iparameters), Npatch_);
@@ -419,8 +417,7 @@ void Element<DIM>::getJacobianMatrix_ISO(double &djac_, double *xsi, double **qu
         {
             xna[j] = alpha_f * (*nodes_)[connect_[i]]->getCoordinateValue(j) +
                      (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousCoordinateValue(j);
-            for (int k = 0; k < DIM; k++)
-                dx_dxsi[j][k] += xna[j] * dphi[k][i] / wpc[i];
+            for (int k = 0; k < DIM; k++) dx_dxsi[j][k] += xna[j] * dphi[k][i];
         };
     };
 
@@ -467,7 +464,7 @@ void Element<DIM>::getJacobianMatrix_ISO(double &djac_, double *xsi, double **qu
     {
         for (int j = 0; j < DIM; j++)
         {
-            quadJacMat[i][j] += dxsi_dqxsi[j][i] * dx_dxsi[i][j];
+            for (int k = 0; k  < DIM; k++) quadJacMat[i][j] += dxsi_dqxsi[k][j] * dx_dxsi[i][k];
         };
     };
 
@@ -512,8 +509,7 @@ void Element<DIM>::getJacobianMatrix_COARSE_ISO(double *xsi, double **ainv_)
         {
             xna[j] = alpha_f * (*nodesC_)[connectC_[i]]->getCoordinateValue(j) +
                      (1. - alpha_f) * (*nodesC_)[connectC_[i]]->getPreviousCoordinateValue(j);
-            for (int k = 0; k < DIM; k++)
-                dx_dxsi[j][k] += xna[j] * dphi[k][i] / wpc[i];
+            for (int k = 0; k < DIM; k++) dx_dxsi[j][k] += xna[j] * dphi[k][i];
         };
     };
 
@@ -551,12 +547,10 @@ void Element<DIM>::getQuadJacobianMatrix_ISO(double *xsi, double **quadJacMatInv
 
     double **dphi;
     dphi = new double *[DIM];
-    for (int i = 0; i < DIM; ++i)
-        dphi[i] = new double[LNN];
+    for (int i = 0; i < DIM; ++i) dphi[i] = new double[LNN];
 
     double wpc[LNN];
-    for (int i = 0; i < LNN; i++)
-        wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
+    for (int i = 0; i < LNN; i++) wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
     int *inc_ = (*nodes_)[connect_[LNN - 1]]->getINC();
 
     shapeQuad.evaluateGradientIso(xsi, dphi, wpc, inc_, (*iparameters), Npatch_);
@@ -569,8 +563,7 @@ void Element<DIM>::getQuadJacobianMatrix_ISO(double *xsi, double **quadJacMatInv
         {
             xna[j] = alpha_f * (*nodes_)[connect_[i]]->getCoordinateValue(j) +
                      (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousCoordinateValue(j);
-            for (int k = 0; k < DIM; k++)
-                dx_dxsi[j][k] += xna[j] * dphi[k][i] / wpc[i];
+            for (int k = 0; k < DIM; k++) dx_dxsi[j][k] += xna[j] * dphi[k][i];
         };
     };
 
@@ -591,7 +584,7 @@ void Element<DIM>::getQuadJacobianMatrix_ISO(double *xsi, double **quadJacMatInv
     double quadJacMat[DIM][DIM] = {};
     for (int i = 0; i < DIM; i++)
         for (int j = 0; j < DIM; j++)
-            quadJacMat[i][j] += dxsi_dqxsi[j][i] * dx_dxsi[i][j];
+            for (int k = 0; k  < DIM; k++) quadJacMat[i][j] += dxsi_dqxsi[k][j] * dx_dxsi[i][k];
 
     MatrixDouble quadJacMatInvAux(DIM, DIM);
 
@@ -976,8 +969,8 @@ void Element<DIM>::getInterpCoord_ISO(int &LNN, double *phi_, double *x_, double
     {
         for (int j = 0; j < DIM; j++)
         {
-            x_[j] += (*nodes_)[connect_[i]]->getCoordinateValue(j) * phi_[i] / (*nodes_)[connect_[i]]->getWeightPC();
-            xPrev_[j] += (*nodes_)[connect_[i]]->getPreviousCoordinateValue(j) * phi_[i] / (*nodes_)[connect_[i]]->getWeightPC();
+            x_[j] += (*nodes_)[connect_[i]]->getCoordinateValue(j) * phi_[i];
+            xPrev_[j] += (*nodes_)[connect_[i]]->getPreviousCoordinateValue(j) * phi_[i];
         };
     };
 };
@@ -1808,25 +1801,26 @@ void Element<DIM>::getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, doubl
         getInvMatrixC(i, MatrixCInv);
 
         std::vector<double> Dxsi(deg);
-        Dxsi.clear();
+        for (int j = 0; j < deg; j++) Dxsi[j] = 0.0;
+        
         for (int j = 0; j < deg + 1; j++)
         {
             Dxsi[0] += j * (MatrixCInv[j][1] - MatrixCInv[j][0]);
             Dxsi[1] += j * (MatrixCInv[j][2] - MatrixCInv[j][1]);
         };
+    
+        for (int j = 0; j < deg; j++) Dxsi[j] *= (dimxsi / deg);
 
-        for (int j = 0; j < deg; j++)
-            Dxsi[j] *= (dimxsi / deg);
-
-        auto it = std::minmax_element(Dxsi.begin(), Dxsi.end());
-
+        auto it = std::max_element(std::begin(Dxsi), std::end(Dxsi));
+ 
         // RQD - MAX
-        MatrixD(i, i) = *it.second;
+        MatrixD(i, i) = *it;
 
         for (int j = 0; j < deg + 1; ++j)
             delete[] MatrixCInv[j];
         delete[] MatrixCInv;
     };
+
 
     // Inverse Matrix D
     MatrixInvD = MatrixD.inverse();
@@ -1836,6 +1830,7 @@ void Element<DIM>::getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, doubl
         for (int j = 0; j < DIM; j++)
             for (int k = 0; k < DIM; k++)
                 MatrixQh(i, j) += quadJacMat[i][k] * MatrixInvD(k, j);
+
 
     // Matrix Inverse Q "hat"
     MatrixInvQh = MatrixQh.inverse();
@@ -1890,6 +1885,7 @@ void Element<DIM>::getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, doubl
     for (int i = 0; i < DIM; i++)
         for (int j = 0; j < DIM; j++)
             rrMG += rr[i][j] * MatrixG(i, j);
+    
 
     rrMG = sqrt(rrMG);
 
@@ -3432,7 +3428,7 @@ void Element<DIM>::getMatrixAndVectorsSameMeshArlqStab(int &LNN, double &wna_, d
                     press += -dphi_dx[l][i] * ddphi_dx[l][k][j] * tARLQ_ / dens_;
 
                 arlequinStab1[DIM * i + k][DIM * LNN + j] += press * WJ;
-                arlequinStab1[DIM * i + k][DIM * j + k] += (0.*mass * alpha_m + convec * AGDT) * WJ;
+                arlequinStab1[DIM * i + k][DIM * j + k] += (mass * alpha_m + convec * AGDT) * WJ;
                 arlequinStabD[DIM * i + k][DIM * j + k] += LL * WJ / wna_;
             };
         };
@@ -3456,7 +3452,7 @@ void Element<DIM>::getMatrixAndVectorsSameMeshArlqStab(int &LNN, double &wna_, d
                     convec += dphi_dx[l][i] * ((una_[m] - umeshna_[m]) * dduna_dxdx[k][m][l] + (duna_dx[m][l] - dumeshna_dx[m][l]) * duna_dx[k][m]) * tARLQ_;
             };
 
-            arlequinStabVector1[DIM * i + k] += (0.*mass + convec + press) * WJ;
+            arlequinStabVector1[DIM * i + k] += (mass + convec + press) * WJ;
             arlequinStabVectorD[DIM * i + k] += LL * WJ / wna_;
         };
     };
@@ -7320,8 +7316,7 @@ void Element<DIM>::getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhs
     double &alpha_f = parameters->getAlphaF();
 
     double wpc[LNN], phi_[LNN], xsi[DIM];
-    for (int i = 0; i < LNN; i++)
-        wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
+    for (int i = 0; i < LNN; i++) wpc[i] = (*nodes_)[connect_[i]]->getWeightPC();
     int *inc_ = (*nodes_)[connect_[LNN - 1]]->getINC();
 
     double **dphi_dx;
@@ -7344,8 +7339,7 @@ void Element<DIM>::getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhs
     {
 
         // Defines the integration points adimentional coordinates
-        for (int i = 0; i < DIM; i++)
-            xsi[i] = nQuad.PointListIso(index, i);
+        for (int i = 0; i < DIM; i++) xsi[i] = nQuad.PointListIso(index, i);
 
         // Returns the quadrature integration weight
         weight_ = nQuad.WeightListIso(index);
@@ -7363,7 +7357,7 @@ void Element<DIM>::getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhs
         getNewParameterSUPG_ISO(tSUPG_, tPSPG_, tLSIC_, quadJacMat, phi_, dphi_dx);
 
         // Computes the element matrix
-        double wna_ = alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
+        double wna_ = 1.;//alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
         getElemMatrixTNS(LNN, wna_, djac_, weight_, tSUPG_, tPSPG_, tLSIC_, phi_, dphi_dx, jacobianNRMatrix);
 
         // Computes the RHS vector
@@ -7517,15 +7511,12 @@ void Element<2>::computeDragAndLiftForces_FEM(int &side, double &pDForce, double
         shapeBound.evaluateGradientBoundaryFem(xsiB, dphiB_);
 
         // computes the normal vector in the linear element
-        double &alpha_f = parameters->getAlphaF();
         double Tx = 0.;
         double Ty = 0.;
         for (int i = 0; i < 3; i++)
         {
-            Tx += (alpha_f * (*nodes_)[nodesb_[i]]->getCoordinateValue(0) - 
-                  (1. - alpha_f) * (*nodes_)[nodesb_[i]]->getPreviousCoordinateValue(0)) * dphiB_[0][i];
-            Ty += (alpha_f * (*nodes_)[nodesb_[i]]->getCoordinateValue(1) - 
-                  (1. - alpha_f) * (*nodes_)[nodesb_[i]]->getPreviousCoordinateValue(1)) * dphiB_[0][i];
+            Tx += (*nodes_)[nodesb_[i]]->getCoordinateValue(0) * dphiB_[0][i];
+            Ty += (*nodes_)[nodesb_[i]]->getCoordinateValue(1) * dphiB_[0][i];
         };
 
         double jacb_ = sqrt(Tx * Tx + Ty * Ty);

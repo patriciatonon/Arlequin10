@@ -41,11 +41,8 @@ void Arlequin<DIM>::setElementBoxes_ISO()
         for (int i = 0; i < LNN; i++)
         {
             double *xx = nodesCoarse_[connec[i]]->getCoordinates();
-            for (int j = 0; j < DIM; j++)
-                coord_[i][j] = xx[j];
-
-            // double *xxp = nodesCoarse_[connec[i]]->getPreviousCoordinates();
-            // for (int j = 0; j < DIM; j++) coord_[i][j] = alpha_f * xx[j] + (1. - alpha_f) * xxp[j];
+            for (int j = 0; j < DIM; j++) coord_[i][j] = xx[j];
+        
         };
 
         // Bezier control points coordinates
@@ -55,10 +52,16 @@ void Arlequin<DIM>::setElementBoxes_ISO()
                 for (int k = 0; k < DIM; k++)
                     Bcoord_[i][k] += transMatrixC_[i][j] * coord_[j][k];
 
-        for (int i = 0; i < DIM; i++)
-        {
-            xk[i] = Bcoord_[0][i];
-            Xk[i] = Bcoord_[LNN - 1][i];
+        
+        for (int i = 0; i < DIM; i++){
+            std::vector<double> Coord(LNN);
+            for (int j = 0; j < LNN; j++){
+                Coord[j] = Bcoord_[j][i];
+                auto it = std::minmax_element(Coord.begin(), Coord.end());
+
+                xk[i] = *it.first;
+                Xk[i] = *it.second;
+            };
         };
 
         elementsCoarse_[jel]->setIntersectionParameters(xk, Xk);
@@ -164,77 +167,81 @@ void Arlequin<2>::searchPointCorrespondence_ISO(double *x, std::vector<Nodes *> 
     for (int i = 0; i < DIM; ++i)
         ainv[i] = new double[DIM];
 
-    // double &alpha_f = isopar -> getAlphaF();
+    // Considering that we know from the last step the possible element in the coarse mesh
+    // get boxes information
+    std::pair<double *, double *> XK;
+    XK = elements[elSearch]->getXIntersectionParameter();
 
-    for (int i = 0; i < DIM; i++)
-    {
-        xsi[i] = 0.0; // central element cooordinates
-        x_[i] = 0.0;
-        xsiC[i] = 1.e50;
-    };
-
-    for (int i = 0; i < DIM + 1; i++)
-        xsiCC[i] = 1.e10;
-
-    int *connec = elements[elSearch]->getConnectivity();
-
-    // Computing basis functions
-    double phi_[LNNC], wpc[LNNC];
-    for (int i = 0; i < LNNC; i++)
-        wpc[i] = nodes[connec[i]]->getWeightPC();
-    int *INC_ = nodes[connec[LNNC - 1]]->getINC();
-    int patch = elements[elSearch]->getPatch();
-    shapeQuad.evaluateIso(xsi, phi_, wpc, INC_, isopar, patch);
-
-    for (int i = 0; i < LNNC; i++)
-    {
-        double *xint = nodes[connec[i]]->getCoordinates();
-        for (int j = 0; j < DIM; j++)
-            x_[j] += xint[j] * phi_[i];
-    };
-
-    double error = 1.e6;
-    int iterations = 0;
-
-    while ((error > 1.e-8) && (iterations < 4))
-    {
-
-        iterations++;
+    if ((x[0] > XK.first[0]) && (x[0] < XK.second[0]) &&
+        (x[1] > XK.first[1]) && (x[1] < XK.second[1])){
 
         for (int i = 0; i < DIM; i++)
         {
-            deltaX[i] = x[i] - x_[i];
-            deltaXsi[i] = 0.0;
-        };
-
-        elements[elSearch]->getQuadJacobianMatrix_ISO(xsi, ainv);
-
-        for (int i = 0; i < DIM; i++)
-        {
-            for (int j = 0; j < DIM; j++)
-            {
-                deltaXsi[i] += ainv[i][j] * deltaX[j];
-            };
-        };
-
-        error = 0.;
-        for (int i = 0; i < DIM; i++)
-        {
-            xsi[i] += deltaXsi[i];
+            xsi[i] = 0.0; // central element cooordinates
             x_[i] = 0.0;
-            error += deltaXsi[i] * deltaXsi[i];
+            xsiC[i] = 1.e50;
         };
 
-        error = sqrt(error);
+        for (int i = 0; i < DIM + 1; i++) xsiCC[i] = 1.e10;
 
+        int *connec = elements[elSearch]->getConnectivity();
+
+        // Computing basis functions
+        double phi_[LNNC], wpc[LNNC];
+        for (int i = 0; i < LNNC; i++) wpc[i] = nodes[connec[i]]->getWeightPC();
+        int *INC_ = nodes[connec[LNNC - 1]]->getINC();
+        int patch = elements[elSearch]->getPatch();
         shapeQuad.evaluateIso(xsi, phi_, wpc, INC_, isopar, patch);
 
         for (int i = 0; i < LNNC; i++)
         {
             double *xint = nodes[connec[i]]->getCoordinates();
-            for (int j = 0; j < DIM; j++)
-                x_[j] += xint[j] * phi_[i];
+            for (int j = 0; j < DIM; j++) x_[j] += xint[j] * phi_[i];
         };
+
+        double error = 1.e6;
+        int iterations = 0;
+
+        while ((error > 1.e-8) && (iterations < 4))
+        {
+
+            iterations++;
+
+            for (int i = 0; i < DIM; i++)
+            {
+                deltaX[i] = x[i] - x_[i];
+                deltaXsi[i] = 0.0;
+            };
+
+            elements[elSearch]->getQuadJacobianMatrix_ISO(xsi, ainv);
+
+            for (int i = 0; i < DIM; i++)
+            {
+                for (int j = 0; j < DIM; j++)
+                {
+                    deltaXsi[i] += ainv[i][j] * deltaX[j];
+                };
+            };
+
+            error = 0.;
+            for (int i = 0; i < DIM; i++)
+            {
+                xsi[i] += deltaXsi[i];
+                x_[i] = 0.0;
+                error += deltaXsi[i] * deltaXsi[i];
+            };
+
+            error = sqrt(error);
+
+            shapeQuad.evaluateIso(xsi, phi_, wpc, INC_, isopar, patch);
+
+            for (int i = 0; i < LNNC; i++)
+            {
+                double *xint = nodes[connec[i]]->getCoordinates();
+                for (int j = 0; j < DIM; j++) x_[j] += xint[j] * phi_[i];
+            };
+        };
+    
     };
 
     double t1 = -1 - 1.e-2;
@@ -247,9 +254,8 @@ void Arlequin<2>::searchPointCorrespondence_ISO(double *x, std::vector<Nodes *> 
         xsiC[0] = xsi[0];
         xsiC[1] = xsi[1];
         elemC = elSearch;
-    }
-    else
-    {
+
+    } else {
 
         for (int jel = 0; jel < numElem; jel++)
         {
@@ -283,8 +289,7 @@ void Arlequin<2>::searchPointCorrespondence_ISO(double *x, std::vector<Nodes *> 
             for (int i = 0; i < LNNC; i++)
             {
                 double *xint = nodes[connec[i]]->getCoordinates();
-                for (int j = 0; j < DIM; j++)
-                    x_[j] += xint[j] * phi_[i];
+                for (int j = 0; j < DIM; j++) x_[j] += xint[j] * phi_[i];
             };
 
             double error = 1.e6;
@@ -1011,6 +1016,7 @@ void Arlequin<2>::setCorrespondenceFine_FEM_ISO()
                                           elementsFine_[elementsGlueZoneFine_[i]]->getIntegPointCorrespondenceElement_FEM(ip));
 
             elementsFine_[elementsGlueZoneFine_[i]]->setIntegrationPointCorrespondence_FEM(ip, xsiC, elemC);
+
         };
     };
 };
@@ -1233,8 +1239,7 @@ void Arlequin<2>::setCorrespondenceFine_ISO_ISO()
         int numberIntPoints = elementsFine_[elementsGlueZoneFine_[i]]->getNumberOfIntegrationPointsSpecial_ISO();
 
         double wpc[LNN];
-        for (int i = 0; i < LNN; i++)
-            wpc[i] = nodesFine_[connec[i]]->getWeightPC();
+        for (int i = 0; i < LNN; i++) wpc[i] = nodesFine_[connec[i]]->getWeightPC();
         int *inc = nodesFine_[connec[LNN - 1]]->getINC();
         int patch = elementsFine_[elementsGlueZoneFine_[i]]->getPatch();
 
@@ -1459,8 +1464,9 @@ void Arlequin<2>::setSignaledDistance_FEM_ISO()
         double &alphaC_f = parametersCoarse->getAlphaF();
         double *xx = nodesCoarse_[ino]->getCoordinates();
         double *xxp = nodesCoarse_[ino]->getPreviousCoordinates();
-        for (int i = 0; i < dim; i++)
-            x[i] = alphaC_f * xx[i] + (1. - alphaC_f) * xxp[i];
+        
+        
+        for (int i = 0; i < dim; i++) x[i] = alphaC_f * xx[i]+ (1. - alphaC_f) * xxp[i];
 
         dist = 10000000000000000000000000000.;
 
@@ -4082,11 +4088,9 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
                 // Data in the NURBS control points
                 for (int i = 0; i < LNNC; i++)
                 {
-
-                    double *x = nodesCoarse_[connec[i]]->getCoordinates();
                     for (int j = 0; j < DIM; j++)
                     {
-                        coord_[i][j] = x[j];
+                        coord_[i][j] = nodesCoarse_[connec[i]]-> getCoordinateValue(j);
                         vel_[i][j] = nodesCoarse_[connec[i]]->getVelocity(j);
                         realvel_[i][j] = nodesCoarse_[connec[i]]->getVelocityArlequin(j);
                     };
@@ -4096,6 +4100,7 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
                     distance_[i] = nodesCoarse_[connec[i]]->getDistFunction();
                     energyW_[i] = nodesCoarse_[connec[i]]->getWeightFunction();
                 };
+
 
                 // interpolated values (Bézier variables)
                 double Bcoord_[LNNC][DIM] = {};
@@ -4111,12 +4116,10 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
 
                     QuadShapeFunction<DIM> shapeQuad;
                     double phi_[LNNC], wpc[LNNC], xsi[DIM];
-                    for (int k = 0; k < LNNC; k++)
-                        wpc[k] = nodesCoarse_[connec[k]]->getWeightPC();
+                    for (int k = 0; k < LNNC; k++) wpc[k] = nodesCoarse_[connec[k]]->getWeightPC();
                     int *inc_ = nodesCoarse_[connec[LNNC - 1]]->getINC();
                     int patch = elementsCoarse_[iElem]->getPatch();
-                    for (int j = 0; j < DIM; j++)
-                        xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
+                    for (int j = 0; j < DIM; j++) xsi[j] = shapeQuad.ParametricCoordBezier(i, j);
                     shapeQuad.evaluateIso(xsi, phi_, wpc, inc_, IsoParCoarse, patch);
 
                     for (int j = 0; j < LNNC; j++)
@@ -4214,6 +4217,16 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
                 };
                 output_v << "      </DataArray> " << std::endl;
             };
+
+            output_v << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                     << "Name=\"Coordenadas\" format=\"ascii\">" << std::endl;
+            
+            for (int i = 0; i < numBezierNodes; i++)
+            {
+                output_v << Coord[i][0] << " " << Coord[i][1] << " " << 0. << std::endl;
+            }
+
+            output_v << "      </DataArray> " << std::endl;
 
             if (coarseModel.printRealVelocity)
             {
@@ -4354,8 +4367,7 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
             {
                 int *connec = elementsFine_[i]->getConnectivity();
                 int con[LNN];
-                for (int i = 0; i < LNN; i++)
-                    con[i] = connec[i];
+                for (int i = 0; i < LNN; i++) con[i] = connec[i];
                 output_vf << con[0] << " " << con[1] << " " << con[2] << " "
                           << con[3] << " " << con[4] << " " << con[5] << std::endl;
             };
@@ -4465,6 +4477,17 @@ void Arlequin<2>::printResults_FEM_ISO(int step)
                 };
                 output_vf << "      </DataArray> " << std::endl;
             };
+
+
+            output_vf << "      <DataArray type=\"Float64\" NumberOfComponents=\"3\" "
+                     << "Name=\"Coordenadas\" format=\"ascii\">" << std::endl;
+            
+            for (int i = 0; i < numNodesFine; i++)
+            {
+                output_vf << nodesFine_[i]->getCoordinateValue(0) << " " << nodesFine_[i]->getCoordinateValue(1) << " " << 0. << std::endl;
+            }
+
+            output_vf << "      </DataArray> " << std::endl;
 
             if (fineModel.printLagrangeMultipliers)
             {
@@ -11000,6 +11023,7 @@ void Arlequin<DIM>::setFluidModels_FEM_ISO(FluidMesh &coarse, FluidMesh &fine)
 
     // Computes the Nodal correspondence between fine nodes/integration points and coarse elements
     setCorrespondenceFine_FEM_ISO();
+    
     printResultsIP_FEM_ISO(0);
 };
 
@@ -11204,17 +11228,28 @@ void Arlequin<DIM>::setDirichletConstrainElasticity_FEM(std::vector<int> &dofTem
 {
     
     //AirFoil problem
+    for (int ibound = 0; ibound < numBoundElemFine; ibound++)
+    {
+        if (boundaryFine_[ibound]->getConstrain(0) == 2)
+        {
+            int *connec = elementsFine_[boundaryFine_[ibound]->getElement()]->getConnectivity();
+            for (int i = 0; i < 3; i++){ //3 is for 2d only
+                int node = connec[i];
+                for (int j = 0; j < DIM; j++){
+                    dofTemp.push_back(DIM*node + j);
+                    double zero = 0.0;
+                    dofValue.push_back(zero);
+                };
+            };
+        };
+    };
+
     for (int iNode = 0; iNode < numNodesFine; iNode++){
         for (int i = 0; i < DIM; i++){
-            if (nodesFine_[iNode]-> getConstrains(i) == 2){
-                dofTemp.push_back(DIM*iNode + i);
-                double zero = 0.0;
-                dofValue.push_back(zero);
-            };
             if (nodesFine_[iNode]-> getConstrains(i) == 1){
                 dofTemp.push_back(DIM*iNode + i);
                 double x_ = nodesFine_[iNode] -> getCoordinateValue(i);
-                double xup_ =   nodesFine_[iNode] -> getUpdatedCoordinates(i);
+                double xup_ = nodesFine_[iNode] -> getUpdatedCoordinates(i);
                 dofValue.push_back(xup_ - x_);
             };
         };
@@ -11493,11 +11528,11 @@ void Arlequin<DIM>::setDirichletConstrain_FEM_ISO(std::vector<int> &dofTemp, std
             {
                 int newconi = nodesCoarse_[i]->getnewcon();
 
-                dofTemp.push_back(DIM * newconi + j);
+                dofTemp.push_back(DIM*newconi + j);
                 dofValue.push_back(nodesCoarse_[i]->getConstrainValue(j));
             };
         };
-    }
+    };
 
     // Fine mesh (FEM elements)
     for (int i = 0; i < numNodesFine; i++)
@@ -11537,6 +11572,7 @@ void Arlequin<DIM>::setMatVecValuesCoarse_ISO()
             double elemVector[LNNC * (DIM + 1)] = {};
 
             elementsCoarse_[jel]->getTNS_ISO(iTimeStep, elemMatrix, elemVector);
+
 
             for (int i = 0; i < LNNC; i++)
             {
@@ -13845,11 +13881,11 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             //Matrix and vectors - COARSE MESH - IGA mesh
             setMatVecValuesCoarse_ISO();
             // Matrix and vectors - Lagrange multiplieres - COARSE MESH
-            setMatVecValuesLagrangeCoarse_FEM_ISO();
+            // setMatVecValuesLagrangeCoarse_FEM_ISO();
             // Matrix and vectors -FINE MESH  - FEM mesh
-            setMatVecValuesFine_FEM();
+            // setMatVecValuesFine_FEM();
             // Matrix and vectors - Lagrange multiplieres - FINE MESH
-            setMatVecValuesLagrangeFine_FEM_ISO();
+            // setMatVecValuesLagrangeFine_FEM_ISO();
 
             // Assemble matrices and vectors
             ierr = MatAssemblyBegin(A, MAT_FINAL_ASSEMBLY);
@@ -13878,7 +13914,7 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
             CHKERRQ(ierr);
             ierr = KSPSetUp(ksp);
 
-//             // //Solve using Mumps
+            // //Solve using Mumps
 // #if defined(PETSC_HAVE_MUMPS)
 //     ierr = KSPSetType(ksp, KSPPREONLY);
 //     ierr = KSPGetPC(ksp, &pc);
@@ -13914,9 +13950,13 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
 
             for (int i = 0; i < numNodesCoarse; ++i)
             {
+
+                int newconi = nodesCoarse_[i] -> getnewcon();
+                
+                
                 for (int k = 0; k < DIM; k++)
                 {
-                    Ii = DIM * i + k;
+                    Ii = DIM * newconi + k;
                     ierr = VecGetValues(All, Ione, &Ii, &val);
                     CHKERRQ(ierr);
                     u_ = val;
@@ -13924,7 +13964,7 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
                     nodesCoarse_[i]->incrementVelocity(k, u_ * gamma * dTime);
                     normU += val * val;
                 };
-                Ii = DIM * NCNumberNodesC + i;
+                Ii = DIM * NCNumberNodesC + newconi;
                 ierr = VecGetValues(All, Ione, &Ii, &val);
                 CHKERRQ(ierr);
                 p_ = val;
