@@ -29,8 +29,8 @@ void Element<DIM>::setIntegPointWeightFunction_FEM()
     for (double *it = nQuad.beginFem(); it != nQuad.endFem(); it++)
     {
 
-        for (int i = 0; i < DIM; i++)
-            xsi[i] = nQuad.PointListFem(index, i);
+        for (int i = 0; i < DIM; i++) xsi[i] = nQuad.PointListFem(index, i);
+        
         shapeQuad.evaluateFem(xsi, phi_);
 
         for (int i = 0; i < LNN; i++)
@@ -55,8 +55,8 @@ void Element<DIM>::setIntegPointWeightFunction_FEM()
     for (double *it = sQuad.beginFem(); it != sQuad.endFem(); it++)
     {
 
-        for (int i = 0; i < DIM; i++)
-            xsi[i] = sQuad.PointListFem(index, i);
+        for (int i = 0; i < DIM; i++) xsi[i] = sQuad.PointListFem(index, i);
+        
         shapeQuad.evaluateFem(xsi, phi_);
 
         for (int i = 0; i < LNN; i++)
@@ -475,6 +475,8 @@ void Element<DIM>::getJacobianMatrix_ISO(double &djac_, double *xsi, double **qu
 
     djac_ = quadJacMatAux.determinant();
 
+    djac_ = abs(djac_);
+
     for (int i = 0; i < DIM; ++i)
         delete[] dphi[i];
     delete[] dphi;
@@ -523,12 +525,9 @@ void Element<DIM>::getJacobianMatrix_COARSE_ISO(double *xsi, double **ainv_)
     // Computing Jacobian inverse (transposed)
     ainvAux = ainvAux.inverse().transpose();
     for (int i = 0; i < DIM; i++)
-    {
         for (int j = 0; j < DIM; j++)
-        {
             ainv_[i][j] = ainvAux(i, j);
-        };
-    };
+  
 
     for (int i = 0; i < DIM; ++i)
         delete[] dphi[i];
@@ -1626,6 +1625,126 @@ void Element<DIM>::getInvMatrixC(int &dir, double **MatrixCInv)
 //------------------------------------------------------------------------------
 //------------------COMPUTES THE SUPG STABILIZATION PARAMETER-------------------
 //------------------------------------------------------------------------------
+template<int DIM>
+void Element<DIM>::getParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_, double *phi_, double **dphi_dx) {
+
+	double   r[2] = {}; double s[2] = {};
+	
+	double tSUGN1_;
+	double tSUGN2_;
+	double tSUGN3_;
+	double hRGN_;
+	double &dTime_ = parameters->getTimeStep();
+	double &visc_ = parameters->getViscosity();
+	double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+
+
+	tSUPG_ = 0.;
+	tSUGN1_ = 0.;
+	tSUGN2_ = 0.;
+	tSUGN3_ = 0.;
+	hRGN_ = 0.;
+	double hUGN_ = 0.;
+
+	double ua_[2] = {};
+	
+    for (int i = 0; i < 6; i++){
+        double ua[2], uma[2];
+        for (int j = 0; j < 2; j++){
+            ua[j] = alpha_f * (*nodes_)[connect_[i]]->getVelocity(j) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(j);
+            uma[j] = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(j) +
+                     (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(j);
+            ua[j] -= uma[j];
+            ua_[j] += ua[j] * phi_[i];
+        }
+	};
+
+	double uNorm = sqrt(ua_[0] * ua_[0] + ua_[1] * ua_[1]);
+	if(uNorm > 1.e-10){
+		s[0] = ua_[0] / uNorm;
+		s[1] = ua_[1] / uNorm;
+	}else{
+		s[0] = 1. / sqrt(2.);
+		s[1] = 1. / sqrt(2.);
+	};
+
+	for (int i = 0; i < 6; i++){
+
+        double ua, va, uma, vma;
+        
+        ua = alpha_f * (*nodes_)[connect_[i]]->getVelocity(0) +
+                (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(0);
+        va = alpha_f * (*nodes_)[connect_[i]]->getVelocity(1) +
+                (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(1);
+
+        uma = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(0) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(0);
+        vma = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(1) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(1);
+
+        ua -= uma;
+        va -= vma;
+    
+        r[0] += sqrt(ua * ua + va * va) * dphi_dx[0][i];
+        r[1] += sqrt(ua * ua + va * va) * dphi_dx[1][i];
+
+	};
+
+	double rNorm = sqrt(r[0]*r[0] + r[1]*r[1]);
+
+	if (rNorm >= 1.e-10){
+		r[0] /= rNorm;
+		r[1] /= rNorm;
+	}else{
+		r[0] = 1. / sqrt(2.);
+		r[1] = 1. / sqrt(2.);
+	};
+
+	for (int i = 0; i < 6; i++){
+		hRGN_ += fabs(r[0] * dphi_dx[0][i] + r[1] * dphi_dx[1][i]);
+		hUGN_ += fabs(s[0] * dphi_dx[0][i] + s[1] * dphi_dx[1][i]);        
+	};
+
+	if (hRGN_ >= 1.e-10){
+		hRGN_ = 2. / hRGN_;
+	}else{
+		hRGN_ = 2. / 1.e-10;
+	};
+
+	if (hUGN_ >= 1.e-10){
+		hUGN_ = 2. / hUGN_;
+	}else{
+		hUGN_ = 2. / 1.e-10;
+	};    
+
+	if (uNorm >= 1.e-10){
+		tSUGN1_ = hUGN_ / (2. * uNorm);
+	}else{
+		tSUGN1_ = hUGN_ / 2.e-10;
+	};
+			  
+	tSUGN2_ = dTime_ / 2.;
+
+	tSUGN3_ = hRGN_ * hRGN_ / (4. * visc_ / dens_);
+
+   
+	if (fabs(tSUGN1_) <= 1.e-10) tSUGN1_ = 1.e-10;
+	if (fabs(tSUGN3_) <= 1.e-10) tSUGN3_ = 1.e-10;
+
+    //Computing tSUPG parameter
+	tSUPG_ = (1. / sqrt(1. / (tSUGN1_ * tSUGN1_) + 
+					   1. / (tSUGN2_ * tSUGN2_) + 
+					   1. / (tSUGN3_ * tSUGN3_)));
+   
+	tPSPG_ = tSUPG_;
+	tLSIC_ = tSUPG_ * uNorm * uNorm;
+ 
+	return;
+};
+
+
 template <int DIM>
 void Element<DIM>::getNewParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **Jac, double *phi_, double **dphi_dx)
 {
@@ -1704,11 +1823,10 @@ void Element<DIM>::getNewParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, doubl
         rNorm += r[i] * r[i];
     rNorm = sqrt(rNorm);
 
-    double referpar = 0.000000000000000001;
+     double referpar = 0.000000000000000001;
 
-    // physical unitary direction from gradient velocity
-    for (int i = 0; i < DIM; i++)
-        r[i] /= (rNorm + referpar);
+    r[0] /= (rNorm+referpar);
+    r[1] /= (rNorm+referpar);
 
     for (int i = 0; i < DIM; i++)
         for (int j = 0; j < DIM; j++)
@@ -2868,7 +2986,7 @@ void Element<DIM>::getElemMatrixTNS(int &LNN, double &wna_, double &djac_, doubl
 
         for (int j = 0; j < LNN; j++)
         {
-
+ 
             double wSUPGj = 0.;
             for (int k = 0; k < DIM; k++)
                 wSUPGj += (una_[k] - umeshna_[k]) * dphi_dx[k][j];
@@ -2881,7 +2999,7 @@ void Element<DIM>::getElemMatrixTNS(int &LNN, double &wna_, double &djac_, doubl
 
             for (int k = 0; k < DIM; k++)
             {
-
+ 
                 jacobianNRMatrix[DIM * i + k][DIM * j + k] += (M + C) * WJ;
 
                 for (int l = 0; l < DIM; l++)
@@ -4038,7 +4156,7 @@ void Element<DIM>::getMatrixAndVectorsDifferentMeshArlqStab(int &LNN, int &LNNC,
                     press += dphi_dx[l][i] * ddphiC_dx[l][k][j] * tARLQ_ / dens_;
 
                 arlequinStab0[DIM * i + k][DIM * LNNC + j] += press * WJ;
-                arlequinStab0[DIM * i + k][DIM * j + k] += (mass * alpha_m + convec * AGDT) * WJ;
+                arlequinStab0[DIM * i + k][DIM * j + k] += (0.*mass * alpha_m + convec * AGDT) * WJ;
             };
         };
 
@@ -4061,7 +4179,7 @@ void Element<DIM>::getMatrixAndVectorsDifferentMeshArlqStab(int &LNN, int &LNNC,
                     convec += -dphi_dx[l][i] * ((una_[m] - umeshna_[m]) * dduna_dxdx[k][m][l] + (duna_dx[m][l] - dumeshna_dx[m][l]) * duna_dx[k][m]) * tARLQ_;
             };
 
-            arlequinStabVector0[DIM * i + k] += (mass + convec + press) * WJ;
+            arlequinStabVector0[DIM * i + k] += (0.*mass + convec + press) * WJ;
             arlequinStabVectorD[DIM * i + k] += LL * WJ / wna_;
         };
 
@@ -4216,8 +4334,8 @@ void Element<DIM>::getResidualVector(int &LNN, double &wna_, double &djac_, doub
             double kls = dphi_dx[j][i] * aux0 * tLSIC_ * dens_;
 
             double kk = 0.;
-            for (int k = 0; k < DIM; k++)
-                kk += dphi_dx[k][i] * (du_dx[j][k] + du_dx[k][j]) * visc_;
+            for (int k = 0; k < DIM; k++) kk += dphi_dx[k][i] * (duna_dx[j][k] + duna_dx[k][j]) * visc_;
+
 
             double aux1 = 0.;
             for (int k = 0; k < DIM; k++)
@@ -4357,7 +4475,8 @@ void Element<DIM>::getResidualVectorTNS(int &iTime, int &LNN, double &wna_, doub
 
             double kk = 0.;
             for (int k = 0; k < DIM; k++)
-                kk += dphi_dx[k][i] * (du_dx[j][k] + du_dx[k][j]) * visc_;
+                kk += dphi_dx[k][i] * (duna_dx[j][k] + duna_dx[k][j]) * visc_;
+
 
             double aux1 = 0.;
             for (int k = 0; k < DIM; k++)
@@ -4393,7 +4512,7 @@ void Element<DIM>::getResidualVectorTNS(int &iTime, int &LNN, double &wna_, doub
                     aux4 * tPSPG_;
 
         double ffp = aux5 * tPSPG_;
-
+        
         rhsVector[DIM * LNN + i] += (ffp - qq) * WJ;
     };
 
@@ -4401,7 +4520,7 @@ void Element<DIM>::getResidualVectorTNS(int &iTime, int &LNN, double &wna_, doub
     // ff[0] = (1.-2.*pi) * (8.*pi*pi*visc_/dens_-1.) * cos(2*pi*coord_[0]) * sin(2*pi*coord_[1]) * exp(-iTime*dTime);
     // ff[1] = (1.+2.*pi) * (1.-8.*pi*pi*visc_/dens_) * cos(2*pi*coord_[1]) * sin(2*pi*coord_[0]) * exp(-iTime*dTime);
 
-    // //Stokes Problem
+    //Stokes Problem
     // double aux0 = 0.;
     // for (int k = 0; k < DIM; k++) aux0 += duna_dx[k][k];
 
@@ -4551,7 +4670,11 @@ void Element<DIM>::getLagrangeMultipliersSameMesh_FEM(int &ip, double **lagrMult
     for (int i = 0; i < DIM; ++i)
         dphi_dx[i] = new double[LNN];
 
-    int index = ip;
+    //int index = ip;
+
+    int index = 0;
+    for (double *it = nQuad.beginFem(); it != nQuad.endFem(); it++)
+    {
 
     // Defines the integration points adimentional coordinates
     for (int i = 0; i < DIM; i++)
@@ -4572,6 +4695,9 @@ void Element<DIM>::getLagrangeMultipliersSameMesh_FEM(int &ip, double **lagrMult
     // Computes matrixes and vectors
     getMatrixAndVectorsSameMesh(LNN, djac_, weight_, phi_, dphi_dx, lagrMultMatrix,
                                 rhsVector1, rhsVector2);
+
+    index++;
+    }
 
     for (int i = 0; i < DIM; ++i)
         delete[] ainv_[i];
@@ -5277,7 +5403,7 @@ void Element<DIM>::getLagrangeMultipliersSameMeshArlqStab_FEM_FEM(int &index, st
     NormalQuad nQuad = NormalQuad();
     QuadShapFunction shapeQuad;
 
-    // Data for IGA coarse mesh computation
+    // Data for FEM coarse mesh computation
     nodesC_ = &nodesCoarse_;
     connectC_ = connecC;
     double phiC_[LNNC], xsiC[DIM];
@@ -5312,8 +5438,7 @@ void Element<DIM>::getLagrangeMultipliersSameMeshArlqStab_FEM_FEM(int &index, st
         Jac[i] = new double[DIM];
 
     // Defines the integration points adimentional coordinates
-    for (int i = 0; i < DIM; i++)
-        xsi[i] = nQuad.PointListFem(index, i);
+    for (int i = 0; i < DIM; i++) xsi[i] = nQuad.PointListFem(index, i);
 
     // Returns the quadrature integration weight
     weight_ = nQuad.WeightListFem(index);
@@ -5532,8 +5657,7 @@ void Element<DIM>::getLagrangeMultipliersDifferentMesh_FEM_ISO(int &ipatchC, std
     NpatchC_ = ipatchC;
     iparametersC = &iparamC;
     double wpcC[LNNC], phiC_[LNNC], xsiC[DIM];
-    for (int i = 0; i < LNNC; i++)
-        wpcC[i] = (*nodesC_)[connectC_[i]]->getWeightPC();
+    for (int i = 0; i < LNNC; i++) wpcC[i] = (*nodesC_)[connectC_[i]]->getWeightPC();
     int *incC_ = (*nodesC_)[connectC_[LNNC - 1]]->getINC();
 
     double **dphiC_dx;
@@ -5591,8 +5715,7 @@ void Element<DIM>::getLagrangeMultipliersDifferentMesh_FEM_ISO(int &ipatchC, std
 
             // Coarse mesh computatation
             // Defines the equivalent integration point in coarse mesh
-            for (int k = 0; k < DIM; k++)
-                xsiC[k] = intPointCorrespXsi_FEM[index][k];
+            for (int k = 0; k < DIM; k++) xsiC[k] = intPointCorrespXsi_FEM[index][k];
 
             // Computes the velocity shape functions
             shapeQuad.evaluateIso(xsiC, phiC_, wpcC, incC_, (*iparametersC), NpatchC_);
@@ -6971,6 +7094,7 @@ void Element<DIM>::getTNS_FEM(int &iTime, double **jacobianNRMatrix, double *rhs
         Jac[i] = new double[DIM];
 
     int index = 0;
+    ip_ = 0;
     for (double *it = nQuad.beginFem(); it != nQuad.endFem(); it++)
     {
 
@@ -6991,16 +7115,19 @@ void Element<DIM>::getTNS_FEM(int &iTime, double **jacobianNRMatrix, double *rhs
         getSpatialDerivatives_FEM(xsi, ainv_, dphi_dx);
 
         // Compute Stabilization Parameters
-        getNewParameterSUPG_FEM(tSUPG_, tPSPG_, tLSIC_, Jac, phi_, dphi_dx);
+        //getNewParameterSUPG_FEM(tSUPG_, tPSPG_, tLSIC_, Jac, phi_, dphi_dx);
+        getParameterSUPG_FEM(tSUPG_, tPSPG_, tLSIC_, phi_, dphi_dx);
 
         // Computes the element matrix
         double wna_ = alpha_f * intPointWeightFunction_FEM[index] + (1. - alpha_f) * intPointWeightFunctionPrev_FEM[index];
+
         getElemMatrixTNS(LNN, wna_, djac_, weight_, tSUPG_, tPSPG_, tLSIC_, phi_, dphi_dx, jacobianNRMatrix);
 
         // Computes the RHS vector
         getResidualVectorTNS(iTime, LNN, wna_, djac_, weight_, tSUPG_, tPSPG_, tLSIC_, phi_, dphi_dx, rhsVector);
 
         index++;
+        ip_++;
     };
 
     for (int i = 0; i < DIM; ++i){
@@ -7357,7 +7484,7 @@ void Element<DIM>::getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhs
         getNewParameterSUPG_ISO(tSUPG_, tPSPG_, tLSIC_, quadJacMat, phi_, dphi_dx);
 
         // Computes the element matrix
-        double wna_ = 1.;//alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
+        double wna_ = alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];
         getElemMatrixTNS(LNN, wna_, djac_, weight_, tSUPG_, tPSPG_, tLSIC_, phi_, dphi_dx, jacobianNRMatrix);
 
         // Computes the RHS vector
@@ -7392,7 +7519,7 @@ void Element<2>::computeDragAndLiftForces_FEM(int &side, double &pDForce, double
     {
         for (int i = 0; i < 2; i++)
         {
-            nodesb_[0]= connect_[1];
+            nodesb_[0]= connect_[1];        
             nodesb_[1]= connect_[4];
             nodesb_[2]= connect_[2];
         };
@@ -7544,6 +7671,7 @@ void Element<2>::computeDragAndLiftForces_FEM(int &side, double &pDForce, double
         per += jacb_ * weightB;
 
         index++;
+
     };
 
     aux_Per = per;

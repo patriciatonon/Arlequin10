@@ -66,7 +66,7 @@ public:
 	
 private:
     
-    // Meshes data
+    // Meshes data   
     int numElemCoarse;                      // Number of elements in the coarse mesh
     int numElemFine;                        // Number of elements in the fine mesh
     int numBoundElemCoarse;                 // Number of bondary elements in the coarse mesh
@@ -156,7 +156,7 @@ public:
    	void setDirichletConstrainLaplace_FEM_ISO(std::vector<int> &dofTemp);
    
     // Searchs point correspondence in the coarse mesh
-    void searchPointCorrespondence_ISO(double *x,std::vector<Nodes *> nodes,
+    void searchPointCorrespondence_ISO(int elemFine, int ip, double *x,std::vector<Nodes *> nodes,
                                       std::vector<Element *> elements, 
                                       std::vector<IsoParameters* > isopar, int numElem,
                                       double *xsiC, int &elemC, int elSearch);

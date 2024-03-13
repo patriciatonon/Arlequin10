@@ -45,6 +45,7 @@ public:
 
 private:
     
+    int ip_;
     //Element basic information
 	FParameters                *parameters;         // Fluid parameters
     std::vector<IParameters *> *iparameters;        // Isogeometric parameters for each patch
@@ -374,6 +375,7 @@ public:
 
     //......................Stabilization Parameters....................
     // Compute and store the SUPG, PSPG and LSIC stabilization parameters
+    void getParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_,double *phi, double **dphi_dx);
     void getNewParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **Jac , double *phi, double **dphi_dx);
     void getNewParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **quadJacMat, double *phi_, double **dphi_dx);
     void getParameterArlequinMN(int &LNN, int &LNNC, double &wna_, double &djac_, double &weight_, double &tARLQ_, 

@@ -69,17 +69,20 @@ int main(int argc, char **args) {
     //2- FEM mesh (function dataReading) or IGA mesh (function dataReadingIso)
 
     //FEM/ISO
-    //2D - Airfoil - Multiplicar por -1 no set Signaled Distance
-    // coarseModel.dataReading_ISO("../../mesh/degrau/degrau3d2_data.txt","../../mesh/degrau/degrau2d2_iso.msh","mirror_coarse.txt",
+    //2D - Airfoil 
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/aero1/coarse_iso.msh","mirror_coarse.txt",
     //                             "../../mesh/aero1/COARSECPOutput100032.dat",0);
-    coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/aero1/coarse1_iso.msh","mirror_coarse.txt",
-                                "../../mesh/aero1/COARSECPOutput100032.dat",0);
-    fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/aero1/fineRef_fem.msh","mirror_fine.txt",
-                                "../../mesh/aero1/FineNodeOutput100032.dat",0);
-    
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/aerofemfem/fine_fem.msh","mirror_fine.txt", "nada.txt", 0);
 
+    
+    //teste que nao deu certo cd e cl
+    // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/aero1/coarse1_iso.msh","mirror_coarse.txt",
+    //                             "../../mesh/aero1/COARSECPOutput100032.dat",0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/aero1/fineRef_fem.msh","mirror_fine.txt",
+    //                             "../../mesh/aero1/FineNodeOutput100032.dat",0);
+   
     //Cylinder
-    // coarseModel.dataReading_ISO("../../mesh/cylinder/meshcoarse_data.txt","../../mesh/cylinder/coarse_iso_cylinder.msh","mirror_coarse.txt", "nada",0);
+    //coarseModel.dataReading_ISO("../../mesh/cylinder/meshcoarse_data.txt","../../mesh/cylinder/coarse_iso_cylinder.msh","mirror_coarse.txt", "nada",0);
     // fineModel.dataReading_FEM("../../mesh/cylinder/meshfine_data.txt","../../mesh/cylinder/fine_fem_cylinder_jefe_nre.msh","mirror_fine.txt","nada", 0);
 
     //2D - cavity
@@ -90,9 +93,9 @@ int main(int argc, char **args) {
     // coarseModel.dataReading_ISO("../../mesh/meshfine_data.txt","../../mesh/Laplace_iso3d.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/Laplace_fem3d1.msh","mirror_fine.txt",0);
 
-    ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
+    // ArlequinProblem.setFluidModels_FEM_ISO(coarseModel,fineModel);
     // ArlequinProblem.solveArlequinProblemLaplace_FEM_ISO(10, 1.e-6);
-    ArlequinProblem.solveArlequinProblem_FEM_ISO(5, 1.e-6);
+    // ArlequinProblem.solveArlequinProblem_FEM_ISO(3, 1.e-6);
 
     //ISO/ISO
     //2d
@@ -111,6 +114,10 @@ int main(int argc, char **args) {
     //FEM/FEM
     //2D
 
+    // AIRFOIL
+    coarseModel.dataReading_FEM("../../mesh/aerofemfem/meshfine_data.txt","../../mesh/aerofemfem/coarse_fem.msh","mirror_coarse.txt", "nada.txt",0);
+    fineModel.dataReading_FEM("../../mesh/aerofemfem/meshfine_data.txt","../../mesh/aerofemfem/fine_fem.msh","mirror_fine.txt", "nada.txt", 0);
+
     // coarseModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/cylinder/coarse_fem_cylinder_jefe.msh","mirror_coarse.txt",0);
     // fineModel.dataReading_FEM("../../mesh/meshfinecyl_data.txt","../../mesh/cylinder/fine_fem_cylinder_jefe.msh","mirror_fine.txt",0);
 
@@ -119,8 +126,8 @@ int main(int argc, char **args) {
     // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineT_fem.msh","mirror_fine.txt",0);
 
     //cavidade faixa embaixo
-    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJ_fem.msh","mirror_fine.txt",0);
-    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt",0);
+    // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJ_fem.msh","mirror_fine.txt", ".", 0);
+    // fineModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/fineJ_fem.msh","mirror_fine.txt", ".", 0);
     
     // Stokes problem with analytic resolution
     // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/coarseJT_fem.msh","mirror_fine.txt",0);
@@ -136,9 +143,9 @@ int main(int argc, char **args) {
     // coarseModel.dataReading_FEM("../../mesh/meshfine_data.txt","../../mesh/LaplaceCoarseT_fem3d1.msh","mirror_coarse.txt",0);
 
     
-    // ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
+    ArlequinProblem.setFluidModels_FEM_FEM(coarseModel,fineModel);
     // ArlequinProblem.solveArlequinProblemLaplace_FEM_FEM(10, 1.e-6);
-    // ArlequinProblem.solveArlequinProblem_FEM_FEM(10, 1.e-6);
+    ArlequinProblem.solveArlequinProblem_FEM_FEM(3, 1.e-6);
 
 
     //Finalize main program   

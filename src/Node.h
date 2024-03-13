@@ -113,6 +113,8 @@ public:
     };
 
     //............................Coordinates functions............................
+    void setCoordinates(double *u) {for (int i = 0; i <DIM; i++) coord_[i] = u[i];};
+
     // Returns the node initial coordinate vector
     double*  getInitialCoordinates() {return initialCoord_;};
     double   getInitialCoordinateValue(int dir) {return initialCoord_[dir];};

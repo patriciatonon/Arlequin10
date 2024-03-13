@@ -946,8 +946,11 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
     int boundElem[numFemBoundElem]; 
     for (int i = 0; i< numFemBoundElem; i++){
             if ((boundary_[i] -> getConstrain(0) > 0) ||
-            (boundary_[i] -> getConstrain(1) > 0)) {
+                (boundary_[i] -> getConstrain(1) > 0)) {
+            
             int *connectB= boundary_[i] -> getBoundaryConnectivity();
+
+
             for (int j = 0; j < numFemElem; j++){               
                 int *connect = elements_[j] -> getConnectivity();              
                 int flag = 0;
@@ -956,14 +959,16 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
                     if ((connectB[0] == connect[k]) || 
                         (connectB[1] == connect[k]) ||
                         (connectB[2] == connect[k])){
+
                         side[flag] = k;
                         flag++;
                     };
                 };
                 if (flag == 3){
+
                     boundary_[i] -> setElement(elements_[j] -> getIndex());
                     //Sets element index and side
-                    if ((side[0]==4) || (side[1]==4) || (side[2]==4)){
+                    if ((side[0]==4) || (side[1]==4) || (side[2]==4)){                       
                         boundary_[i] -> setElementSide(0);
                         boundElem[i] = j;
                     };
@@ -987,11 +992,15 @@ void FluidData<2>::dataReading_FEM(const std::string& inputFile,const std::strin
         for (int j =0; j<numFemBoundElem; j++){
             if (boundElem[j] == i){
                 int side = boundary_[j] -> getElementSide();
+
                 elemSide.push_back(side);
                 elemBound.push_back(j);
             };
         };
         elements_[i] -> setElemSideInBoundary(elemSide,elemBound);
+
+        elemSide.clear();
+        elemBound.clear();
     };
 
 
@@ -1581,15 +1590,21 @@ void FluidData<3>::dataReading_FEM(const std::string& inputFile,const std::strin
     std::vector<int> elemSide;
     std::vector<int> elemBound;
 
+    elemSide.clear();
+    elemBound.clear();
+
     for (int i = 0; i < numFemElem; i++){
         for (int j = 0; j < numFemBoundElem; j++){
             if (boundElem[j] == i){
                 int side = boundary_[j] -> getElementSide();
+
                 elemSide.push_back(side);
                 elemBound.push_back(j);
             };
         };
         elements_[i] -> setElemSideInBoundary(elemSide,elemBound);
+        elemSide.clear();
+        elemBound.clear();
     };
 
 
@@ -2237,6 +2252,7 @@ void FluidData<2>::dataReading_ISO(const std::string& inputFile,const std::strin
         for (int j =0; j<numBoundElemIso; j++){ 
             if (boundElem[j] == i){
                 int side = boundary_[j] -> getElementSide();
+
                 elemSide.push_back(side);
                 elemBound.push_back(j);
             };
@@ -3086,6 +3102,7 @@ void FluidData<3>::dataReading_ISO(const std::string& inputFile,const std::strin
         for (int j =0; j<numBoundElemIso; j++){ 
             if (boundElem[j] == i){
                 int side = boundary_[j] -> getElementSide();
+
                 elemSide.push_back(side);
                 elemBound.push_back(j);
             };
