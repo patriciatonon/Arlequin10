@@ -3922,7 +3922,7 @@ void Arlequin<DIM>::setWeightFunction_FEM_ISO()
     double glueZoneThickness = fineModel.glueZoneThickness;
     double arlequinEpsilon = fineModel.arlequinEpsilon;
 
-    glueZoneThickness *= 1.00; // Thickness from gluing zone
+    glueZoneThickness *= 1.01; // Thickness from gluing zone
 
     // IGA coarse mesh
     for (int iNode = 0; iNode < numNodesCoarse; iNode++)
@@ -12597,13 +12597,13 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_FEM()
             int *connec = elementsFine_[jel]->getConnectivity();
             int *connecL = glueZoneFine_[l]->getConnectivity();
 
-            // int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
+            int numberIntPoints = elementsFine_[jel]->getNumberOfIntegrationPointsSpecial_FEM();
 
-            // for (int ip = 0; ip < numberIntPoints; ip++)
-            // {
+            for (int ip = 0; ip < numberIntPoints; ip++)
+            {
                 
-            //     int iElemCoarse = elementsFine_[jel]->getIntegPointCorrespondenceElement_FEM(ip);
-            //     int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
+                int iElemCoarse = elementsFine_[jel]->getIntegPointCorrespondenceElement_FEM(ip);
+                int *connecC = elementsCoarse_[iElemCoarse]->getConnectivity();
 
                 // LAGRANGE MULTIPLIERS MATRIXES AND VECTORS
                 double **elemMatrixLag1;
@@ -12627,42 +12627,12 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_FEM()
                 double elemStabVectorD[DIM * LNN] = {};
                 double elemStabVector1[DIM * LNN] = {};
 
-                int ip = 0;
+
                 elementsFine_[jel]->getLagrangeMultipliersSameMesh_FEM(ip, elemMatrixLag1, elemVectorLag1_1, elemVectorLag1_2);
                 // elementsFine_[jel]->getLagrangeMultipliersSameMeshArlqStab_FEM_FEM(ip, nodesCoarse_, connecC, 
                 //                                                                    elemStabMatrixD,elemStabVectorD,
                 //                                                                    elemStabMatrix1, elemStabVector1);
-
-                // if (jel == 5064) {
-
-                //     std::cout << "jel 5064" << std::endl;
-                        
-                //         for (int i = 0; i < 2*LNN; i++)
-                //         {
-                //             for (int j = 0; j < 2*LNN; j++)
-                //             {
-                //                 std::cout << elemMatrixLag1[i][j] << " ";
-                //             }
-                //             std::cout << std::endl;
-                //         }
-
-                // }
-                
-                //   if (jel == 5116) {
-
-                //     std::cout << "jel 5116" << std::endl;
-                        
-                //         for (int i = 0; i < 2*LNN; i++)
-                //         {
-                //             for (int j = 0; j < 2*LNN; j++)
-                //             {
-                //                 std::cout << elemMatrixLag1[i][j] << " ";
-                //             }
-                //             std::cout << std::endl;
-                //         }
-
-                // }
-                
+               
                 for (int i = 0; i < LNN; i++)
                 {
                     for (int j = 0; j < LNN; j++)
@@ -12731,7 +12701,7 @@ void Arlequin<DIM>::setMatVecValuesLagrangeFine_FEM_FEM()
                 };
                 delete[] elemMatrixLag1;
 
-            // };//integration points
+            };//integration points
 
         }; // decomposition
 
@@ -14005,7 +13975,7 @@ int Arlequin<DIM>::solveArlequinProblem_FEM_ISO(int iterNumber, double tolerance
                       << std::endl;
         }
 
-        if (iTimeStep == 500)
+        if (iTimeStep == 10)
         {
             parametersCoarse->setSpectralRadius(integScheme);
             parametersFine->setSpectralRadius(integScheme);

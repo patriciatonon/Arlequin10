@@ -1745,6 +1745,127 @@ void Element<DIM>::getParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &
 };
 
 
+
+template<int DIM>
+void Element<DIM>::getParameterSUPG_ISO(double &tSUPG_, double &tPSPG_, double &tLSIC_, double *phi_, double **dphi_dx) {
+
+	double   r[2] = {}; double s[2] = {};
+	
+	double tSUGN1_;
+	double tSUGN2_;
+	double tSUGN3_;
+	double hRGN_;
+	double &dTime_ = parameters->getTimeStep();
+	double &visc_ = parameters->getViscosity();
+	double &dens_ = parameters->getDensity();
+    double &alpha_f = parameters->getAlphaF();
+
+
+	tSUPG_ = 0.;
+	tSUGN1_ = 0.;
+	tSUGN2_ = 0.;
+	tSUGN3_ = 0.;
+	hRGN_ = 0.;
+	double hUGN_ = 0.;
+
+	double ua_[2] = {};
+	
+    for (int i = 0; i < 9; i++){
+        double ua[2], uma[2];
+        for (int j = 0; j < 2; j++){
+            ua[j] = alpha_f * (*nodes_)[connect_[i]]->getVelocity(j) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(j);
+            uma[j] = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(j) +
+                     (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(j);
+            ua[j] -= uma[j];
+            ua_[j] += ua[j] * phi_[i];
+        }
+	};
+
+	double uNorm = sqrt(ua_[0] * ua_[0] + ua_[1] * ua_[1]);
+	if(uNorm > 1.e-10){
+		s[0] = ua_[0] / uNorm;
+		s[1] = ua_[1] / uNorm;
+	}else{
+		s[0] = 1. / sqrt(2.);
+		s[1] = 1. / sqrt(2.);
+	};
+
+	for (int i = 0; i < 9; i++){
+
+        double ua, va, uma, vma;
+        
+        ua = alpha_f * (*nodes_)[connect_[i]]->getVelocity(0) +
+                (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(0);
+        va = alpha_f * (*nodes_)[connect_[i]]->getVelocity(1) +
+                (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousVelocity(1);
+
+        uma = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(0) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(0);
+        vma = alpha_f * (*nodes_)[connect_[i]]->getMeshVelocity(1) +
+                    (1. - alpha_f) * (*nodes_)[connect_[i]]->getPreviousMeshVelocity(1);
+
+        ua -= uma;
+        va -= vma;
+    
+        r[0] += sqrt(ua * ua + va * va) * dphi_dx[0][i];
+        r[1] += sqrt(ua * ua + va * va) * dphi_dx[1][i];
+
+	};
+
+	double rNorm = sqrt(r[0]*r[0] + r[1]*r[1]);
+
+	if (rNorm >= 1.e-10){
+		r[0] /= rNorm;
+		r[1] /= rNorm;
+	}else{
+		r[0] = 1. / sqrt(2.);
+		r[1] = 1. / sqrt(2.);
+	};
+
+	for (int i = 0; i < 9; i++){
+		hRGN_ += fabs(r[0] * dphi_dx[0][i] + r[1] * dphi_dx[1][i]);
+		hUGN_ += fabs(s[0] * dphi_dx[0][i] + s[1] * dphi_dx[1][i]);        
+	};
+
+	if (hRGN_ >= 1.e-10){
+		hRGN_ = 2. / hRGN_;
+	}else{
+		hRGN_ = 2. / 1.e-10;
+	};
+
+	if (hUGN_ >= 1.e-10){
+		hUGN_ = 2. / hUGN_;
+	}else{
+		hUGN_ = 2. / 1.e-10;
+	};    
+
+	if (uNorm >= 1.e-10){
+		tSUGN1_ = hUGN_ / (2. * uNorm);
+	}else{
+		tSUGN1_ = hUGN_ / 2.e-10;
+	};
+			  
+	tSUGN2_ = dTime_ / 2.;
+
+	tSUGN3_ = hRGN_ * hRGN_ / (4. * visc_ / dens_);
+
+   
+	if (fabs(tSUGN1_) <= 1.e-10) tSUGN1_ = 1.e-10;
+	if (fabs(tSUGN3_) <= 1.e-10) tSUGN3_ = 1.e-10;
+
+    //Computing tSUPG parameter
+	tSUPG_ = (1. / sqrt(1. / (tSUGN1_ * tSUGN1_) + 
+					   1. / (tSUGN2_ * tSUGN2_) + 
+					   1. / (tSUGN3_ * tSUGN3_)));
+   
+	tPSPG_ = tSUPG_;
+	tLSIC_ = tSUPG_ * uNorm * uNorm;
+ 
+	return;
+};
+
+
 template <int DIM>
 void Element<DIM>::getNewParameterSUPG_FEM(double &tSUPG_, double &tPSPG_, double &tLSIC_, double **Jac, double *phi_, double **dphi_dx)
 {
@@ -4670,11 +4791,7 @@ void Element<DIM>::getLagrangeMultipliersSameMesh_FEM(int &ip, double **lagrMult
     for (int i = 0; i < DIM; ++i)
         dphi_dx[i] = new double[LNN];
 
-    //int index = ip;
-
-    int index = 0;
-    for (double *it = nQuad.beginFem(); it != nQuad.endFem(); it++)
-    {
+    int index = ip;
 
     // Defines the integration points adimentional coordinates
     for (int i = 0; i < DIM; i++)
@@ -4695,9 +4812,6 @@ void Element<DIM>::getLagrangeMultipliersSameMesh_FEM(int &ip, double **lagrMult
     // Computes matrixes and vectors
     getMatrixAndVectorsSameMesh(LNN, djac_, weight_, phi_, dphi_dx, lagrMultMatrix,
                                 rhsVector1, rhsVector2);
-
-    index++;
-    }
 
     for (int i = 0; i < DIM; ++i)
         delete[] ainv_[i];
@@ -7481,7 +7595,8 @@ void Element<DIM>::getTNS_ISO(int &iTime, double **jacobianNRMatrix, double *rhs
         getSpatialDerivatives_ISO(xsi, ainv_, dphi_dx);
 
         // Compute Stabilization Parameters
-        getNewParameterSUPG_ISO(tSUPG_, tPSPG_, tLSIC_, quadJacMat, phi_, dphi_dx);
+        //getNewParameterSUPG_ISO(tSUPG_, tPSPG_, tLSIC_, quadJacMat, phi_, dphi_dx);
+        getParameterSUPG_ISO(tSUPG_, tPSPG_, tLSIC_, phi_,dphi_dx);
 
         // Computes the element matrix
         double wna_ = alpha_f * intPointWeightFunction_ISO[index] + (1. - alpha_f) * intPointWeightFunctionPrev_ISO[index];

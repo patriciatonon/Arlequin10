@@ -1,5 +1,5 @@
 Number of Time Steps   = 10000
-Printing Frequence     = 50
+Printing Frequence     = 1
 Thickness of glue zone   = 0.2
 Epsilon from Arlequin formulation   = 0.01
 Arlequin k1   = 10
